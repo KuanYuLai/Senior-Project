@@ -1,0 +1,6 @@
+name: "BA-rule"
+description: "Determines whether or not to apply the bonding agent."
+priority: 1
+condition: "!job.checkValidPaperType()"
+actions:
+  - "job.setBA(false);"

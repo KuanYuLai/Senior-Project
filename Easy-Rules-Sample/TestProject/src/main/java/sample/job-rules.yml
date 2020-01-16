@@ -1,0 +1,42 @@
+---
+name: "large-job-rule"
+description: "Sets the job size to Large."
+priority: 1
+condition: "job.getPageCount() >= 200"
+actions:
+  - "job.setJobSize('Large');"
+---
+name: "medium-job-rule"
+description: "Sets the job size to Medium."
+priority: 1
+condition: "job.getPageCount() < 200"
+actions:
+  - "job.setJobSize('Medium');"
+---
+name: "small-job-rule"
+description: "Sets the job size to Small."
+priority: 1
+condition: "job.getPageCount() < 100"
+actions:
+  - "job.setJobSize('Small');"
+---
+name: "high-coverage-rule"
+description: "Sets the coverage size to \"High\"."
+priority: 2
+condition: "job.getMaxCoverage() >= 70.0"
+actions:
+  - "job.setCoverageAmt('High');"
+---
+name: "medium-coverage-rule"
+description: "Sets the coverage size to \"Medium\"."
+priority: 2
+condition: "job.getMaxCoverage() >= 30.0 && job.getMaxCoverage() < 70.0"
+actions:
+  - "job.setCoverageAmt('Medium');"
+---
+name: "low-coverage-rule"
+description: "Sets the coverage size to \"Low\"."
+priority: 2
+condition: "job.getMaxCoverage() < 30.0"
+actions:
+  - "job.setCoverageAmt('Low');"

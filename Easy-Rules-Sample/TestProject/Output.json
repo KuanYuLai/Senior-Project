@@ -1,0 +1,10 @@
+{
+	"customer": "HP",
+	"paperType": "PaperThatNeedsBA",
+	"pageCount": 100,
+	"maxCoverage": 75.8,
+	"BA": true,
+	"primer": false,
+	"jobSize": "Medium",
+	"coverageSize": "High"
+}

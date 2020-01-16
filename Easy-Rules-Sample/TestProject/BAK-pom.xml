@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.jeasy</groupId>
+    <artifactId>easy-rules</artifactId>
+    <version>3.4.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.jeasy</groupId>
+  <artifactId>TestProject</artifactId>
+  <version>1.0.0</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.jeasy</groupId>
+      <artifactId>easy-rules-core</artifactId>
+      <version>3.3.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.7.25</version>
+    </dependency>
+  </dependencies>
+
+  <profiles>
+    <profile>
+      <id>runSample</id>
+      <build>
+        <defaultGoal>exec:java</defaultGoal>
+        <plugins>
+          <plugin>
+            <groupId>org.jeasy</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>${maven-exec-plugin.version}</version>
+            <configuration>
+              <mainClass>sample.Launcher</mainClass>
+              <systemProperties>
+                <systemProperty>
+                  <key>java.util.logging.SimpleFormatter.format</key>
+                  <value>[%1$tc] %4$s: %5$s%n</value>
+                </systemProperty>
+              </systemProperties>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

@@ -1,0 +1,6 @@
+name: "primer-rule"
+description: "Determine whether or not to apply primer."
+priority: 2
+condition: "true"
+actions:
+  - "job.setPrimer(true);"
