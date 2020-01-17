@@ -1,31 +1,25 @@
-﻿/*
-.mainContent {
+﻿.mainContent {
 	width: calc(100vw - 40px);
-	height: calc(100vh - 90px);
-	border: 1px solid black;
+	height: calc(100vh - 110px);
 	position: relative;
 	left: 20px;
 	right: 20px;
 	bottom: 20px;
 	top: 20px;
-	display: table-cell;
-	vertical-align: middle;
-	text-align: center;
-}
-*/
-
-.mainContent {
-	width: calc(100vw - 40px);
-	height: calc(100vh - 90px);
-	border: 1px solid black;
-	position: relative;
-	left: 20px;
-	right: 20px;
-	bottom: 20px;
-	top: 20px;
+	background-color: white;
+	padding: 20px;
 }
 
 .navIcon {
 	position: relative;
 	bottom: 3px;
+}
+
+.appFooter {
+	padding-top: 10px;
+	padding-bottom: 10px;
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	text-align: center;
 }
