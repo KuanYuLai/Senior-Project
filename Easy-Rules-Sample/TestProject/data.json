@@ -1,0 +1,30 @@
+{
+    "JobID": "001",
+    "customer": "Sample",
+    "jobSize": "Medium",
+    "BA": true,
+    "maxCoverage": 75.8,
+    "pageCount": 100, "coverageSize": "High",
+    "paperType": "PaperThatNeedsBA",
+    "primer": false
+},
+{
+    "JobID": "001",
+    "customer": "Sample",
+    "jobSize": "Medium",
+    "BA": true,
+    "maxCoverage": 75.8,
+    "pageCount": 100, "coverageSize": "High",
+    "paperType": "PaperThatNeedsBA",
+    "primer": false
+},
+{
+    "JobID": "001",
+    "customer": "Sample",
+    "jobSize": "Medium",
+    "BA": true,
+    "maxCoverage": 75.8,
+    "pageCount": 100, "coverageSize": "High",
+    "paperType": "PaperThatNeedsBA",
+    "primer": false
+}

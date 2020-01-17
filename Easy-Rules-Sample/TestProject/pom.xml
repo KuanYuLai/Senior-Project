@@ -154,10 +154,10 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>${maven-exec-plugin.version}</version>
                         <configuration>
-                            <mainClass>sample.Launcher</mainClass>
-			    <arguments>
+                            <mainClass>sample.Server</mainClass>
+			    <!--arguments>
 				<argument>test.json</argument>
-			    </arguments>
+            </arguments-->
                             <systemProperties>
                                 <systemProperty>
                                     <key>java.util.logging.SimpleFormatter.format</key>
