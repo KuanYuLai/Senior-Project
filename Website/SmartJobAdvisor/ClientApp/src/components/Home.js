@@ -10,7 +10,7 @@ export class Home extends Component {
 
 		return (
 			<div className={Style.homePage}>
-				<Icon component={() => (<img src={require('../Images/HP_Logo.svg')} height="250px" />)} />
+				<Icon component={() => (<img src={require('../Images/SJA-logo.svg')} height="250px" />)} />
 				<br />
 				<h3>What would you like to do?</h3>
 

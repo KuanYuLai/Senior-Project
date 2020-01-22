@@ -62,7 +62,7 @@ export default class App extends Component {
 				<Layout>
 					<Menu onClick={(e) => {this.handleMenuClick(e.key)}} selectedKeys={[this.state.currentPage]} mode="horizontal">
 						<Menu.Item key="navImage">
-							<img className={Style.navIcon} src={require('./Images/HP_Logo.svg')} height="30px" />
+							<img className={Style.navIcon} src={require('./Images/SJA-logo.svg')} height="30px" />
 							<Link to="/" />
 						</Menu.Item>
 

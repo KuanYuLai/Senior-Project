@@ -1,0 +1,9 @@
+﻿.newJobFormContainer {
+	border: 1px solid black;
+	width: 500px;
+}
+
+.formItemPaper {
+	position: relative;
+	bottom: 4px;
+}
