@@ -1,6 +1,7 @@
 ﻿.newJobFormContainer {
 	border: 1px solid black;
-	width: 500px;
+	max-width: 808px;
+	min-width: 500px;
 }
 
 .formItemPaper {
