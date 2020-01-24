@@ -8,7 +8,7 @@
   { "manufacturer":"Arsn","productname":"Co JP","weightclass":"light","papertype":"Uncoated Pro","papersubtype":"Text","finish":"Matte","useprimer":"false","usefixer":"false" },
   { "manufacturer":"Arsn","productname":"Co JP","weightclass":"medium","papertype":"Uncoated Pro","papersubtype":"Text","finish":"Matte","useprimer":"false","usefixer":"false" },
   { "manufacturer":"Arsn","productname":"Cy JP","weightclass":"light","papertype":"Uncoated Treated","papersubtype":"Text","finish":"Matte","useprimer":"false","usefixer":"false" },
-  { "manufacturer":"Bore","productname":"Bo Ps","weightclass":"light","papertype":"Uncoated ","papersubtype":"Bond","finish":"Smooth","useprimer":"false","usefixer":"true" },
+  { "manufacturer":"Bore","productname":"Bo Ps","weightclass":"light","papertype":"Uncoated","papersubtype":"Bond","finish":"Smooth","useprimer":"false","usefixer":"true" },
   { "manufacturer":"Crre","productname":"Cr Brite Silk","weightclass":"heavy","papertype":"Uncoated Pro","papersubtype":"Text","finish":"Silk","useprimer":"false","usefixer":"false" },
   { "manufacturer":"Crre","productname":"Cr Brite Silk","weightclass":"light","papertype":"Uncoated Pro","papersubtype":"Text","finish":"Silk","useprimer":"false","usefixer":"false" },
   { "manufacturer":"Crre","productname":"Cr Brite Silk","weightclass":"medium","papertype":"Uncoated Pro","papersubtype":"Text","finish":"Silk","useprimer":"false","usefixer":"false" },

@@ -21,37 +21,51 @@ class NewJobForm extends React.Component {
 		this.state = {
 			paperDatabase: paperDatabase.paperdb,
 			coverageVal: 50,
-			paperNameDropdown: this.getDropdown(paperDatabase.paperdb, "productname"),
+			nameDisabled: true,
+			paperMfrDropdown: this.getMfrDropdown(paperDatabase.paperdb, "manufacturer"),
+			paperNameDropdown: null,
 			paperWeightRadio: this.getRadio(paperDatabase.paperdb, "weightclass"),
 			paperTypeRadio: this.getRadio(paperDatabase.paperdb, "papertype"),
 			paperSubTypeRadio: this.getRadio(paperDatabase.paperdb, "papersubtype"),
 			paperFinishRadio: this.getRadio(paperDatabase.paperdb, "finish"),
 		};
 
-		this.getRadio(paperDatabase.paperdb, 'manufacturer');
+		//this.getRadio(paperDatabase.paperdb, 'manufacturer');
 	};
 
-	getRadio = (data, key) => {
+	getRadio = (data, key, filter = null) => {
 		// Create the select component
 		var radio = [];
 
 		var tempArray = data.map(function (e) { return e[key]; }).filter((v, i, a) => a.indexOf(v) === i);
 
 		for (let i = 0; i < tempArray.length; i++) {
-			var text = tempArray[i].toProperCase();
-			radio.push(<Radio.Button key={i} value={text}>{text}</Radio.Button>);
+			var text = tempArray[i];
+			var disabled = true;
+
+			if (filter !== null)
+				if (filter.indexOf(text) > -1)
+					disabled = false;
+
+			radio.push(<Radio.Button disabled={disabled} key={i} value={text}>{text}</Radio.Button>);
 		}
 
 		return radio;
 	}
 
-	getDropdown = (data, key) => {
+	getMfrDropdown = (data, key) => {
 		// Create the select component
 		var dropdown = [];
+		var mfrNames = [];
 
 		for (let i = 0; i < data.length; i++) {
-			var text = data[i][key].toProperCase();
-			dropdown.push(<Option key={text}>{text}</Option>);
+			mfrNames.push(data[i][key]);
+		}
+
+		mfrNames = mfrNames.filter((v, i, a) => a.indexOf(v) === i);
+
+		for (let j = 0; j < mfrNames.length; j++) {
+			dropdown.push(<Option key={mfrNames[j]}>{mfrNames[j]}</Option>);
 		}
 
 		return dropdown;
@@ -80,29 +94,99 @@ class NewJobForm extends React.Component {
 		*/
 	};
 
-
-
 	/* Called when the coverage value is changed. */
 	onCoverageValChange = val => {
+		const { setFieldsValue } = this.props.form;
+
+		setFieldsValue({
+			maxCoverage: val,
+		});
+
 		this.setState({
 			coverageVal: val,
 		});
 	};
 
+	onPaperMfrChange = val => {
+		const { paperDatabase } = this.state;
+		const { setFieldsValue, getFieldsValue } = this.props.form;
+
+		var dropdown = [];
+		var paperNames = [];
+
+		/* Grab all instances that contain the manufacturer selected in the Mfr dropdown. */
+		var selectedMfr = this.state.paperDatabase.filter((e) => e.manufacturer === val);
+
+		/* Grab all of the productnames within the list of objects. */
+		for (let i = 0; i < selectedMfr.length; i++) {
+			paperNames.push(selectedMfr[i].productname);
+		}
+
+		/* Filter the list of productnames to remove duplicates. */
+		paperNames = paperNames.filter((v, i, a) => a.indexOf(v) === i);
+
+		/* Create the paper name dropdown list using the filtered list of productnames. */
+		for (let j = 0; j < paperNames.length; j++) {
+			dropdown.push(<Option key={paperNames[j]}>{paperNames[j]}</Option>);
+		}
+
+		/* Clear the field value for paper name in case mfr is changed. */
+		setFieldsValue({
+			productname: null,
+			weightclass: null,
+			papertype: null,
+			papersubtype: null,
+			finish: null,
+		});
+
+		this.setState({
+			paperNameDropdown: dropdown,
+			nameDisabled: false,
+			paperTypeRadio: this.getRadio(paperDatabase, "papertype"),
+			paperSubTypeRadio: this.getRadio(paperDatabase, "papersubtype"),
+			paperWeightRadio: this.getRadio(paperDatabase, "weightclass"),
+			paperFinishRadio: this.getRadio(paperDatabase, "finish"),
+		});
+	}
+
 	onPaperNameChange = val => {
+		const { paperDatabase } = this.state;
 		const { setFieldsValue } = this.props.form;
 
-		var selectedPaper = this.state.paperDatabase.filter((e) => e.productname === val)[0];
+		var selectedPaper = this.state.paperDatabase.filter((e) => e.productname === val);
+
+		var paperTypes = [];
+		var paperSubTypes = [];
+		var paperWeights = [];
+		var paperFinishes = [];
+
+		/* Grab all of the types/subtypes/weights/finishes within the list of objects. */
+		for (let i = 0; i < selectedPaper.length; i++) {
+			paperTypes.push(selectedPaper[i].papertype);
+			paperSubTypes.push(selectedPaper[i].papersubtype);
+			paperWeights.push(selectedPaper[i].weightclass);
+			paperFinishes.push(selectedPaper[i].finish);
+		}
+
+		/* Filter the lists of types/subtypes/weights/finishes to remove duplicates. */
+		paperTypes = paperTypes.filter((v, i, a) => a.indexOf(v) === i);
+		paperSubTypes = paperSubTypes.filter((v, i, a) => a.indexOf(v) === i);
+		paperWeights = paperWeights.filter((v, i, a) => a.indexOf(v) === i);
+		paperFinishes = paperFinishes.filter((v, i, a) => a.indexOf(v) === i);
+
+		/* Rebuild the radios for types/subtypes/weights/finishes to disable options that are not present in data for the given productname. */
+		this.setState({
+			paperTypeRadio: this.getRadio(paperDatabase, "papertype", paperTypes),
+			paperSubTypeRadio: this.getRadio(paperDatabase, "papersubtype", paperSubTypes),
+			paperWeightRadio: this.getRadio(paperDatabase, "weightclass", paperWeights),
+			paperFinishRadio: this.getRadio(paperDatabase, "finish", paperFinishes),
+		})
 
 		setFieldsValue({
-			productname: selectedPaper.productname.toProperCase(),
-			manufacturer: selectedPaper.manufacturer.toProperCase(),
-			weightclass: selectedPaper.weightclass.toProperCase(),
-			papertype: selectedPaper.papertype.toProperCase(),
-			papersubtype: selectedPaper.papersubtype.toProperCase(),
-			finish: selectedPaper.finish.toProperCase(),
-			useprimer: selectedPaper.useprimer.toProperCase(),
-			usefixer: selectedPaper.usefixer.toProperCase(),
+			weightclass: null,
+			papertype: null,
+			papersubtype: null,
+			finish: null,
 		});
 	};
 
@@ -124,20 +208,21 @@ class NewJobForm extends React.Component {
 	};
 
 	render() {
-		const { coverageVal, paperManufacturer } = this.state;
-		const { getFieldDecorator, getFieldsValue } = this.props.form;
+		const { coverageVal, nameDisabled, paperDisabled } = this.state;
+		const { getFieldDecorator } = this.props.form;
 
 		const paperFormItemLayout = {
-			labelCol: { span: 2 },
-			wrapperCol: { span: 22 },
+			labelCol: { span: 3 },
+			wrapperCol: { span: 21 },
 		}
-
+		const paperFormItemLayoutMfr = {
+			labelCol: { span: 8 },
+			wrapperCol: { span: 16 },
+		}
 		const paperFormItemLayoutName = {
 			labelCol: { span: 3 },
 			wrapperCol: { span: 21 },
 		}
-
-		console.log(this.state.paperDatabase);
 
 		return (
 			<div className={Style.newJobFormContainer}>
@@ -151,7 +236,7 @@ class NewJobForm extends React.Component {
 
 				<Form layout="vertical" onSubmit={this.handleSubmit} className={Style.newJobForm}>
 					<h5>General Info</h5>
-					<Row gutter={12}>
+					<Row gutter={20}>
 						<Col span={8}>
 							<Form.Item label="Job Name" style={{ marginBottom: 10 }}>
 								{getFieldDecorator('jobName', {
@@ -182,6 +267,7 @@ class NewJobForm extends React.Component {
 					<Form.Item label="PDF Max Coverage Percentage">
 						{getFieldDecorator('maxCoverage', {
 							rules: [{ required: true, message: 'Please input max coverage' }],
+							initialValue: 50,
 						})(
 							<Row>
 								<Col span={12}>
@@ -209,20 +295,31 @@ class NewJobForm extends React.Component {
 
 					<h5>Paper Type</h5>
 					<div style={{ marginLeft: 30 }}>
-						<Row gutter={12}>
-							<Col span={16}>
-								<Form.Item label="Name:" {...paperFormItemLayoutName} style={{ marginBottom: 0 }}>
-									{getFieldDecorator('productname')(
-										<Select className={Style.formItemPaper} onChange={this.onPaperNameChange} placeholder="Select a paper or fill out data manually">
-											{this.state.paperNameDropdown}
+						<Row gutter={0}>
+							<Col span={9}>
+								<Form.Item label="Mfr:" {...paperFormItemLayoutMfr} style={{ marginBottom: 0 }}>
+									{getFieldDecorator('manufacturer')(
+										<Select
+											className={Style.formItemPaper}
+											onChange={this.onPaperMfrChange}
+											placeholder="Select a manufacturer"
+										>
+											{this.state.paperMfrDropdown}
 										</Select>
 									)}
 								</Form.Item>
 							</Col>
-							<Col span={8}>
-								<Form.Item label="Mfr:" {...paperFormItemLayoutName} style={{ marginBottom: 0 }}>
-									{getFieldDecorator('manufacturer')(
-										<Input className={Style.formItemPaper} readOnly placeholder="(autofilled)" />
+							<Col span={12}>
+								<Form.Item label="Name:" {...paperFormItemLayoutName} style={{ marginBottom: 0, marginLeft: 20 }}>
+									{getFieldDecorator('productname')(
+										<Select
+											className={Style.formItemPaper}
+											onChange={this.onPaperNameChange}
+											placeholder="Select a paper"
+											disabled={nameDisabled}
+										>
+											{this.state.paperNameDropdown}
+										</Select>
 									)}
 								</Form.Item>
 							</Col>
@@ -262,30 +359,10 @@ class NewJobForm extends React.Component {
 								</Radio.Group>
 							)}
 						</Form.Item>
-						<Form.Item label="Primer:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
-							{getFieldDecorator('useprimer', {
-								rules: [{ required: true, message: 'Please indicate primer use' }],
-							})(
-								<Radio.Group className={Style.formItemPaper} onChange={this.resetPaperName}>
-									<Radio.Button value="True">True</Radio.Button>
-									<Radio.Button value="False">False</Radio.Button>
-								</Radio.Group>
-							)}
-						</Form.Item>
-						<Form.Item label="Fixer:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
-							{getFieldDecorator('usefixer', {
-								rules: [{ required: true, message: 'Please indicate fixer use' }],
-							})(
-								<Radio.Group className={Style.formItemPaper} onChange={this.resetPaperName}>
-									<Radio.Button value="True">True</Radio.Button>
-									<Radio.Button value="False">False</Radio.Button>
-								</Radio.Group>
-							)}
-						</Form.Item>
 					</div>
 					<br />
 					<Form.Item>
-						<Button type="primary">
+						<Button type="primary" onClick={this.handleSubmit}>
 							Submit
 						</Button>
 					</Form.Item>
