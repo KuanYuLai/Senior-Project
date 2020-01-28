@@ -21,6 +21,7 @@ class NewJobForm extends React.Component {
 		this.state = {
 			paperDatabase: paperDatabase.paperdb,
 			coverageVal: 50,
+			opticalDensity: 100,
 			nameDisabled: true,
 			paperMfrDropdown: this.getMfrDropdown(paperDatabase.paperdb, "manufacturer"),
 			paperNameDropdown: null,
@@ -104,6 +105,19 @@ class NewJobForm extends React.Component {
 
 		this.setState({
 			coverageVal: val,
+		});
+	};
+
+	/* Called when the coverage value is changed. */
+	onODValChange = val => {
+		const { setFieldsValue } = this.props.form;
+
+		setFieldsValue({
+			opticalDensity: val,
+		});
+
+		this.setState({
+			opticalDensity: val,
 		});
 	};
 
@@ -208,7 +222,7 @@ class NewJobForm extends React.Component {
 	};
 
 	render() {
-		const { coverageVal, nameDisabled, paperDisabled } = this.state;
+		const { coverageVal, nameDisabled, opticalDensity } = this.state;
 		const { getFieldDecorator } = this.props.form;
 
 		const paperFormItemLayout = {
@@ -220,8 +234,8 @@ class NewJobForm extends React.Component {
 			wrapperCol: { span: 16 },
 		}
 		const paperFormItemLayoutName = {
-			labelCol: { span: 3 },
-			wrapperCol: { span: 21 },
+			labelCol: { span: 4 },
+			wrapperCol: { span: 20 },
 		}
 
 		return (
@@ -238,7 +252,7 @@ class NewJobForm extends React.Component {
 					<h5>General Info</h5>
 					<Row gutter={20}>
 						<Col span={8}>
-							<Form.Item label="Job Name" style={{ marginBottom: 10 }}>
+							<Form.Item label="Job Name:" style={{ marginBottom: 10 }}>
 								{getFieldDecorator('jobName', {
 									rules: [{ required: true, message: 'Please input a job name' }],
 									initialValue: "Setting Advice",
@@ -250,7 +264,7 @@ class NewJobForm extends React.Component {
 							</Form.Item>
 						</Col>
 						<Col span={7}>
-							<Form.Item label="Ruleset" style={{ marginBottom: 10 }}>
+							<Form.Item label="Ruleset:" style={{ marginBottom: 10 }}>
 								{getFieldDecorator('ruleset', {
 									rules: [{ required: true, message: 'Please choose a ruleset' }],
 									initialValue: "Default",
@@ -264,7 +278,7 @@ class NewJobForm extends React.Component {
 							</Form.Item>
 						</Col>
 					</Row>
-					<Form.Item label="PDF Max Coverage Percentage">
+					<Form.Item label="PDF Max Coverage Percentage:">
 						{getFieldDecorator('maxCoverage', {
 							rules: [{ required: true, message: 'Please input max coverage' }],
 							initialValue: 50,
@@ -292,8 +306,38 @@ class NewJobForm extends React.Component {
 							</Row>
 						)}
 					</Form.Item>
+					<Form.Item label="Optical Density:">
+						{getFieldDecorator('opticalDensity', {
+							rules: [{ required: true, message: 'Please input max coverage' }],
+							initialValue: 50,
+						})(
+							<Row>
+								<Col span={12}>
+									<Slider
+										className={Style.formItemPaper}
+										step={5}
+										min={50}
+										max={100}
+										onChange={this.onODValChange}
+										value={typeof opticalDensity === 'number' ? opticalDensity : 0}
+									/>
+								</Col>
+								<Col span={4}>
+									<InputNumber
+										step={5}
+										min={50}
+										max={100}
+										formatter={value => `${value}%`}
+										style={{ marginLeft: 16 }}
+										value={opticalDensity}
+										onChange={this.onODValChange}
+									/>
+								</Col>
+							</Row>
+						)}
+					</Form.Item>
 
-					<h5>Paper Type</h5>
+					<h5>Paper Selection</h5>
 					<div style={{ marginLeft: 30 }}>
 						<Row gutter={0}>
 							<Col span={9}>
