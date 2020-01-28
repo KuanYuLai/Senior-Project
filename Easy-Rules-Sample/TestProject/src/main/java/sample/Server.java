@@ -40,15 +40,15 @@ public class Server extends HttpServlet {
             reader.close();
         }
         System.out.println(sb.toString());
-        String result = "Success!\n";
+        String result = "";
         try{
-            result += launch.Cal(sb.toString());
+            result = launch.Cal(sb.toString());
         } catch(Exception e){
             result = "Please try again!";
-            System.out.println("Exception Catched");
+            System.out.println("Exception Catched: " + e);
         };
         //out.print("Printing result...\n" + sb.toString());
-        out.print("Printing result...\n" + result);
+        out.print(result);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
