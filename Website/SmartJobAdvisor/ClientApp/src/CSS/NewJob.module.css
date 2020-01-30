@@ -1,9 +1,47 @@
 ﻿.newJobFormContainer {
-	max-width: 800px;
-	min-width: 300px;
+	max-width: 711px;
+	min-width: 330px;
+}
+
+.formGeneralInfo {
+	max-width: 500px;
+}
+
+.formItem {
+	margin-top: 100px;
 }
 
 .formItemPaper {
 	position: relative;
 	bottom: 4px;
+}
+
+.formItemInput {
+	position: relative;
+	top: -10px;
+}
+
+.formItemInputNumber {
+	margin-left: 16px;
+	position: relative;
+	top: -7px;
+	left: 16px;
+}
+
+.iconAdjust {
+	position: relative;
+	bottom: 3px;
+}
+
+.resetButton {
+	position: relative;
+	left: 20px;
+	bottom: 2px;
+	margin-bottom: 5px;
+}
+
+.formButtons {
+	max-width: 500px;
+	display: flex;
+	justify-content: space-between;
 }

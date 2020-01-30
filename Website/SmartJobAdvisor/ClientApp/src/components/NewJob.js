@@ -1,5 +1,5 @@
 ﻿import React, { Component, Fragment } from 'react';
-import { Button, Form, Icon, Input, InputNumber, Radio, Row, Col, Select, Slider } from 'antd';
+import { Button, Form, Icon, Input, InputNumber, Popconfirm, Radio, Row, Col, Select, Slider } from 'antd';
 
 import Style from '../CSS/NewJob.module.css'
 
@@ -18,20 +18,18 @@ class NewJobForm extends React.Component {
 		 * For now, this file exists locally. */
 		var paperDatabase = require('../PaperData/SJA-paper-db-2020-01-20-trim.json');
 
+		/* Initialize all values and populate radios/selects. */
 		this.state = {
 			paperDatabase: paperDatabase.paperdb,
 			coverageVal: 50,
 			opticalDensity: 100,
-			nameDisabled: true,
 			paperMfrDropdown: this.getMfrDropdown(paperDatabase.paperdb, "manufacturer"),
-			paperNameDropdown: null,
+			paperNameDropdown: this.getMfrDropdown(paperDatabase.paperdb, "productname"),
 			paperWeightRadio: this.getRadio(paperDatabase.paperdb, "weightclass"),
 			paperTypeRadio: this.getRadio(paperDatabase.paperdb, "papertype"),
 			paperSubTypeRadio: this.getRadio(paperDatabase.paperdb, "papersubtype"),
 			paperFinishRadio: this.getRadio(paperDatabase.paperdb, "finish"),
 		};
-
-		//this.getRadio(paperDatabase.paperdb, 'manufacturer');
 	};
 
 	getRadio = (data, key, filter = null) => {
@@ -40,13 +38,17 @@ class NewJobForm extends React.Component {
 
 		var tempArray = data.map(function (e) { return e[key]; }).filter((v, i, a) => a.indexOf(v) === i);
 
+		// Sort the list, except for weights
+		if (key !== "weightclass")
+			tempArray.sort();
+
 		for (let i = 0; i < tempArray.length; i++) {
 			var text = tempArray[i];
-			var disabled = true;
+			var disabled = false;
 
 			if (filter !== null)
-				if (filter.indexOf(text) > -1)
-					disabled = false;
+				if (filter.indexOf(text) === -1)
+					disabled = true;
 
 			radio.push(<Radio.Button disabled={disabled} key={i} value={text}>{text}</Radio.Button>);
 		}
@@ -59,12 +61,15 @@ class NewJobForm extends React.Component {
 		var dropdown = [];
 		var mfrNames = [];
 
+		// Get all names
 		for (let i = 0; i < data.length; i++) {
 			mfrNames.push(data[i][key]);
 		}
 
-		mfrNames = mfrNames.filter((v, i, a) => a.indexOf(v) === i);
+		// Filter list for unique names only, then sort it alphabetically
+		mfrNames = mfrNames.filter((v, i, a) => a.indexOf(v) === i).sort();
 
+		// Create the dropdown for the Select using the list of names
 		for (let j = 0; j < mfrNames.length; j++) {
 			dropdown.push(<Option key={mfrNames[j]}>{mfrNames[j]}</Option>);
 		}
@@ -108,9 +113,13 @@ class NewJobForm extends React.Component {
 		});
 	};
 
-	/* Called when the coverage value is changed. */
+	/* Called when the optical density value is changed. */
 	onODValChange = val => {
 		const { setFieldsValue } = this.props.form;
+
+		// Set a minimum value
+		if (val < 50)
+			val = 50;
 
 		setFieldsValue({
 			opticalDensity: val,
@@ -121,9 +130,18 @@ class NewJobForm extends React.Component {
 		});
 	};
 
+	/* Clear the field value for paper name in case mfr is changed. * /
+	setFieldsValue({
+		productname: null,
+		weightclass: null,
+		papertype: null,
+		papersubtype: null,
+		finish: null,
+	});
+	*/
+
 	onPaperMfrChange = val => {
 		const { paperDatabase } = this.state;
-		const { setFieldsValue, getFieldsValue } = this.props.form;
 
 		var dropdown = [];
 		var paperNames = [];
@@ -144,18 +162,8 @@ class NewJobForm extends React.Component {
 			dropdown.push(<Option key={paperNames[j]}>{paperNames[j]}</Option>);
 		}
 
-		/* Clear the field value for paper name in case mfr is changed. */
-		setFieldsValue({
-			productname: null,
-			weightclass: null,
-			papertype: null,
-			papersubtype: null,
-			finish: null,
-		});
-
 		this.setState({
 			paperNameDropdown: dropdown,
-			nameDisabled: false,
 			paperTypeRadio: this.getRadio(paperDatabase, "papertype"),
 			paperSubTypeRadio: this.getRadio(paperDatabase, "papersubtype"),
 			paperWeightRadio: this.getRadio(paperDatabase, "weightclass"),
@@ -182,7 +190,7 @@ class NewJobForm extends React.Component {
 			paperFinishes.push(selectedPaper[i].finish);
 		}
 
-		/* Filter the lists of types/subtypes/weights/finishes to remove duplicates. */
+		/* Filter the lists of types/subtypes/weights/finishes to remove duplicates. Sort all alphabetically except for weights */
 		paperTypes = paperTypes.filter((v, i, a) => a.indexOf(v) === i);
 		paperSubTypes = paperSubTypes.filter((v, i, a) => a.indexOf(v) === i);
 		paperWeights = paperWeights.filter((v, i, a) => a.indexOf(v) === i);
@@ -194,7 +202,7 @@ class NewJobForm extends React.Component {
 			paperSubTypeRadio: this.getRadio(paperDatabase, "papersubtype", paperSubTypes),
 			paperWeightRadio: this.getRadio(paperDatabase, "weightclass", paperWeights),
 			paperFinishRadio: this.getRadio(paperDatabase, "finish", paperFinishes),
-		})
+		});
 
 		setFieldsValue({
 			weightclass: null,
@@ -204,12 +212,70 @@ class NewJobForm extends React.Component {
 		});
 	};
 
+	/*
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * Continue working on this function.
+	 */
 	resetPaperName = () => {
-		const { setFieldsValue } = this.props.form;
+		this.props.form.resetFields("productname");
+	}
 
-		setFieldsValue({
-			paperName: undefined,
+	/* Resets all the paper selection radio disabled values. */
+	resetPaperSelectionRadio = () => {
+		let { paperDatabase } = this.state;
+
+		this.setState({
+			paperTypeRadio: this.getRadio(paperDatabase, "papertype"),
+			paperSubTypeRadio: this.getRadio(paperDatabase, "papersubtype"),
+			paperWeightRadio: this.getRadio(paperDatabase, "weightclass"),
+			paperFinishRadio: this.getRadio(paperDatabase, "finish"),
 		});
+	}
+
+	/* Resets all form fields for paper selection. */
+	paperReset = () => {
+		this.props.form.resetFields(["manufacturer", "productname", "papertype", "papersubtype", "weightclass", "finish"]);
+		this.resetPaperSelectionRadio();
+	}
+
+	/* Resets the max coverage and optical density sliders. */
+	sliderReset = () => {
+		this.setState({
+			coverageVal: 50,
+			opticalDensity: 100,
+		});
+	}
+
+	infoReset = () => {
+		this.props.form.resetFields(["jobName", "ruleset", "maxCoverage", "opticalDensity"]);
+		this.sliderReset();
+	}
+
+	/* Resets the entire form. */
+	formReset = () => {
+		this.props.form.resetFields();
+		this.resetPaperSelectionRadio();
+		this.sliderReset();
 	}
 
 	handleSubmit = e => {
@@ -222,20 +288,12 @@ class NewJobForm extends React.Component {
 	};
 
 	render() {
-		const { coverageVal, nameDisabled, opticalDensity } = this.state;
+		const { coverageVal, opticalDensity } = this.state;
 		const { getFieldDecorator } = this.props.form;
 
 		const paperFormItemLayout = {
 			labelCol: { span: 3 },
 			wrapperCol: { span: 21 },
-		}
-		const paperFormItemLayoutMfr = {
-			labelCol: { span: 8 },
-			wrapperCol: { span: 16 },
-		}
-		const paperFormItemLayoutName = {
-			labelCol: { span: 4 },
-			wrapperCol: { span: 20 },
 		}
 
 		return (
@@ -249,167 +307,193 @@ class NewJobForm extends React.Component {
 				<br />
 
 				<Form layout="vertical" onSubmit={this.handleSubmit} className={Style.newJobForm}>
-					<h5>General Info</h5>
-					<Row gutter={20}>
-						<Col span={8}>
-							<Form.Item label="Job Name:" style={{ marginBottom: 10 }}>
-								{getFieldDecorator('jobName', {
-									rules: [{ required: true, message: 'Please input a job name' }],
-									initialValue: "Setting Advice",
-								})(
-									<Input
-										prefix={<Icon type="edit" style={{ color: 'rgba(0,0,0,.25)' }} />}
-									/>,
-								)}
-							</Form.Item>
-						</Col>
-						<Col span={7}>
-							<Form.Item label="Ruleset:" style={{ marginBottom: 10 }}>
-								{getFieldDecorator('ruleset', {
-									rules: [{ required: true, message: 'Please choose a ruleset' }],
-									initialValue: "Default",
-								})(
-									<Select>
-										<Option value="Default">Default</Option>
-										<Option value="Ruleset B">Ruleset B</Option>
-										<Option value="Ruleset C">Ruleset C</Option>
-									</Select>
-								)}
-							</Form.Item>
-						</Col>
-					</Row>
-					<Form.Item label="PDF Max Coverage Percentage:">
-						{getFieldDecorator('maxCoverage', {
-							rules: [{ required: true, message: 'Please input max coverage' }],
-							initialValue: 50,
-						})(
-							<Row>
-								<Col span={12}>
-									<Slider
-										className={Style.formItemPaper}
-										min={1}
-										max={100}
-										onChange={this.onCoverageValChange}
-										value={typeof coverageVal === 'number' ? coverageVal : 0}
-									/>
-								</Col>
-								<Col span={4}>
-									<InputNumber
-										min={1}
-										max={100}
-										formatter={value => `${value}%`}
-										style={{ marginLeft: 16 }}
-										value={coverageVal}
-										onChange={this.onCoverageValChange}
-									/>
-								</Col>
-							</Row>
-						)}
-					</Form.Item>
-					<Form.Item label="Optical Density:">
-						{getFieldDecorator('opticalDensity', {
-							rules: [{ required: true, message: 'Please input max coverage' }],
-							initialValue: 50,
-						})(
-							<Row>
-								<Col span={12}>
-									<Slider
-										className={Style.formItemPaper}
-										step={5}
-										min={50}
-										max={100}
-										onChange={this.onODValChange}
-										value={typeof opticalDensity === 'number' ? opticalDensity : 0}
-									/>
-								</Col>
-								<Col span={4}>
-									<InputNumber
-										step={5}
-										min={50}
-										max={100}
-										formatter={value => `${value}%`}
-										style={{ marginLeft: 16 }}
-										value={opticalDensity}
-										onChange={this.onODValChange}
-									/>
-								</Col>
-							</Row>
-						)}
-					</Form.Item>
-
-					<h5>Paper Selection</h5>
-					<div style={{ marginLeft: 30 }}>
-						<Row gutter={0}>
-							<Col span={9}>
-								<Form.Item label="Mfr:" {...paperFormItemLayoutMfr} style={{ marginBottom: 0 }}>
-									{getFieldDecorator('manufacturer')(
-										<Select
-											className={Style.formItemPaper}
-											onChange={this.onPaperMfrChange}
-											placeholder="Select a manufacturer"
-										>
-											{this.state.paperMfrDropdown}
-										</Select>
+					<div className={Style.formGeneralInfo}>
+						<div style={{ display: 'inline-block' }}>
+							<h5>
+								General Info
+								<Button className={Style.resetButton} onClick={() => this.infoReset()} type="default" >
+									<Icon style={{ position: 'relative', bottom: 3 }} type="undo" />
+									Reset
+								</Button>
+							</h5>
+						</div>
+						<Row gutter={20}>
+							<Col span={12}>
+								<Form.Item label="Job Name:" style={{ marginBottom: -5 }}>
+									{getFieldDecorator('jobName', {
+										rules: [{ required: true, message: 'Please input a job name' }],
+										initialValue: "Setting Advice",
+									})(
+										<Input
+											className={Style.formItemInput}
+											prefix={<Icon type="edit" style={{ color: 'rgba(0,0,0,.25)' }} />}
+										/>,
 									)}
 								</Form.Item>
 							</Col>
 							<Col span={12}>
-								<Form.Item label="Name:" {...paperFormItemLayoutName} style={{ marginBottom: 0, marginLeft: 20 }}>
-									{getFieldDecorator('productname')(
-										<Select
-											className={Style.formItemPaper}
-											onChange={this.onPaperNameChange}
-											placeholder="Select a paper"
-											disabled={nameDisabled}
-										>
-											{this.state.paperNameDropdown}
+								<Form.Item label="Ruleset:" style={{ marginBottom: -5 }}>
+									{getFieldDecorator('ruleset', {
+										rules: [{ required: true, message: 'Please choose a ruleset' }],
+										initialValue: "Default",
+									})(
+										<Select className={Style.formItemInput}>
+											<Option value="Default">Default</Option>
+											<Option value="Ruleset B">Ruleset B</Option>
+											<Option value="Ruleset C">Ruleset C</Option>
 										</Select>
 									)}
 								</Form.Item>
 							</Col>
 						</Row>
-
-						<Form.Item label="Type:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
-							{getFieldDecorator('papertype', {
-								rules: [{ required: true, message: 'Please choose a paper type' }],
+						<Form.Item style={{ marginBottom: -5 }} label="PDF Max Coverage Percentage:">
+							{getFieldDecorator('maxCoverage', {
+								rules: [{ required: true, message: 'Please input max coverage' }],
+								initialValue: 50,
 							})(
-								<Radio.Group className={Style.formItemPaper} onChange={this.resetPaperName}>
-									{this.state.paperTypeRadio}
-								</Radio.Group>
+								<div style={{ display: 'flex' }} >
+									<Slider
+										className={Style.formItemInput}
+										style={{ width: 'calc(100% - 100px)' }}
+										min={0}
+										max={100}
+										onChange={this.onCoverageValChange}
+										value={typeof coverageVal === 'number' ? coverageVal : 0}
+									/>
+									<InputNumber
+										className={Style.formItemInputNumber}
+										style={{ width: 72 }}
+										min={1}
+										max={100}
+										formatter={value => `${value}%`}
+										value={coverageVal}
+										onChange={this.onCoverageValChange}
+									/>
+								</div>
 							)}
 						</Form.Item>
-						<Form.Item label="Sub-Type:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
-							{getFieldDecorator('papersubtype')(
-								<Radio.Group className={Style.formItemPaper} onChange={this.resetPaperName}>
-									{this.state.paperSubTypeRadio}
-								</Radio.Group>
-							)}
-						</Form.Item>
-						<Form.Item label="Weight:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
-							{getFieldDecorator('weightclass', {
-								rules: [{ required: true, message: 'Please choose a weight class' }],
+						<Form.Item label="Optical Density:">
+							{getFieldDecorator('opticalDensity', {
+								rules: [{ required: true, message: 'Please input max coverage' }],
+								initialValue: 50,
 							})(
-								<Radio.Group className={Style.formItemPaper} onChange={this.resetPaperName}>
-									{this.state.paperWeightRadio}
-								</Radio.Group>
-							)}
-						</Form.Item>
-						<Form.Item label="Finish:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
-							{getFieldDecorator('finish', {
-								rules: [{ required: true, message: 'Please choose a finish' }],
-							})(
-								<Radio.Group className={Style.formItemPaper} onChange={this.resetPaperName}>
-									{this.state.paperFinishRadio}
-								</Radio.Group>
+								<div style={{ display: 'flex' }} >
+									<Slider
+										className={Style.formItemInput}
+										style={{ width: 'calc(100% - 100px)' }}
+										step={5}
+										min={0}
+										max={100}
+										onChange={this.onODValChange}
+										value={typeof opticalDensity === 'number' ? opticalDensity : 0}
+									/>
+									<InputNumber
+										className={Style.formItemInputNumber}
+										style={{ width: 72 }}
+										step={5}
+										min={50}
+										max={100}
+										formatter={value => `${value}%`}
+										value={opticalDensity}
+										onChange={this.onODValChange}
+									/>
+								</div>
 							)}
 						</Form.Item>
 					</div>
+
+					<div style={{ display: 'inline-block' }}>
+						<h5>
+							Paper Selection
+							<Button className={Style.resetButton} onClick={() => this.paperReset()} type="default" >
+								<Icon style={{ position: 'relative', bottom: 3 }} type="undo" />
+								Reset
+							</Button>
+						</h5>
+					</div>
+					<Form.Item label="Mfr:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						{getFieldDecorator('manufacturer', {
+							rules: [{ required: true, message: 'Please select a manufacturer' }],
+						})(
+							<Select
+								className={Style.formItemPaper}
+								style={{ maxWidth: 330 }}
+								onChange={this.onPaperMfrChange}
+								placeholder={<span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select a manufacturer</span>}
+								showSearch
+							>
+								{this.state.paperMfrDropdown}
+							</Select>
+						)}
+					</Form.Item>
+					<Form.Item label="Name:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						{getFieldDecorator('productname', {
+							rules: [{ required: true, message: 'Please select a paper' }],
+						})(
+							<Select
+								className={Style.formItemPaper}
+								style={{ maxWidth: 330 }}
+								onChange={this.onPaperNameChange}
+								placeholder={<span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select a paper</span>}
+								showSearch
+							>
+								{this.state.paperNameDropdown}
+							</Select>
+						)}
+					</Form.Item>
+
+					<Form.Item label="Type:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						{getFieldDecorator('papertype', {
+							rules: [{ required: true, message: 'Please choose a paper type' }],
+						})(
+							<Radio.Group className={Style.formItemPaper} onChange={this.resetPaperName}>
+								{this.state.paperTypeRadio}
+							</Radio.Group>
+						)}
+					</Form.Item>
+					<Form.Item label="Sub-Type:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						{getFieldDecorator('papersubtype')(
+							<Radio.Group className={Style.formItemPaper} onChange={this.resetPaperName}>
+								{this.state.paperSubTypeRadio}
+							</Radio.Group>
+						)}
+					</Form.Item>
+					<Form.Item label="Weight:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						{getFieldDecorator('weightclass', {
+							rules: [{ required: true, message: 'Please choose a weight class' }],
+						})(
+							<Radio.Group className={Style.formItemPaper} onChange={this.resetPaperName}>
+								{this.state.paperWeightRadio}
+							</Radio.Group>
+						)}
+					</Form.Item>
+					<Form.Item label="Finish:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						{getFieldDecorator('finish', {
+							rules: [{ required: true, message: 'Please choose a finish' }],
+						})(
+							<Radio.Group className={Style.formItemPaper} onChange={this.resetPaperName}>
+								{this.state.paperFinishRadio}
+							</Radio.Group>
+						)}
+					</Form.Item>
+
 					<br />
-					<Form.Item>
+
+					<div className={Style.formButtons}>
+						<Popconfirm
+							title="Are you sure reset the form?"
+							placement="top"
+							onConfirm={() => this.formReset()}
+						>
+							<Button ghost type="danger">
+								<Icon style={{ position: 'relative', bottom: 3 }} type="undo" />
+								Reset Form
+							</Button>
+						</Popconfirm>
 						<Button type="primary" onClick={this.handleSubmit}>
 							Submit
 						</Button>
-					</Form.Item>
+					</div>
 				</Form>
 			</div>
 		);
