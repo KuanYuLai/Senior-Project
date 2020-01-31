@@ -18,10 +18,18 @@ class NewJobForm extends React.Component {
 		 * For now, this file exists locally. */
 		var paperDatabase = require('../PaperData/SJA-paper-db-2020-01-20-trim.json');
 
+		var fieldHasClicked = {
+			"papertype": false,
+			"papersubtype": false,
+			"weightclass": false,
+			"finish": false,
+		};
+
 		/* Initialize all values and populate radios/selects. */
 		this.state = {
 			currentPaperNames: paperDatabase.paperdb,
 			paperDatabase: paperDatabase.paperdb,
+			fieldHasClicked: fieldHasClicked,
 			coverageVal: 50,
 			opticalDensity: 100,
 			paperMfrDropdown: this.getMfrDropdown(paperDatabase.paperdb, "manufacturer"),
@@ -50,8 +58,12 @@ class NewJobForm extends React.Component {
 				if (filter.indexOf(tempArray[i]) === -1) {
 					disabled = true;
 
-					if (this.props.form.getFieldValue(key) === tempArray[i])
+					if (this.props.form.getFieldValue(key) === tempArray[i]) {
 						this.props.form.resetFields(key);
+						this.props.form.resetFields("manufacturer");
+						this.props.form.resetFields("productname");
+					}
+						
 				}
 			}
 
@@ -142,7 +154,7 @@ class NewJobForm extends React.Component {
 		var paperNames = [];
 
 		/* Grab all instances that contain the manufacturer selected in the Mfr dropdown. */
-		var selectedMfr = this.state.paperDatabase.filter((e) => e.manufacturer === val);
+		var selectedMfr = this.state.currentPaperNames.filter((e) => e.manufacturer === val);
 
 		/* Grab all of the productnames within the list of objects. */
 		for (let i = 0; i < selectedMfr.length; i++) {
@@ -188,7 +200,7 @@ class NewJobForm extends React.Component {
 		this.setRadios(selectedPaper);
 	};
 
-	setRadios = (selected) => {
+	setRadios = (selected, exclude = null) => {
 		const { paperDatabase } = this.state;
 		const { setFieldsValue } = this.props.form;
 
@@ -221,7 +233,7 @@ class NewJobForm extends React.Component {
 		if (paperFinishes.length === 1)
 			setFieldsValue({ finish: paperFinishes[0] });
 
-		/* Rebuild the radios for types/subtypes/weights/finishes to disable options that are not present in data for the given productname. */
+		/* Update other radios. Once a choice has been made on a radio, all other options grey out. */
 		this.setState({
 			paperTypeRadio: this.getRadio(paperDatabase, "papertype", paperTypes),
 			paperSubTypeRadio: this.getRadio(paperDatabase, "papersubtype", paperSubTypes),
@@ -235,14 +247,23 @@ class NewJobForm extends React.Component {
 		const { getFieldValue, setFieldsValue } = this.props.form;
 		const { paperDatabase, currentPaperNames } = this.state;
 
-		var currentPapers = [...currentPaperNames];
+		//var currentPapers = [...currentPaperNames];
+		var currentPapers = [...paperDatabase];
 
 		currentPapers = currentPapers.filter((a) => a[field] === e.target.value);
 
-		if (typeof getFieldValue("manufacturer") !== 'undefined')
+		if (typeof getFieldValue("manufacturer") !== 'undefined' && field !== "manufacturer")
 			currentPapers = currentPapers.filter((a) => a.manufacturer === getFieldValue("manufacturer"));
-		if (typeof getFieldValue("productname") !== 'undefined')
+		if (typeof getFieldValue("productname") !== 'undefined' && field !== "productname")
 			currentPapers = currentPapers.filter((a) => a.productname === getFieldValue("productname"));
+		if (typeof getFieldValue("papertype") !== 'undefined' && field !== "papertype")
+			currentPapers = currentPapers.filter((a) => a.papertype === getFieldValue("papertype"));
+		if (typeof getFieldValue("papersubtype") !== 'undefined' && field !== "papersubtype")
+			currentPapers = currentPapers.filter((a) => a.papersubtype === getFieldValue("papersubtype"));
+		if (typeof getFieldValue("weightclass") !== 'undefined' && field !== "weightclass")
+			currentPapers = currentPapers.filter((a) => a.weightclass === getFieldValue("weightclass"));
+		if (typeof getFieldValue("finish") !== 'undefined' && field !== "finish")
+			currentPapers = currentPapers.filter((a) => a.finish === getFieldValue("finish"));
 
 		var paperMfrs = [];
 		var paperNames = [];
@@ -272,7 +293,7 @@ class NewJobForm extends React.Component {
 			paperNameDropdown: this.getMfrDropdown(currentPapers, "productname"),
 		});
 
-		this.setRadios(currentPapers);
+		this.setRadios(currentPapers, field);
 	}
 
 	/* Resets all the paper selection radio disabled values. */
@@ -340,6 +361,8 @@ class NewJobForm extends React.Component {
 			labelCol: { span: 3 },
 			wrapperCol: { span: 21 },
 		}
+
+		console.log(this.props.form.getFieldsValue());
 
 		return (
 			<div className={Style.newJobFormContainer}>
@@ -462,7 +485,7 @@ class NewJobForm extends React.Component {
 						})(
 							<Select
 								className={Style.formItemPaper}
-								style={{ maxWidth: 330 }}
+								style={{ maxWidth: 320 }}
 								onChange={this.onPaperMfrChange}
 								placeholder={<span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select a manufacturer</span>}
 								showSearch
@@ -477,7 +500,7 @@ class NewJobForm extends React.Component {
 						})(
 							<Select
 								className={Style.formItemPaper}
-								style={{ maxWidth: 330 }}
+								style={{ maxWidth: 320 }}
 								onChange={this.onPaperNameChange}
 								placeholder={<span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select a paper</span>}
 								showSearch
