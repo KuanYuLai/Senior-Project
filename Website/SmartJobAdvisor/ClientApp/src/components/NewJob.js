@@ -100,6 +100,8 @@ class NewJobForm extends React.Component {
 		if (paperFinishes.length === 1)
 			setFieldsValue({ finish: paperFinishes[0] });
 
+		console.log(paperWeights);
+
 		/* Update other radios. Once a choice has been made on a radio, all other options grey out. */
 		this.setState({
 			paperTypeRadio: this.getRadio(paperDatabase, "papertype", paperTypes),
@@ -293,10 +295,12 @@ class NewJobForm extends React.Component {
 	handleUnknownPaper = () => {
 		const { unknownPaper, paperNameMfrDisabled, paperDatabase } = this.state;
 
-		this.props.form.resetFields(["manufacturer", "productname"]);
+		this.props.form.resetFields(["manufacturer", "productname", "papertype", "papersubtype", "weightclass", "finish"]);
 		this.setState({
 			unknownPaper: !unknownPaper,
 			paperNameMfrDisabled: !paperNameMfrDisabled,
+			paperMfrDropdown: this.getMfrDropdown(paperDatabase, "manufacturer"),
+			paperNameDropdown: this.getMfrDropdown(paperDatabase, "productname"),
 		});
 
 		this.resetPaperSelectionRadio();
@@ -494,7 +498,7 @@ class NewJobForm extends React.Component {
 								showSearch
 								placeholder={
 									paperNameMfrDisabled === true ? <span>Disabled</span>
-									: <span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select a manufacturer</span>
+									: <span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select a product</span>
 								}
 							>
 								{this.state.paperMfrDropdown}
