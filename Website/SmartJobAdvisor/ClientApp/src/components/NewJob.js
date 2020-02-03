@@ -1,5 +1,5 @@
 ﻿import React, { Component, Fragment } from 'react';
-import { Button, Form, Icon, Input, InputNumber, Popconfirm, Radio, Row, Col, Select, Slider } from 'antd';
+import { Button, Checkbox, Form, Icon, Input, InputNumber, Popconfirm, Radio, Row, Col, Select, Slider } from 'antd';
 
 import Style from '../CSS/NewJob.module.css'
 
@@ -18,18 +18,12 @@ class NewJobForm extends React.Component {
 		 * For now, this file exists locally. */
 		var paperDatabase = require('../PaperData/SJA-paper-db-2020-01-20-trim.json');
 
-		var fieldHasClicked = {
-			"papertype": false,
-			"papersubtype": false,
-			"weightclass": false,
-			"finish": false,
-		};
-
 		/* Initialize all values and populate radios/selects. */
 		this.state = {
+			unknownPaper: false,
+			paperNameMfrDisabled: false,
 			currentPaperNames: paperDatabase.paperdb,
 			paperDatabase: paperDatabase.paperdb,
-			fieldHasClicked: fieldHasClicked,
 			coverageVal: 50,
 			opticalDensity: 100,
 			paperMfrDropdown: this.getMfrDropdown(paperDatabase.paperdb, "manufacturer"),
@@ -71,6 +65,48 @@ class NewJobForm extends React.Component {
 		}
 
 		return radio;
+	}
+
+	setRadios = (selected) => {
+		const { paperDatabase } = this.state;
+		const { setFieldsValue } = this.props.form;
+
+		var paperTypes = [];
+		var paperSubTypes = [];
+		var paperWeights = [];
+		var paperFinishes = [];
+
+		/* Grab all of the types/subtypes/weights/finishes within the list of objects. */
+		for (let i = 0; i < selected.length; i++) {
+			paperTypes.push(selected[i].papertype);
+			paperSubTypes.push(selected[i].papersubtype);
+			paperWeights.push(selected[i].weightclass);
+			paperFinishes.push(selected[i].finish);
+		}
+
+		/* Filter the lists of types/subtypes/weights/finishes to remove duplicates. */
+		paperTypes = paperTypes.filter((v, i, a) => a.indexOf(v) === i);
+		paperSubTypes = paperSubTypes.filter((v, i, a) => a.indexOf(v) === i);
+		paperWeights = paperWeights.filter((v, i, a) => a.indexOf(v) === i);
+		paperFinishes = paperFinishes.filter((v, i, a) => a.indexOf(v) === i);
+
+		/* If there's only one choice for a radio, just fill it out. */
+		if (paperTypes.length === 1)
+			setFieldsValue({ papertype: paperTypes[0] });
+		if (paperSubTypes.length === 1)
+			setFieldsValue({ papersubtype: paperSubTypes[0] });
+		if (paperWeights.length === 1)
+			setFieldsValue({ weightclass: paperWeights[0] });
+		if (paperFinishes.length === 1)
+			setFieldsValue({ finish: paperFinishes[0] });
+
+		/* Update other radios. Once a choice has been made on a radio, all other options grey out. */
+		this.setState({
+			paperTypeRadio: this.getRadio(paperDatabase, "papertype", paperTypes),
+			paperSubTypeRadio: this.getRadio(paperDatabase, "papersubtype", paperSubTypes),
+			paperWeightRadio: this.getRadio(paperDatabase, "weightclass", paperWeights),
+			paperFinishRadio: this.getRadio(paperDatabase, "finish", paperFinishes),
+		});
 	}
 
 	getMfrDropdown = (data, key) => {
@@ -187,6 +223,7 @@ class NewJobForm extends React.Component {
 		});
 	}
 
+	/* Narrows down the paper selection radio buttons when a paper product is selected. */
 	onPaperNameChange = val => {
 		const { setFieldsValue } = this.props.form;
 
@@ -200,54 +237,11 @@ class NewJobForm extends React.Component {
 		this.setRadios(selectedPaper);
 	};
 
-	setRadios = (selected, exclude = null) => {
-		const { paperDatabase } = this.state;
-		const { setFieldsValue } = this.props.form;
-
-		var paperTypes = [];
-		var paperSubTypes = [];
-		var paperWeights = [];
-		var paperFinishes = [];
-
-		/* Grab all of the types/subtypes/weights/finishes within the list of objects. */
-		for (let i = 0; i < selected.length; i++) {
-			paperTypes.push(selected[i].papertype);
-			paperSubTypes.push(selected[i].papersubtype);
-			paperWeights.push(selected[i].weightclass);
-			paperFinishes.push(selected[i].finish);
-		}
-
-		/* Filter the lists of types/subtypes/weights/finishes to remove duplicates. */
-		paperTypes = paperTypes.filter((v, i, a) => a.indexOf(v) === i);
-		paperSubTypes = paperSubTypes.filter((v, i, a) => a.indexOf(v) === i);
-		paperWeights = paperWeights.filter((v, i, a) => a.indexOf(v) === i);
-		paperFinishes = paperFinishes.filter((v, i, a) => a.indexOf(v) === i);
-
-		/* If there's only one choice for a radio, just fill it out. */
-		if (paperTypes.length === 1)
-			setFieldsValue({ papertype: paperTypes[0] });
-		if (paperSubTypes.length === 1)
-			setFieldsValue({ papersubtype: paperSubTypes[0] });
-		if (paperWeights.length === 1)
-			setFieldsValue({ weightclass: paperWeights[0] });
-		if (paperFinishes.length === 1)
-			setFieldsValue({ finish: paperFinishes[0] });
-
-		/* Update other radios. Once a choice has been made on a radio, all other options grey out. */
-		this.setState({
-			paperTypeRadio: this.getRadio(paperDatabase, "papertype", paperTypes),
-			paperSubTypeRadio: this.getRadio(paperDatabase, "papersubtype", paperSubTypes),
-			paperWeightRadio: this.getRadio(paperDatabase, "weightclass", paperWeights),
-			paperFinishRadio: this.getRadio(paperDatabase, "finish", paperFinishes),
-		});
-	}
-
 	/* Called when a radio button is hit in paper selection. Narrows down mfr and product names, autofills once there is only one option. */
 	checkPaperMfrName = (e, field) => {
 		const { getFieldValue, setFieldsValue } = this.props.form;
-		const { paperDatabase, currentPaperNames } = this.state;
+		const { paperDatabase } = this.state;
 
-		//var currentPapers = [...currentPaperNames];
 		var currentPapers = [...paperDatabase];
 
 		currentPapers = currentPapers.filter((a) => a[field] === e.target.value);
@@ -293,7 +287,19 @@ class NewJobForm extends React.Component {
 			paperNameDropdown: this.getMfrDropdown(currentPapers, "productname"),
 		});
 
-		this.setRadios(currentPapers, field);
+		this.setRadios(currentPapers);
+	}
+
+	handleUnknownPaper = () => {
+		const { unknownPaper, paperNameMfrDisabled, paperDatabase } = this.state;
+
+		this.props.form.resetFields(["manufacturer", "productname"]);
+		this.setState({
+			unknownPaper: !unknownPaper,
+			paperNameMfrDisabled: !paperNameMfrDisabled,
+		});
+
+		this.resetPaperSelectionRadio();
 	}
 
 	/* Resets all the paper selection radio disabled values. */
@@ -328,22 +334,14 @@ class NewJobForm extends React.Component {
 		});
 	}
 
+	/* Resets the paper selection section. */
 	infoReset = () => {
 		this.props.form.resetFields(["jobName", "ruleset", "maxCoverage", "opticalDensity"]);
+		this.setState({ unknownPaper: false });
 		this.sliderReset();
 	}
 
-	/* Resets the entire form. */
-	formReset = () => {
-		this.props.form.resetFields();
-		this.resetPaperSelectionRadio();
-		this.sliderReset();
-
-		this.setState({
-			currentPaperNames: this.state.paperDatabase,
-		});
-	}
-
+	/* Gathers and validates form data. */
 	handleSubmit = e => {
 		e.preventDefault();
 		this.props.form.validateFields((err, values) => {
@@ -354,15 +352,13 @@ class NewJobForm extends React.Component {
 	};
 
 	render() {
-		const { coverageVal, opticalDensity } = this.state;
+		const { coverageVal, opticalDensity, paperNameMfrDisabled, unknownPaper } = this.state;
 		const { getFieldDecorator } = this.props.form;
 
 		const paperFormItemLayout = {
 			labelCol: { span: 3 },
 			wrapperCol: { span: 21 },
 		}
-
-		console.log(this.props.form.getFieldsValue());
 
 		return (
 			<div className={Style.newJobFormContainer}>
@@ -477,18 +473,29 @@ class NewJobForm extends React.Component {
 								<Icon style={{ position: 'relative', bottom: 3 }} type="undo" />
 								Reset
 							</Button>
+							<Checkbox
+								style={{ position: 'relative', bottom: 2 }}
+								onChange={() => this.handleUnknownPaper()}
+								checked={unknownPaper}
+							>
+								Unknown Paper?
+							</Checkbox>
 						</h5>
 					</div>
 					<Form.Item label="Mfr:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
 						{getFieldDecorator('manufacturer', {
-							rules: [{ required: true, message: 'Please select a manufacturer' }],
+							rules: [{ required: !paperNameMfrDisabled, message: 'Please select a manufacturer' }],
 						})(
 							<Select
 								className={Style.formItemPaper}
 								style={{ maxWidth: 320 }}
+								disabled={paperNameMfrDisabled}
 								onChange={this.onPaperMfrChange}
-								placeholder={<span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select a manufacturer</span>}
 								showSearch
+								placeholder={
+									paperNameMfrDisabled === true ? <span>Disabled</span>
+									: <span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select a manufacturer</span>
+								}
 							>
 								{this.state.paperMfrDropdown}
 							</Select>
@@ -496,14 +503,18 @@ class NewJobForm extends React.Component {
 					</Form.Item>
 					<Form.Item label="Name:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
 						{getFieldDecorator('productname', {
-							rules: [{ required: true, message: 'Please select a paper' }],
+							rules: [{ required: !paperNameMfrDisabled, message: 'Please select a paper' }],
 						})(
 							<Select
 								className={Style.formItemPaper}
 								style={{ maxWidth: 320 }}
+								disabled={paperNameMfrDisabled}
 								onChange={this.onPaperNameChange}
-								placeholder={<span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select a paper</span>}
 								showSearch
+								placeholder={
+									paperNameMfrDisabled === true ? <span>Disabled</span>
+										: <span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select a manufacturer</span>
+								}
 							>
 								{this.state.paperNameDropdown}
 							</Select>
@@ -514,14 +525,26 @@ class NewJobForm extends React.Component {
 						{getFieldDecorator('papertype', {
 							rules: [{ required: true, message: 'Please choose a paper type' }],
 						})(
-							<Radio.Group className={Style.formItemPaper} onChange={(e) => this.checkPaperMfrName(e, "papertype")}>
+							<Radio.Group
+								className={Style.formItemPaper}
+								onChange={(e) => {
+									if (!paperNameMfrDisabled)
+										this.checkPaperMfrName(e, "papertype");
+								}}
+							>
 								{this.state.paperTypeRadio}
 							</Radio.Group>
 						)}
 					</Form.Item>
 					<Form.Item label="Sub-Type:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
 						{getFieldDecorator('papersubtype')(
-							<Radio.Group className={Style.formItemPaper} onChange={(e) => this.checkPaperMfrName(e, "papersubtype")}>
+							<Radio.Group
+								className={Style.formItemPaper}
+								onChange={(e) => {
+									if (!paperNameMfrDisabled)
+										this.checkPaperMfrName(e, "papersubtype");
+								}}
+							>
 								{this.state.paperSubTypeRadio}
 							</Radio.Group>
 						)}
@@ -530,7 +553,13 @@ class NewJobForm extends React.Component {
 						{getFieldDecorator('weightclass', {
 							rules: [{ required: true, message: 'Please choose a weight class' }],
 						})(
-							<Radio.Group className={Style.formItemPaper} onChange={(e) => this.checkPaperMfrName(e, "weightclass")}>
+							<Radio.Group
+								className={Style.formItemPaper}
+								onChange={(e) => {
+									if (!paperNameMfrDisabled)
+										this.checkPaperMfrName(e, "weightclass");
+								}}
+							>
 								{this.state.paperWeightRadio}
 							</Radio.Group>
 						)}
@@ -539,7 +568,13 @@ class NewJobForm extends React.Component {
 						{getFieldDecorator('finish', {
 							rules: [{ required: true, message: 'Please choose a finish' }],
 						})(
-							<Radio.Group className={Style.formItemPaper} onChange={(e) => this.checkPaperMfrName(e, "finish")}>
+							<Radio.Group
+								className={Style.formItemPaper}
+								onChange={(e) => {
+									if (!paperNameMfrDisabled)
+										this.checkPaperMfrName(e, "finish");
+								}}
+							>
 								{this.state.paperFinishRadio}
 							</Radio.Group>
 						)}
@@ -548,16 +583,6 @@ class NewJobForm extends React.Component {
 					<br />
 
 					<div className={Style.formButtons}>
-						<Popconfirm
-							title="Are you sure reset the form?"
-							placement="top"
-							onConfirm={() => this.formReset()}
-						>
-							<Button ghost type="danger">
-								<Icon style={{ position: 'relative', bottom: 3 }} type="undo" />
-								Reset Form
-							</Button>
-						</Popconfirm>
 						<Button type="primary" onClick={this.handleSubmit}>
 							Submit
 						</Button>
