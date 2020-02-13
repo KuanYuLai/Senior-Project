@@ -6,8 +6,6 @@ import { Home } from './components/Home';
 
 import { NewJob } from './components/NewJob';
 import { JobHistory } from './components/JobHistory';
-import { FetchData } from './components/FetchData';
-import { Counter } from './components/Counter';
 
 import 'antd/dist/antd.css';
 import Style from './CSS/App.module.css'
@@ -83,33 +81,15 @@ export default class App extends Component {
 							Job History
 							<Link to="/job-history" />
 						</Menu.Item>
-
-						<Menu.Item key="counter">
-							<Icon className={Style.navIcon} type="plus" />
-							Counter
-							<Link to="/counter" />
-						</Menu.Item>
-
-						<Menu.Item key="data">
-							<Icon className={Style.navIcon} type="cloud" />
-							Weather
-							<Link to="/weather" />
-						</Menu.Item>
 					</Menu>
 
-					<Content style={{ height: 'calc(100vh - 85px)' }}>
+					<Content style={{ height: 'calc(100vh - 48px)' }}>
 						<div className={Style.mainContent}>
 							<Route exact path='/' render={(props) => <Home {...props} callback={this.handleMenuClick} />} />
                             <Route exact path='/new-job' component={NewJob} />
                             <Route exact path='/job-history' component={JobHistory} />
-							<Route exact path='/counter' component={Counter} />
-							<Route exact path='/weather' component={FetchData} />
 						</div>
 					</Content>
-
-                    <Footer className={Style.appFooter}>
-						Ant Design &copy;2016 Created by Ant UED
-					</Footer>
 				</Layout>
 			</Router>
 		);
