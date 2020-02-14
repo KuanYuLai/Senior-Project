@@ -1,5 +1,5 @@
 ﻿import React, { Component, Fragment } from 'react';
-import { Button, Checkbox, Form, Icon, Input, InputNumber, Popconfirm, Radio, Row, Col, Select, Slider } from 'antd';
+import { Button, Checkbox, Form, Icon, Input, InputNumber, notification, Radio, Row, Col, Select, Slider } from 'antd';
 
 import Style from '../CSS/NewJob.module.css'
 import { ServerURL } from './Home';
@@ -32,51 +32,51 @@ class NewJobForm extends React.Component {
 	constructor() {
 		super();
 
-		/* This will eventually be replaced with a call to a database.
-		 * For now, this file exists locally. */
-		var paperDatabase = require('../PaperData/SJA-paper-db-2020-02-09-trim.json');
-
-		/* Call database to request paperDatabase object. */
-		fetch(ServerURL + "rules/SJA-paper-db-2020-02-09-trim.json", {
-			method: "GET",
-			mode: 'no-cors',
-			headers: {
-				"Accept": "application/json"
-			}
-		}).then((res) => {
-			res.json().then((data) => {
-				console.log(data);
-			});
-		}).catch(err => err);
-
-
 		/* Initialize all values and populate radios/selects. */
 		this.state = {
 			unknownPaper: false,
 			paperNameMfrDisabled: false,
-			currentPaperNames: paperDatabase.paperdb,
-			paperDatabase: paperDatabase.paperdb,
-			weightgsm: 150,
+			weightgsm: null,
 			maxCoverage: 50,
 			opticalDensity: 100,
-			paperMfrDropdown: this.getMfrDropdown(paperDatabase.paperdb, "manufacturer"),
-			paperNameDropdown: this.getMfrDropdown(paperDatabase.paperdb, "productname"),
-			paperWeightDropdown: this.getWeightDropdown(paperDatabase.paperdb),
-			paperTypeRadio: this.getRadio(paperDatabase.paperdb, "papertype"),
-			paperSubTypeRadio: this.getRadio(paperDatabase.paperdb, "papersubtype"),
-			paperFinishRadio: this.getRadio(paperDatabase.paperdb, "finish"),
 		};
 	};
 
-	getWeightDropdown = (data) => {
-		/* Get all weights, sort them in ascending order, then filter for duplicates. */
-		var weightArray = data.map((obj) => { return parseFloat(obj.weightgsm) }).sort((a, b) => { return a - b });
-		weightArray = [...new Set(weightArray)];
+	/* Runs before the constructor. */
+	componentDidMount = async () => {
+		/* Fetch the paper database from the server. Wait unfil fetch is complete to continue. */
+		await this.fetchPaperDatabase();
 
-		this.weightMarks = {};
-		for (let i = 0; i < weightArray.length; i++) {
-			this.weightMarks[weightArray[i]] = "";
+		/* If there was an error fetching the paper database, don't attempt to populat dropdowns/radios. */
+		if (typeof this.state.error === 'undefined' && this.state.error !== true) {
+			this.setState({
+				currentPaperNames: this.state.paperDatabase,
+				paperMfrDropdown: this.getDropdown(this.state.paperDatabase, "manufacturer"),
+				paperNameDropdown: this.getDropdown(this.state.paperDatabase, "productname"),
+				paperWeightDropdown: this.getDropdown(this.state.paperDatabase, "weightgsm"),
+				paperTypeRadio: this.getRadio(this.state.paperDatabase, "papertype"),
+				paperSubTypeRadio: this.getRadio(this.state.paperDatabase, "papersubtype"),
+				paperFinishRadio: this.getRadio(this.state.paperDatabase, "finish"),
+			});
 		}
+	}
+
+	/* Fetch the paper database from the server. */
+	fetchPaperDatabase = async () => {
+		/* Call database to request paperDatabase object. */
+		await fetch(ServerURL + "paper-db/", {
+			method: "GET",
+			mode: 'cors',
+			headers: {
+				'Accept': 'application/json',
+			}
+		}).then(async (res) => {
+			await res.json().then((data) => {
+				this.setState({ paperDatabase: data.paperdb });
+			});
+		}).catch(err => {
+			this.fetchError("fetch paper database");
+		});
 	}
 
 	/* Get the values for the radio group. */
@@ -115,18 +115,21 @@ class NewJobForm extends React.Component {
 		var paperTypes = [];
 		var paperSubTypes = [];
 		var paperFinishes = [];
+		var paperWeights = [];
 
 		/* Grab all of the types/subtypes/weights/finishes within the list of objects. */
 		for (let i = 0; i < selected.length; i++) {
 			paperTypes.push(selected[i].papertype);
 			paperSubTypes.push(selected[i].papersubtype);
 			paperFinishes.push(selected[i].finish);
+			paperWeights.push(parseFloat(selected[i].weightgsm));
 		}
 
 		/* Filter the lists of types/subtypes/weights/finishes to remove duplicates. */
 		paperTypes = paperTypes.filter((v, i, a) => a.indexOf(v) === i);
 		paperSubTypes = paperSubTypes.filter((v, i, a) => a.indexOf(v) === i);
 		paperFinishes = paperFinishes.filter((v, i, a) => a.indexOf(v) === i);
+		paperWeights = paperWeights.filter((v, i, a) => a.indexOf(v) === i);
 
 		/* If there's only one choice for a radio, just fill it out. */
 		if (paperTypes.length === 1)
@@ -135,31 +138,44 @@ class NewJobForm extends React.Component {
 			setFieldsValue({ papersubtype: paperSubTypes[0] });
 		if (paperFinishes.length === 1)
 			setFieldsValue({ finish: paperFinishes[0] });
+		if (paperWeights.length === 1) {
+			setFieldsValue({ weightgsm: paperWeights[0] });
+			this.setState({ weightgsm: paperWeights[0] });
+		}
+
+		/* Set the weightgsm dropdown values. */
+		var dropdown = [];
+		for (let i = 0; i < paperWeights.length; i++) {
+			dropdown.push(<Option key={paperWeights[i]}>{paperWeights[i]}</Option>);
+		}
 
 		/* Update other radios. Once a choice has been made on a radio, all other options grey out. */
 		this.setState({
 			paperTypeRadio: this.getRadio(paperDatabase, "papertype", paperTypes),
 			paperSubTypeRadio: this.getRadio(paperDatabase, "papersubtype", paperSubTypes),
 			paperFinishRadio: this.getRadio(paperDatabase, "finish", paperFinishes),
+			paperWeightDropdown: dropdown
 		});
 	}
 
-	getMfrDropdown = (data, key) => {
-		// Create the select component
+	/* Populate a Select component. */
+	getDropdown = (data, key) => {
+		/* Initialize the arrays to hold values scraped from data source and Select component Options. */
+		var vals = [];
 		var dropdown = [];
-		var mfrNames = [];
 
-		// Get all names
-		for (let i = 0; i < data.length; i++) {
-			mfrNames.push(data[i][key]);
-		}
+		/* A bit different for weightgsm, since it needs to be floats instead of strings. */
+		if (key === "weightgsm")
+			vals = data.map((obj) => { return parseFloat(obj.weightgsm) }).sort((a, b) => { return a - b });
+		else
+			vals = data.map((obj) => { return obj[key] }).sort();
 
-		// Filter list for unique names only, then sort it alphabetically
-		mfrNames = mfrNames.filter((v, i, a) => a.indexOf(v) === i).sort();
+		/* Filter the array for duplicates. */
+		vals = [...new Set(vals)];
 
-		// Create the dropdown for the Select using the list of names
-		for (let j = 0; j < mfrNames.length; j++) {
-			dropdown.push(<Option key={mfrNames[j]}>{mfrNames[j]}</Option>);
+		/* Create the dropdown for the Select using the list of names. */
+		for (let i = 0; i < vals.length; i++) {
+			dropdown.push(<Option key={vals[i]}>{vals[i]}</Option>);
 		}
 
 		return dropdown;
@@ -169,7 +185,7 @@ class NewJobForm extends React.Component {
 	onSliderChange = (val, field) => {
 		const { setFieldsValue } = this.props.form;
 
-		/* Set a minimum value, but only for opticalDensity slider*/
+		/* Set a minimum value, but only for opticalDensity slider. */
 		if (val < 50 && field === "opticalDensity")
 			val = 50;
 
@@ -177,6 +193,8 @@ class NewJobForm extends React.Component {
 		this.setState({ [field]: val });
 	};
 
+	/* Called when the paper manufacturer is changed.
+	 * Repopulates paper names dropdown with papers made by the selected manufacturer. */
 	onPaperMfrChange = val => {
 		const { setFieldsValue, getFieldValue, resetFields } = this.props.form;
 
@@ -195,7 +213,7 @@ class NewJobForm extends React.Component {
 		paperNames = paperNames.filter((v, i, a) => a.indexOf(v) === i);
 
 		/* Check to see if currently selected paper name is a product of selected manufacturer.
-		 * If it is, leave it, if it's not, clear it */
+		 * If it is, leave it, if it's not, clear it. */
 		if (paperNames.indexOf(getFieldValue("productname")) === -1)
 			resetFields("productname");
 
@@ -238,7 +256,12 @@ class NewJobForm extends React.Component {
 
 		var currentPapers = [...paperDatabase];
 
-		currentPapers = currentPapers.filter((a) => a[field] === e.target.value);
+		if (field !== "weightgsm")
+			currentPapers = currentPapers.filter((a) => a[field] === e.target.value);
+		else {
+			this.setState({ weightgsm: e });
+			currentPapers = currentPapers.filter((a) => a[field] === e);
+		}
 
 		if (typeof getFieldValue("manufacturer") !== 'undefined' && field !== "manufacturer")
 			currentPapers = currentPapers.filter((a) => a.manufacturer === getFieldValue("manufacturer"));
@@ -277,25 +300,27 @@ class NewJobForm extends React.Component {
 
 		this.setState({
 			currentPaperNames: currentPapers,
-			paperMfrDropdown: this.getMfrDropdown(currentPapers, "manufacturer"),
-			paperNameDropdown: this.getMfrDropdown(currentPapers, "productname"),
+			paperMfrDropdown: this.getDropdown(currentPapers, "manufacturer"),
+			paperNameDropdown: this.getDropdown(currentPapers, "productname"),
+			paperWeightDropdown: this.getDropdown(currentPapers, "weightgsm")
 		});
 
 		this.setRadios(currentPapers);
 	}
 
 	handleUnknownPaper = () => {
-		const { unknownPaper, paperNameMfrDisabled, paperDatabase } = this.state;
+		const { unknownPaper, paperNameMfrDisabled } = this.state;
 
-		this.props.form.resetFields(["manufacturer", "productname", "papertype", "papersubtype", "weightgsm", "finish"]);
 		this.setState({
 			unknownPaper: !unknownPaper,
 			paperNameMfrDisabled: !paperNameMfrDisabled,
-			paperMfrDropdown: this.getMfrDropdown(paperDatabase, "manufacturer"),
-			paperNameDropdown: this.getMfrDropdown(paperDatabase, "productname"),
 		});
 
-		this.resetPaperSelectionRadio();
+		/* Putting a timeout here fixes a weird bug where the "weightgsm" field decorator gets deleted. */
+		setTimeout(() => {
+			this.paperReset();
+		}, 100);
+		
 	}
 
 	/* Resets all the paper selection radio disabled values. */
@@ -311,13 +336,17 @@ class NewJobForm extends React.Component {
 
 	/* Resets all form fields for paper selection. */
 	paperReset = () => {
+		const { paperDatabase } = this.state;
+
 		this.props.form.resetFields(["manufacturer", "productname", "papertype", "papersubtype", "weightgsm", "finish"]);
 		this.resetPaperSelectionRadio();
 
 		this.setState({
-			paperMfrDropdown: this.getMfrDropdown(this.state.paperDatabase, "manufacturer"),
-			paperNameDropdown: this.getMfrDropdown(this.state.paperDatabase, "productname"),
-			currentPaperNames: this.state.paperDatabase,
+			paperMfrDropdown: this.getDropdown(paperDatabase, "manufacturer"),
+			paperNameDropdown: this.getDropdown(paperDatabase, "productname"),
+			paperWeightDropdown: this.getDropdown(paperDatabase, "weightgsm"),
+			currentPaperNames: paperDatabase,
+			weightgsm: null,
 		});
 	}
 
@@ -331,15 +360,52 @@ class NewJobForm extends React.Component {
 		});
 	}
 
-	/* Gathers and validates form data. */
+	/* Gathers and validates form data, then makes a POST call to the rules engine. */
 	handleSubmit = e => {
 		e.preventDefault();
-		this.props.form.validateFields((err, values) => {
+		this.props.form.validateFields(async (err, values) => {
 			if (!err) {
 				console.log('Received values of form: ', values);
+
+				/* Call database to request paperDatabase object. */
+				await fetch(ServerURL + 'new-job/', {
+					method: 'POST',
+					mode: 'cors',
+					body: JSON.stringify(values),
+					headers: {
+						'Accept': 'application/json',
+						'Content-Type': 'application/json',
+					}
+				}).then((res) => {
+					console.log(res);
+				}).catch(() => {
+					this.fetchError("submit job");
+				});
 			}
 		});
 	};
+
+	/* Called when there is an error in a fetch call. */
+	fetchError = (type) => {
+		this.alertPresent = false;
+
+		/* This is for debouncing, so the alert doesn't appear twice. */
+		if (!this.alertPresent) {
+			this.alertPresent = true;
+
+			notification['error']({
+				message: 'Failed to ' + type + '.',
+				description: "The server is probably down. Try again later.",
+				duration: null
+			});
+
+			setTimeout(() => {
+				this.alertPresent = false;
+			}, 1000);
+		}
+
+		this.setState({ error: true });
+	}
 
 	render() {
 		const {
@@ -362,8 +428,6 @@ class NewJobForm extends React.Component {
 				sm: { span: 20 },
 			},
 		}
-
-		console.log(ServerURL);
 
 		return (
 			<div className={Style.newJobFormContainer}>
@@ -510,9 +574,10 @@ class NewJobForm extends React.Component {
 								disabled={paperNameMfrDisabled}
 								onChange={this.onPaperMfrChange}
 								showSearch
+								showArrow={false}
 								placeholder={
 									paperNameMfrDisabled === true ? <span>Disabled</span>
-									: <span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select a product</span>
+									: <span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select manufacturer</span>
 								}
 							>
 								{this.state.paperMfrDropdown}
@@ -529,9 +594,10 @@ class NewJobForm extends React.Component {
 								disabled={paperNameMfrDisabled}
 								onChange={this.onPaperNameChange}
 								showSearch
+								showArrow={false}
 								placeholder={
 									paperNameMfrDisabled === true ? <span>Disabled</span>
-										: <span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select a paper</span>
+										: <span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select paper</span>
 								}
 							>
 								{this.state.paperNameDropdown}
@@ -569,27 +635,41 @@ class NewJobForm extends React.Component {
 					</Form.Item>
 					<Form.Item label="Weight:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
 						{getFieldDecorator('weightgsm', {
-							rules: [{ required: true, message: 'Please choose a weight class' }],
+							rules: [{ required: true, message: 'Please choose a weight in gsm' }],
+							initialValue: weightgsm || null
 						})(
 							unknownPaper ?
-								<span>meme</span>
-								:
 								<div style={{ display: 'flex', marginBottom: '-20px' }} >
 									<Slider
 										className={Style.formItemInput}
 										style={{ width: 'calc(100% - 127px)' }}
 										min={0}
 										max={500}
-										value={weightgsm}
+										value={weightgsm || 0}
 										onChange={(e) => this.onSliderChange(e, "weightgsm")}
 									/>
 									<BetterInputNumber
 										addonAfter="gsm"
-										value={weightgsm}
+										value={weightgsm || null}
 										field="weightgsm"
 										onSliderChange={this.onSliderChange}
 									/>
 								</div>
+								:
+								<>
+									<Select
+										className={Style.formItemPaper}
+										style={{ maxWidth: 80 }}
+										showSearch
+										showArrow={false}
+										onChange={(e) => this.checkPaperMfrName(e, "weightgsm")}
+										placeholder={<span>Weight</span>}
+										value={weightgsm || undefined}
+									>
+										{this.state.paperWeightDropdown}
+									</Select>
+									<div className="ant-input-group-addon" style={{ position: 'relative', borderBottomLeftRadius: 2, borderTopLeftRadius: 2, bottom: 6, paddingTop: '2px', verticalAlign: 'middle', display: 'inline-table', lineHeight: '24px', height: '32px' }}>gsm</div>
+								</>
 						)}
 					</Form.Item>
 					<Form.Item label="Finish:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>

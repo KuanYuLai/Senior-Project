@@ -4,7 +4,7 @@ import { Button, Icon } from 'antd';
 
 import Style from '../CSS/Home.module.css'
 
-export const ServerURL = "http://ec2-52-27-132-187.us-west-2.compute.amazonaws.com:8080/"
+export const ServerURL = "http://ec2-34-220-146-4.us-west-2.compute.amazonaws.com:8000/"
 
 export class Home extends Component {
     render() {
