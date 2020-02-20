@@ -1,6 +1,6 @@
 ﻿import React, { Component, Fragment } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { Button, Form, Modal, Table, Row, Col } from 'antd';
+import { Button, Form, Modal, notification, Table, Row, Col } from 'antd';
 import moment from 'moment';
 
 import Style from '../CSS/JobHistory.module.css'
