@@ -73,7 +73,7 @@ export class JobHistory extends Component {
 			currentJobId: -1,
 			modalVisible: false,
 			modalContent: null,
-			jobHistory: this.sampleHistory,
+			//jobHistory: this.sampleHistory,
 		}
 	}
 
@@ -111,6 +111,7 @@ export class JobHistory extends Component {
 			}
 		}).then(async (res) => {
 			await res.json().then((data) => {
+				console.log(data);
 				this.setState({ jobHistory: data });
 			});
 		}).catch(err => {

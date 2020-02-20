@@ -111,7 +111,7 @@ class NewJobForm extends React.Component {
 	setRadios = (selected) => {
 		const { paperDatabase } = this.state;
 		const { setFieldsValue } = this.props.form;
-		console.log(selected);
+
 		var paperTypes = [];
 		var paperSubTypes = [];
 		var paperFinishes = [];
