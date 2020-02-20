@@ -367,7 +367,7 @@ class NewJobForm extends React.Component {
 			if (!err) {
 				console.log('Received values of form: ', values);
 
-				/* Call database to request paperDatabase object. */
+				/* Call database to request paperDatabase object. * /
 				await fetch(ServerURL + 'new-job/', {
 					method: 'POST',
 					mode: 'cors',
@@ -381,6 +381,7 @@ class NewJobForm extends React.Component {
 				}).catch(() => {
 					this.fetchError("submit job");
 				});
+				*/
 			}
 		});
 	};
