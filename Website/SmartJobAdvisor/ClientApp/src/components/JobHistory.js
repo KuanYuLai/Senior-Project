@@ -15,7 +15,7 @@ export class JobHistory extends Component {
 		this.sampleColumns = [
 			{
 				title: 'Job ID',
-				dataIndex: 'jobid',
+				dataIndex: 'jobID',
 				width: 100,
 				sorter: (a, b) => a.jobNumber - b.JobNumber,
 			},
@@ -36,7 +36,7 @@ export class JobHistory extends Component {
             {
                 title: 'Results',
                 //dataIndex: 'results',
-				render: (text, row) => <Button onClick={() => this.showResults(row.jobid)}>View</Button>,
+				render: (text, row) => <Button onClick={() => this.showResults(row.jobID)}>View</Button>,
             },
 		];
 		/*
@@ -88,7 +88,7 @@ export class JobHistory extends Component {
 
 			for (let i = 0; i < this.state.jobHistory.length; i++) {
 				rowObject = {
-					jobid: this.state.jobHistory[i].jobid,
+					jobID: this.state.jobHistory[i].jobID,
 					jobName: this.state.jobHistory[i].jobName
 				};
 
@@ -153,7 +153,7 @@ export class JobHistory extends Component {
 		var currentData = [...this.state.jobHistory];
 
 		currentData = currentData.filter(obj => {
-			return obj.jobid === key;
+			return obj.jobID === key;
 		})[0];
 
 		var modalInnards =
@@ -256,7 +256,7 @@ export class JobHistory extends Component {
 				</Modal>
 
                 <Table
-                    rowKey="jobid"
+                    rowKey="jobID"
                     dataSource={tableData}
                     columns={this.sampleColumns}
                     style={{ width: 450 }}
