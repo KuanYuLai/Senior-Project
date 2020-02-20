@@ -111,7 +111,7 @@ class NewJobForm extends React.Component {
 	setRadios = (selected) => {
 		const { paperDatabase } = this.state;
 		const { setFieldsValue } = this.props.form;
-
+		console.log(selected);
 		var paperTypes = [];
 		var paperSubTypes = [];
 		var paperFinishes = [];
@@ -271,7 +271,7 @@ class NewJobForm extends React.Component {
 			currentPapers = currentPapers.filter((a) => a.papertype === getFieldValue("papertype"));
 		if (typeof getFieldValue("papersubtype") !== 'undefined' && field !== "papersubtype")
 			currentPapers = currentPapers.filter((a) => a.papersubtype === getFieldValue("papersubtype"));
-		if (typeof getFieldValue("weightgsm") !== 'undefined' && field !== "weightgsm")
+		if (typeof getFieldValue("weightgsm") !== 'undefined' && getFieldValue("weightgsm") !== null && field !== "weightgsm")
 			currentPapers = currentPapers.filter((a) => a.weightgsm === getFieldValue("weightgsm"));
 		if (typeof getFieldValue("finish") !== 'undefined' && field !== "finish")
 			currentPapers = currentPapers.filter((a) => a.finish === getFieldValue("finish"));
@@ -367,7 +367,7 @@ class NewJobForm extends React.Component {
 			if (!err) {
 				console.log('Received values of form: ', values);
 
-				/* Call database to request paperDatabase object. * /
+				/* Call database to request paperDatabase object. */
 				await fetch(ServerURL + 'new-job/', {
 					method: 'POST',
 					mode: 'cors',
@@ -381,7 +381,6 @@ class NewJobForm extends React.Component {
 				}).catch(() => {
 					this.fetchError("submit job");
 				});
-				*/
 			}
 		});
 	};
