@@ -79,6 +79,29 @@ class NewJobForm extends React.Component {
 		});
 	}
 
+	/* Populate a Select component. */
+	getDropdown = (data, key) => {
+		/* Initialize the arrays to hold values scraped from data source and Select component Options. */
+		var vals = [];
+		var dropdown = [];
+
+		/* A bit different for weightgsm, since it needs to be floats instead of strings. */
+		if (key === "weightgsm")
+			vals = data.map((obj) => { return parseFloat(obj.weightgsm) }).sort((a, b) => { return a - b });
+		else
+			vals = data.map((obj) => { return obj[key] }).sort();
+
+		/* Filter the array for duplicates. */
+		vals = [...new Set(vals)];
+
+		/* Create the dropdown for the Select using the list of names. */
+		for (let i = 0; i < vals.length; i++) {
+			dropdown.push(<Option key={vals[i]}>{vals[i]}</Option>);
+		}
+
+		return dropdown;
+	};
+
 	/* Get the values for the radio group. */
 	getRadio = (data, key, filter = null) => {
 		var radio = [];
@@ -159,28 +182,72 @@ class NewJobForm extends React.Component {
 		});
 	}
 
-	/* Populate a Select component. */
-	getDropdown = (data, key) => {
-		/* Initialize the arrays to hold values scraped from data source and Select component Options. */
-		var vals = [];
-		var dropdown = [];
+	/* Called when a radio button is hit in paper selection. Narrows down mfr and product names, autofills once there is only one option. */
+	checkPaperMfrName = (e, field) => {
+		const { getFieldValue, setFieldsValue, getFieldsValue } = this.props.form;
+		const { paperDatabase, currentPaperNames } = this.state;
 
-		/* A bit different for weightgsm, since it needs to be floats instead of strings. */
-		if (key === "weightgsm")
-			vals = data.map((obj) => { return parseFloat(obj.weightgsm) }).sort((a, b) => { return a - b });
-		else
-			vals = data.map((obj) => { return obj[key] }).sort();
+		//var currentPapers = [...paperDatabase];
+		var currentPapers = [...currentPaperNames];
 
-		/* Filter the array for duplicates. */
-		vals = [...new Set(vals)];
-
-		/* Create the dropdown for the Select using the list of names. */
-		for (let i = 0; i < vals.length; i++) {
-			dropdown.push(<Option key={vals[i]}>{vals[i]}</Option>);
+		if (field !== "weightgsm") {
+			setFieldsValue({
+				[field]: e.target.value
+			})
+			currentPapers = currentPapers.filter((a) => a[field] === e.target.value);
+		}
+		else {
+			this.setState({ weightgsm: e });
+			setFieldsValue({
+				[field]: e
+			})
+			currentPapers = currentPapers.filter((a) => a[field] === e);
 		}
 
-		return dropdown;
-	};
+		if (typeof getFieldValue("manufacturer") !== 'undefined' && field !== "manufacturer")
+			currentPapers = currentPapers.filter((a) => a.manufacturer == getFieldValue("manufacturer"));
+		if (typeof getFieldValue("productname") !== 'undefined' && field !== "productname")
+			currentPapers = currentPapers.filter((a) => a.productname == getFieldValue("productname"));
+		if (typeof getFieldValue("papertype") !== 'undefined' && field !== "papertype")
+			currentPapers = currentPapers.filter((a) => a.papertype == getFieldValue("papertype"));
+		if (typeof getFieldValue("papersubtype") !== 'undefined' && field !== "papersubtype")
+			currentPapers = currentPapers.filter((a) => a.papersubtype == getFieldValue("papersubtype"));
+		if (typeof getFieldValue("weightgsm") !== 'undefined' && getFieldValue("weightgsm") !== null && field !== "weightgsm")
+			currentPapers = currentPapers.filter((a) => a.weightgsm == getFieldValue("weightgsm"));
+		if (typeof getFieldValue("finish") !== 'undefined' && field !== "finish")
+			currentPapers = currentPapers.filter((a) => a.finish == getFieldValue("finish"));
+
+		var paperMfrs = [];
+		var paperNames = [];
+
+		/* Grab all of the types/subtypes/weights/finishes within the list of objects. */
+		for (let i = 0; i < currentPapers.length; i++) {
+			paperMfrs.push(currentPapers[i].manufacturer);
+			paperNames.push(currentPapers[i].productname);
+		}
+
+		paperMfrs = [...new Set(paperMfrs)];
+		paperNames = [...new Set(paperNames)];
+
+		if (paperNames.length === 1)
+			setFieldsValue({
+				manufacturer: paperMfrs[0],
+				productname: currentPapers[0].productname,
+			});
+		else if (paperMfrs.length === 1)
+			setFieldsValue({
+				manufacturer: paperMfrs[0],
+			});
+
+		this.setState({
+			currentPaperNames: currentPapers,
+			paperMfrDropdown: this.getDropdown(currentPapers, "manufacturer"),
+			paperNameDropdown: this.getDropdown(currentPapers, "productname"),
+			paperWeightDropdown: this.getDropdown(currentPapers, "weightgsm")
+		});
+
+		this.setRadios(currentPapers);
+	}
 
 	/* Called when the optical density value is changed. */
 	onSliderChange = (val, field) => {
@@ -249,73 +316,6 @@ class NewJobForm extends React.Component {
 
 		this.setRadios(selectedPaper);
 	};
-
-	/* Called when a radio button is hit in paper selection. Narrows down mfr and product names, autofills once there is only one option. */
-	checkPaperMfrName = (e, field) => {
-		const { getFieldValue, setFieldsValue, getFieldsValue } = this.props.form;
-		const { paperDatabase, currentPaperNames } = this.state;
-
-		//var currentPapers = [...paperDatabase];
-		var currentPapers = [...currentPaperNames];
-
-		if (field !== "weightgsm") {
-			setFieldsValue({
-				[field]: e.target.value
-			})
-			currentPapers = currentPapers.filter((a) => a[field] === e.target.value);
-		}
-		else {
-			this.setState({ weightgsm: e });
-			setFieldsValue({
-				[field]: e
-			})
-			currentPapers = currentPapers.filter((a) => a[field] === e);
-		}
-
-		if (typeof getFieldValue("manufacturer") !== 'undefined' && field !== "manufacturer")
-			currentPapers = currentPapers.filter((a) => a.manufacturer == getFieldValue("manufacturer"));
-		if (typeof getFieldValue("productname") !== 'undefined' && field !== "productname")
-			currentPapers = currentPapers.filter((a) => a.productname == getFieldValue("productname"));
-		if (typeof getFieldValue("papertype") !== 'undefined' && field !== "papertype")
-			currentPapers = currentPapers.filter((a) => a.papertype == getFieldValue("papertype"));
-		if (typeof getFieldValue("papersubtype") !== 'undefined' && field !== "papersubtype")
-			currentPapers = currentPapers.filter((a) => a.papersubtype == getFieldValue("papersubtype"));
-		if (typeof getFieldValue("weightgsm") !== 'undefined' && getFieldValue("weightgsm") !== null && field !== "weightgsm")
-			currentPapers = currentPapers.filter((a) => a.weightgsm == getFieldValue("weightgsm"));
-		if (typeof getFieldValue("finish") !== 'undefined' && field !== "finish")
-			currentPapers = currentPapers.filter((a) => a.finish == getFieldValue("finish"));
-
-		var paperMfrs = [];
-		var paperNames = [];
-
-		/* Grab all of the types/subtypes/weights/finishes within the list of objects. */
-		for (let i = 0; i < currentPapers.length; i++) {
-			paperMfrs.push(currentPapers[i].manufacturer);
-			paperNames.push(currentPapers[i].productname);
-		}
-
-		paperMfrs = [...new Set(paperMfrs)];
-		paperNames = [...new Set(paperNames)];
-
-		if (paperNames.length === 1)
-			setFieldsValue({
-				manufacturer: paperMfrs[0],
-				productname: currentPapers[0].productname,
-			});
-		else if (paperMfrs.length === 1)
-			setFieldsValue({
-				manufacturer: paperMfrs[0],
-			});
-
-		this.setState({
-			currentPaperNames: currentPapers,
-			paperMfrDropdown: this.getDropdown(currentPapers, "manufacturer"),
-			paperNameDropdown: this.getDropdown(currentPapers, "productname"),
-			paperWeightDropdown: this.getDropdown(currentPapers, "weightgsm")
-		});
-
-		this.setRadios(currentPapers);
-	}
 
 	handleUnknownPaper = () => {
 		const { unknownPaper, paperNameMfrDisabled } = this.state;
