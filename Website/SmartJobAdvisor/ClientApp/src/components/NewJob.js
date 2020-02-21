@@ -132,6 +132,7 @@ class NewJobForm extends React.Component {
 		paperWeights = paperWeights.filter((v, i, a) => a.indexOf(v) === i);
 
 		/* If there's only one choice for a radio, just fill it out. */
+		var temp = null;
 		if (paperTypes.length === 1)
 			setFieldsValue({ papertype: paperTypes[0] });
 		if (paperSubTypes.length === 1)
@@ -251,30 +252,38 @@ class NewJobForm extends React.Component {
 
 	/* Called when a radio button is hit in paper selection. Narrows down mfr and product names, autofills once there is only one option. */
 	checkPaperMfrName = (e, field) => {
-		const { getFieldValue, setFieldsValue } = this.props.form;
-		const { paperDatabase } = this.state;
+		const { getFieldValue, setFieldsValue, getFieldsValue } = this.props.form;
+		const { paperDatabase, currentPaperNames } = this.state;
 
-		var currentPapers = [...paperDatabase];
+		//var currentPapers = [...paperDatabase];
+		var currentPapers = [...currentPaperNames];
 
-		if (field !== "weightgsm")
+		if (field !== "weightgsm") {
+			setFieldsValue({
+				[field]: e.target.value
+			})
 			currentPapers = currentPapers.filter((a) => a[field] === e.target.value);
+		}
 		else {
 			this.setState({ weightgsm: e });
+			setFieldsValue({
+				[field]: e
+			})
 			currentPapers = currentPapers.filter((a) => a[field] === e);
 		}
 
 		if (typeof getFieldValue("manufacturer") !== 'undefined' && field !== "manufacturer")
-			currentPapers = currentPapers.filter((a) => a.manufacturer === getFieldValue("manufacturer"));
+			currentPapers = currentPapers.filter((a) => a.manufacturer == getFieldValue("manufacturer"));
 		if (typeof getFieldValue("productname") !== 'undefined' && field !== "productname")
-			currentPapers = currentPapers.filter((a) => a.productname === getFieldValue("productname"));
+			currentPapers = currentPapers.filter((a) => a.productname == getFieldValue("productname"));
 		if (typeof getFieldValue("papertype") !== 'undefined' && field !== "papertype")
-			currentPapers = currentPapers.filter((a) => a.papertype === getFieldValue("papertype"));
+			currentPapers = currentPapers.filter((a) => a.papertype == getFieldValue("papertype"));
 		if (typeof getFieldValue("papersubtype") !== 'undefined' && field !== "papersubtype")
-			currentPapers = currentPapers.filter((a) => a.papersubtype === getFieldValue("papersubtype"));
+			currentPapers = currentPapers.filter((a) => a.papersubtype == getFieldValue("papersubtype"));
 		if (typeof getFieldValue("weightgsm") !== 'undefined' && getFieldValue("weightgsm") !== null && field !== "weightgsm")
-			currentPapers = currentPapers.filter((a) => a.weightgsm === getFieldValue("weightgsm"));
+			currentPapers = currentPapers.filter((a) => a.weightgsm == getFieldValue("weightgsm"));
 		if (typeof getFieldValue("finish") !== 'undefined' && field !== "finish")
-			currentPapers = currentPapers.filter((a) => a.finish === getFieldValue("finish"));
+			currentPapers = currentPapers.filter((a) => a.finish == getFieldValue("finish"));
 
 		var paperMfrs = [];
 		var paperNames = [];
@@ -376,8 +385,10 @@ class NewJobForm extends React.Component {
 						'Accept': 'application/json',
 						'Content-Type': 'application/json',
 					}
-				}).then((res) => {
-					console.log(res);
+				}).then(async (res) => {
+					await res.json().then((data) => {
+						console.log(data);
+					});
 				}).catch(() => {
 					this.fetchError("submit job");
 				});
