@@ -1,5 +1,6 @@
 ﻿.newJobFormContainer {
-	max-width: 495px;
+	/*max-width: 495px;*/
+	max-width: 600px;
 	min-width: 235px;
 }
 

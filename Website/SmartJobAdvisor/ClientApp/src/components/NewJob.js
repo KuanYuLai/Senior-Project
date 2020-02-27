@@ -73,6 +73,10 @@ class NewJobForm extends React.Component {
 		}).then(async (res) => {
 			await res.json().then((data) => {
 				this.setState({ paperDatabase: data.paperdb });
+
+				// Testing with actual data
+				//var data = require('../PaperData/HP-paper-db-CONFIDENTIAL-2020-02-09.json');
+				//this.setState({ paperDatabase: data.paperdb })
 			});
 		}).catch(err => {
 			this.fetchError("fetch paper database");
