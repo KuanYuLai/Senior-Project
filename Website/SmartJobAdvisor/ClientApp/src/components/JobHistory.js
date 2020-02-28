@@ -23,7 +23,7 @@ export class JobHistory extends Component {
 			{
 				title: 'Date',
 				dataIndex: 'jobTime',
-				width: 150,
+				width: 200,
                 sorter: (a, b) => moment(a.jobTime).unix() - moment(b.jobTime).unix(),
 				defaultSortOrder: 'descend',
             },
@@ -59,7 +59,7 @@ export class JobHistory extends Component {
 			for (let i = 0; i < this.state.jobHistory.length; i++) {
 				rowObject = {
 					jobid: this.state.jobHistory[i].jobid,
-					jobTime: moment(this.state.jobHistory[i].jobTime).unix(),
+					jobTime: this.state.jobHistory[i].jobTime,
 					jobName: this.state.jobHistory[i].jobName
 				};
 
@@ -146,7 +146,7 @@ export class JobHistory extends Component {
 			})[0];
 
 			/* Column for each job being compared. */
-			temp.push({ value: 'Job ' + currentData.jobid, width: 150, readOnly: true });
+			temp.push({ value: 'Job ' + currentData.jobid, width: 175, readOnly: true });
 		}
 
 		spreadsheetData.push(temp);
@@ -224,7 +224,7 @@ export class JobHistory extends Component {
 					}}
 					destroyOnClose={true}
 					footer={null}
-					width={selectedRowKeys.length === 0 ? 350 : ((selectedRowKeys.length + 1) * 150) + 50}
+					width={selectedRowKeys.length === 0 ? 350 : ((selectedRowKeys.length) * 175) + 200}
 				>
 					{modalContent}
 				</Modal>
@@ -267,7 +267,7 @@ export class JobHistory extends Component {
 					rowSelection={rowSelection}
                     dataSource={tableData}
                     columns={this.sampleColumns}
-					style={{ width: 600 }}
+					style={{ width: 650 }}
 					scroll={{ y: 1000 }}
 					bordered
 				/>
