@@ -1,80 +1,50 @@
 ﻿import React, { Component, Fragment } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { Button, Form, Modal, notification, Table, Row, Col } from 'antd';
+import { Button, Icon, Modal, notification, Table, Row, Col } from 'antd';
+import ReactDataSheet from "react-datasheet";
+import 'react-datasheet/lib/react-datasheet.css';
 import moment from 'moment';
 
 import Style from '../CSS/JobHistory.module.css'
 import { ServerURL } from './Home';
 
+/* The job history page displays a table of all previously completed jobs, sorted chronologically. */
 export class JobHistory extends Component {
 	constructor() {
 		super();
-
-		this.sampleHistory = [{ "jobName": "Setting Advice", "qualityMode": "Quality", "maxCoverage": 50, "opticalDensity": 100, "papertype": "Uncoasted", "papersubtype": "Bond", "weightgsm": 90, "finish": "Smooth" }, { "jobName": "Setting Advice", "qualityMode": "Quality", "maxCoverage": 50, "opticalDensity": 100, "papertype": "Uncoasted", "papersubtype": "Bond", "weightgsm": 90, "finish": "Smooth" }, { "jobName": "Setting Advice", "qualityMode": "Quality", "maxCoverage": 50, "opticalDensity": 100, "papertype": "Uncoasted", "papersubtype": "Bond", "weightgsm": 90, "finish": "Smooth" }];
 
 		this.sampleColumns = [
 			{
 				title: 'Job ID',
 				dataIndex: 'jobid',
 				width: 100,
-				sorter: (a, b) => a.jobNumber - b.JobNumber,
+				sorter: (a, b) => a.jobid - b.jobid,
 			},
-			/*
 			{
 				title: 'Date',
-				dataIndex: 'date',
+				dataIndex: 'jobTime',
 				width: 150,
-                sorter: (a, b) => moment(a.date).unix() - moment(b.date).unix(),
+                sorter: (a, b) => moment(a.jobTime).unix() - moment(b.jobTime).unix(),
 				defaultSortOrder: 'descend',
             },
-			*/
 			{
 				title: 'Job Name',
 				dataIndex: 'jobName',
-				width: 200
+				sorter: (a, b) => { return a.jobName.localeCompare(b.jobName) },
 			},
             {
                 title: 'Results',
-                //dataIndex: 'results',
-				render: (text, row) => <Button onClick={() => this.showResults(row.jobid)}>View</Button>,
+				render: (text, row) => <Button className={Style.resultsColumn} onClick={() => this.compareJobs([row.jobid])}>View</Button>,
+				width: 80,
             },
 		];
-		/*
-		this.sampleData = [
-			{
-				jobId: 0,
-                date: moment(new Date()).add(-20, 'days').format("MM-DD-YYYY"),
-                //results: '',
-            },
-            {
-                jobId: 1,
-                date: moment(new Date()).add(-15, 'days').format("MM-DD-YYYY"),
-                //results: '',
-            },
-            {
-                jobId: 2,
-                date: moment(new Date()).add(-10, 'days').format("MM-DD-YYYY"),
-                //results: '',
-            },
-            {
-                jobId: 3,
-                date: moment(new Date()).add(-5, 'days').format("MM-DD-YYYY"),
-                //results: '',
-            },
-            {
-                jobId: 4,
-                date: moment(new Date()).format("MM-DD-YYYY"),
-                //results: '',
-            },
-		]
-		*/
 
 		this.state = {
+			selectedRowKeys: [],
 			currentJobId: -1,
 			modalVisible: false,
 			modalContent: null,
-			//jobHistory: this.sampleHistory,
-		}
+		};
 	}
 
 	componentDidMount = async () => {
@@ -89,21 +59,20 @@ export class JobHistory extends Component {
 			for (let i = 0; i < this.state.jobHistory.length; i++) {
 				rowObject = {
 					jobid: this.state.jobHistory[i].jobid,
+					jobTime: moment(this.state.jobHistory[i].jobTime).unix(),
 					jobName: this.state.jobHistory[i].jobName
 				};
 
 				tableArray.push(rowObject);
 			}
 
-			this.setState({
-				tableData: tableArray
-			})
+			this.setState({ tableData: tableArray })
 		}
 	}
 
+	/* Calls the database to request job history. */
 	fetchHistory = async () => {
-		/* Call database to request job history. */
-		await fetch(ServerURL + "job-history/", {
+		await fetch(ServerURL + "history/", {
 			method: "GET",
 			mode: 'cors',
 			headers: {
@@ -141,6 +110,11 @@ export class JobHistory extends Component {
 		this.setState({ error: true });
 	}
 
+	/* Called when ticking a checkbox to select a row. */
+	onSelectChange = selectedRowKeys => {
+		this.setState({ selectedRowKeys });
+	}
+
 	/* Toggles the visibility of the job results modal. */
 	toggleModal = () => {
 		this.setState({
@@ -148,86 +122,73 @@ export class JobHistory extends Component {
 		})
 	}
 
-	showResults = (key) => {
+	/* Constructs the spreadsheet containing the job results. Can also compare multiple jobs. */
+	buildSpreadsheet = (keys) => {
+		const { jobHistory } = this.state;
+
+		var spreadsheetData = [];
+		var temp = [];
+
+		/* Get list of all keys in an entry, except for jobid. */
+		var keyList = Object.keys(jobHistory[0]).filter((val) => {
+			return val !== "jobid";
+		});
+
 		/* Get the data from the row in the table, organize it. */
-		var currentData = [...this.state.jobHistory];
+		var currentData = [];
 
-		currentData = currentData.filter(obj => {
-			return obj.jobid === key;
-		})[0];
+		/* The first column that holds the labels. Empty. */
+		temp.push({ value: '', width: 150, readOnly: true });
 
+		for (let i = 0; i < keys.length; i++) {
+			currentData = jobHistory.filter(obj => {
+				return obj.jobid === keys[i];
+			})[0];
+
+			/* Column for each job being compared. */
+			temp.push({ value: 'Job ' + currentData.jobid, width: 150, readOnly: true });
+		}
+
+		spreadsheetData.push(temp);
+		temp = [];
+
+		/* Runs through the list of all keys (except jobid), making a row for each. */
+		for (let j = 0; j < keyList.length; j++) {
+
+			temp.push({ value: keyList[j], readOnly: true });
+
+			/* Runs through the data in each job, pairing it with the label. */
+			for (let k = 0; k < keys.length; k++) {
+				currentData = jobHistory.filter(obj => {
+					return obj.jobid === keys[k];
+				})[0];
+
+				temp.push({ value: currentData[keyList[j]] });
+			}
+
+			spreadsheetData.push(temp);
+			temp = [];
+		}
+
+		return spreadsheetData;
+	}
+
+	/* Constructs the content of the modal. */
+	compareJobs = (keys) => {
+		/* Get the data from the row in the table, organize it. */
+		const spreadsheetData = this.buildSpreadsheet(keys);
+
+		/* Build the ReactDataSheet component using the data returned from buildSpreadsheet(). */
 		var modalInnards =
-			<>
-				<Row gutter={6}>
-					<Col span={7}>
-						<b>Job Name:</b>
-					</Col>
-					<Col span={17}>
-						{currentData.jobName}
-					</Col>
-				</Row>
-				<Row gutter={7}>
-					<Col span={7}>
-						<b>Quality Mode:</b>
-					</Col>
-					<Col span={17}>
-						{currentData.qualityMode}
-					</Col>
-				</Row>
-				<Row gutter={7}>
-					<Col span={7}>
-						<b>Max Coverage:</b>
-					</Col>
-					<Col span={17}>
-						{currentData.maxCoverage}
-					</Col>
-				</Row>
-				<Row gutter={7}>
-					<Col span={7}>
-						<b>Optical Density:</b>
-					</Col>
-					<Col span={17}>
-						{currentData.opticalDensity}
-					</Col>
-				</Row>
-				<Row gutter={7}>
-					<Col span={7}>
-						<b>Paper Type:</b>
-					</Col>
-					<Col span={17}>
-						{currentData.papertype}
-					</Col>
-				</Row>
-				<Row gutter={7}>
-					<Col span={7}>
-						<b>Paper Sub Type:</b>
-					</Col>
-					<Col span={17}>
-						{currentData.papersubtype}
-					</Col>
-				</Row>
-				<Row gutter={7}>
-					<Col span={7}>
-						<b>Weight (gsm):</b>
-					</Col>
-					<Col span={17}>
-						{currentData.weightgsm}
-					</Col>
-				</Row>
-				<Row gutter={7}>
-					<Col span={7}>
-						<b>Finish:</b>
-					</Col>
-					<Col span={17}>
-						{currentData.finish}
-					</Col>
-				</Row>
-			</>;
-
+			<ReactDataSheet
+				data={spreadsheetData}
+				valueRenderer={(cell) => cell.value}
+				onChange={() => { }}
+			/>;
 
 		this.setState({
 			modalContent: modalInnards,
-			currentJobId: key
+			currentJobId: keys.length === 1 ? keys[0] : null
 		})
 
 		/* Open the modal and display the data. */
@@ -235,7 +196,12 @@ export class JobHistory extends Component {
 	}
 
 	render() {
-		const { tableData, modalContent } = this.state;
+		const { tableData, modalContent, selectedRowKeys } = this.state;
+
+		const rowSelection = {
+			selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
 
 		return (
 			<Fragment>
@@ -243,23 +209,67 @@ export class JobHistory extends Component {
 				<br />
 
 				<Modal
-					title={"Job " + this.state.currentJobId + " Results"}
+					title={selectedRowKeys.length === 1 ?
+						"Job " + this.state.currentJobId + " Results"
+						:
+						"Job Comparison"
+					}
 					visible={this.state.modalVisible}
 					onCancel={() => {
 						this.toggleModal();
-						this.setState({ currentJobId: -1 });
+						this.setState({
+							selectedRowKeys: [],
+							currentJobId: -1
+						});
 					}}
 					destroyOnClose={true}
 					footer={null}
+					width={selectedRowKeys.length === 0 ? 350 : ((selectedRowKeys.length + 1) * 150) + 50}
 				>
 					{modalContent}
 				</Modal>
 
+				{/* Only render the clear button and row selection indication when rows are selected. */}
+				<div className={Style.tableHeader}>
+					{selectedRowKeys.length > 1 ?
+						<Button
+							className={Style.tableButton}
+							onClick={() => this.compareJobs(selectedRowKeys)}
+							type="primary"
+						>
+							<Icon className={Style.buttonIcon} type="diff" />
+							Compare
+						</Button>
+						:
+						null
+
+					}
+					{selectedRowKeys.length > 0 ?
+						<>
+							<Button
+								className={Style.tableButton}
+								onClick={() => this.setState({ selectedRowKeys: [] })}
+								type="danger"
+								ghost
+							>
+								<Icon className={Style.buttonIcon} type="undo" />
+								Clear
+							</Button>
+							<span>{selectedRowKeys.length} job{selectedRowKeys.length == 1 ? '' : 's'} selected</span>
+						</>
+						:
+						<br />
+					}
+				</div>
+
                 <Table
-                    rowKey="jobid"
+					rowKey="jobid"
+					rowSelection={rowSelection}
                     dataSource={tableData}
                     columns={this.sampleColumns}
-                    style={{ width: 450 }}
+					style={{ width: 600 }}
+					scroll={{ y: 1000 }}
+					bordered
 				/>
 			</Fragment>
 		);

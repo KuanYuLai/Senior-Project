@@ -10,6 +10,29 @@
 	}
 }
 
+.betterInputNumber {
+	vertical-align: middle;
+	border-bottom-right-radius: 0;
+	border-top-right-radius: 0;
+	width: 60px;
+}
+
+.betterInputNumberLabel {
+	padding-top: 2px;
+	vertical-align: middle;
+	display: inline-table;
+	line-height: 24px;
+	height: 32px;
+}
+
+.betterInputNumberDiv {
+	position: relative;
+	top: -7px;
+	left: 16px;
+	display: flex;
+	margin-left: -10px;
+}
+
 .formItem {
 	margin-top: 100px;
 }

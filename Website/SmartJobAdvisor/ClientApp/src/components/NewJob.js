@@ -6,18 +6,20 @@ import { ServerURL } from './Home';
 
 const { Option } = Select;
 
+/* An AntD InputNumber with a label on the right. */
 class BetterInputNumber extends React.Component {
 	render() {
 		if (this.props.addonAfter) {
 			return (
-				<div className={Style.formItemInputNumber} style={{ display: 'flex', marginLeft: -10 }}>
+				<div className={Style.betterInputNumberDiv}>
 					<InputNumber
 						{...this.props}
-						style={{ verticalAlign: 'middle', borderBottomRightRadius: 0, borderTopRightRadius: 0, width: 60 }}
+						className={Style.betterInputNumber}
 						value={this.props.value}
 						onChange={(e) => this.props.onSliderChange(e, this.props.field)}
 					/>
-					<div className="ant-input-group-addon" style={{ paddingTop: '2px', verticalAlign: 'middle', display: 'inline-table', lineHeight: '24px', height: '32px' }}>{this.props.addonAfter}</div>
+					{/* Can't use CSS here, since I need the className to be something else. */}
+					<div style={{ paddingTop: '2px', verticalAlign: 'middle', display: 'inline-table', lineHeight: '24px', height: '32px' }} className="ant-input-group-addon">{this.props.addonAfter}</div>
 				</div>
 			);
 		} else {
@@ -28,6 +30,7 @@ class BetterInputNumber extends React.Component {
 	}
 }
 
+/* Holds the form that the user fills out and POSTs to the SJA Engine. */
 class NewJobForm extends React.Component {
 	constructor() {
 		super();
@@ -47,7 +50,7 @@ class NewJobForm extends React.Component {
 		/* Fetch the paper database from the server. Wait unfil fetch is complete to continue. */
 		await this.fetchPaperDatabase();
 
-		/* If there was an error fetching the paper database, don't attempt to populat dropdowns/radios. */
+		/* If there was an error fetching the paper database, don't attempt to populate dropdowns/radios (otherwise it crashes). */
 		if (typeof this.state.error === 'undefined' && this.state.error !== true) {
 			this.setState({
 				currentPaperNames: this.state.paperDatabase,
@@ -75,8 +78,8 @@ class NewJobForm extends React.Component {
 				this.setState({ paperDatabase: data.paperdb });
 
 				// Testing with actual data
-				//var data = require('../PaperData/HP-paper-db-CONFIDENTIAL-2020-02-09.json');
-				//this.setState({ paperDatabase: data.paperdb })
+				//var realData = require('../PaperData/HP-paper-db-CONFIDENTIAL-2020-02-09.json');
+				//this.setState({ paperDatabase: realData.paperdb })
 			});
 		}).catch(err => {
 			this.fetchError("fetch paper database");
@@ -99,9 +102,8 @@ class NewJobForm extends React.Component {
 		vals = [...new Set(vals)];
 
 		/* Create the dropdown for the Select using the list of names. */
-		for (let i = 0; i < vals.length; i++) {
+		for (let i = 0; i < vals.length; i++)
 			dropdown.push(<Option key={vals[i]}>{vals[i]}</Option>);
-		}
 
 		return dropdown;
 	};
@@ -152,14 +154,20 @@ class NewJobForm extends React.Component {
 			paperWeights.push(parseFloat(selected[i].weightgsm));
 		}
 
-		/* Filter the lists of types/subtypes/weights/finishes to remove duplicates. */
+		/* Filter the lists of types/subtypes/weights/finishes to remove duplicates.
 		paperTypes = paperTypes.filter((v, i, a) => a.indexOf(v) === i);
 		paperSubTypes = paperSubTypes.filter((v, i, a) => a.indexOf(v) === i);
 		paperFinishes = paperFinishes.filter((v, i, a) => a.indexOf(v) === i);
 		paperWeights = paperWeights.filter((v, i, a) => a.indexOf(v) === i);
+		*/
+
+		/* Filter the lists of types/subtypes/weights/finishes to remove duplicates. */
+		paperTypes = [...new Set(paperTypes)];
+		paperSubTypes = [...new Set(paperSubTypes)];
+		paperFinishes = [...new Set(paperFinishes)];
+		paperWeights = [...new Set(paperWeights)];
 
 		/* If there's only one choice for a radio, just fill it out. */
-		var temp = null;
 		if (paperTypes.length === 1)
 			setFieldsValue({ papertype: paperTypes[0] });
 		if (paperSubTypes.length === 1)
@@ -173,9 +181,8 @@ class NewJobForm extends React.Component {
 
 		/* Set the weightgsm dropdown values. */
 		var dropdown = [];
-		for (let i = 0; i < paperWeights.length; i++) {
+		for (let i = 0; i < paperWeights.length; i++)
 			dropdown.push(<Option key={paperWeights[i]}>{paperWeights[i]}</Option>);
-		}
 
 		/* Update other radios. Once a choice has been made on a radio, all other options grey out. */
 		this.setState({
@@ -188,26 +195,21 @@ class NewJobForm extends React.Component {
 
 	/* Called when a radio button is hit in paper selection. Narrows down mfr and product names, autofills once there is only one option. */
 	checkPaperMfrName = (e, field) => {
-		const { getFieldValue, setFieldsValue, getFieldsValue } = this.props.form;
-		const { paperDatabase, currentPaperNames } = this.state;
+		const { getFieldValue, setFieldsValue } = this.props.form;
+		const { currentPaperNames } = this.state;
 
-		//var currentPapers = [...paperDatabase];
 		var currentPapers = [...currentPaperNames];
 
-		if (field !== "weightgsm") {
-			setFieldsValue({
-				[field]: e.target.value
-			})
-			currentPapers = currentPapers.filter((a) => a[field] === e.target.value);
-		}
-		else {
+		/* If weightgsm, need to set state. Else assign 'e.target.value' to 'e'. Saves a few lines. */
+		if (field == "weightgsm")
 			this.setState({ weightgsm: e });
-			setFieldsValue({
-				[field]: e
-			})
-			currentPapers = currentPapers.filter((a) => a[field] === e);
-		}
+		else
+			e = e.target.value;
 
+		setFieldsValue({ [field]: e })
+		currentPapers = currentPapers.filter((a) => a[field] === e);
+
+		/* Filter remaining fields to apply constraints. */
 		if (typeof getFieldValue("manufacturer") !== 'undefined' && field !== "manufacturer")
 			currentPapers = currentPapers.filter((a) => a.manufacturer == getFieldValue("manufacturer"));
 		if (typeof getFieldValue("productname") !== 'undefined' && field !== "productname")
@@ -230,9 +232,11 @@ class NewJobForm extends React.Component {
 			paperNames.push(currentPapers[i].productname);
 		}
 
+		/* Filter the array for unique values only. */
 		paperMfrs = [...new Set(paperMfrs)];
 		paperNames = [...new Set(paperNames)];
 
+		/* If there's only one paper name or manufacturer, then set both. */
 		if (paperNames.length === 1)
 			setFieldsValue({
 				manufacturer: paperMfrs[0],
@@ -243,6 +247,7 @@ class NewJobForm extends React.Component {
 				manufacturer: paperMfrs[0],
 			});
 
+		/* Refresh the dropdown lists so they only show values applicable to the currently available papers. */
 		this.setState({
 			currentPaperNames: currentPapers,
 			paperMfrDropdown: this.getDropdown(currentPapers, "manufacturer"),
@@ -250,6 +255,7 @@ class NewJobForm extends React.Component {
 			paperWeightDropdown: this.getDropdown(currentPapers, "weightgsm")
 		});
 
+		/* Do the same for the radios. */
 		this.setRadios(currentPapers);
 	}
 
@@ -261,6 +267,7 @@ class NewJobForm extends React.Component {
 		if (val < 50 && field === "opticalDensity")
 			val = 50;
 
+		/* Apply the value to both the form and state. */
 		setFieldsValue({ [field]: val });
 		this.setState({ [field]: val });
 	};
@@ -277,9 +284,8 @@ class NewJobForm extends React.Component {
 		var selectedMfr = this.state.currentPaperNames.filter((e) => e.manufacturer === val);
 
 		/* Grab all of the productnames within the list of objects. */
-		for (let i = 0; i < selectedMfr.length; i++) {
+		for (let i = 0; i < selectedMfr.length; i++)
 			paperNames.push(selectedMfr[i].productname);
-		}
 
 		/* Filter the list of productnames to remove duplicates. */
 		paperNames = paperNames.filter((v, i, a) => a.indexOf(v) === i);
@@ -290,9 +296,8 @@ class NewJobForm extends React.Component {
 			resetFields("productname");
 
 		/* Create the paper name dropdown list using the filtered list of productnames. */
-		for (let j = 0; j < paperNames.length; j++) {
+		for (let j = 0; j < paperNames.length; j++)
 			dropdown.push(<Option key={paperNames[j]}>{paperNames[j]}</Option>);
-		}
 
 		/* If there's only one product for the manufacturer, select is automatically. */
 		if (paperNames.length === 1)
@@ -300,11 +305,9 @@ class NewJobForm extends React.Component {
 				productname: paperNames[0],
 			});
 
+		/* Refresh the radios and the papername dropdown. */
 		this.setRadios(selectedMfr);
-
-		this.setState({
-			paperNameDropdown: dropdown,
-		});
+		this.setState({ paperNameDropdown: dropdown, });
 	}
 
 	/* Narrows down the paper selection radio buttons when a paper product is selected. */
@@ -318,9 +321,11 @@ class NewJobForm extends React.Component {
 			manufacturer: selectedPaper[0].manufacturer,
 		});
 
+		/* Refresh the radios. */
 		this.setRadios(selectedPaper);
 	};
 
+	/* If checkbox is checked: make manufacturer and paper name NOT required; swap Select component for Slider. */
 	handleUnknownPaper = () => {
 		const { unknownPaper, paperNameMfrDisabled } = this.state;
 
@@ -590,9 +595,10 @@ class NewJobForm extends React.Component {
 								onChange={this.onPaperMfrChange}
 								showSearch
 								showArrow={false}
-								placeholder={
-									paperNameMfrDisabled === true ? <span>Disabled</span>
-									: <span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select manufacturer</span>
+								placeholder={ paperNameMfrDisabled === true ?
+									<span>Disabled</span>
+									:
+									<span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select manufacturer</span>
 								}
 							>
 								{this.state.paperMfrDropdown}
