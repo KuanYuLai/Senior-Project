@@ -4,3 +4,38 @@ priority: 1
 condition: "!job.checkValidPaperType()"
 actions:
   - "job.setBA(false);"
+---
+name: "TargetSpeed-Performance"
+description: "Determines whether or not to apply the bonding agent."
+priority: 1
+condition: "job.getqualityMode() == 'Performance'"
+actions:
+  - "job.setTargetSpeed(500);"
+---
+name: "TargetSpeed-Quality"
+description: "Determines whether or not to apply the bonding agent."
+priority: 1
+condition: "job.getqualityMode() == 'Quality'"
+actions:
+  - "job.setTargetSpeed(250);"
+---
+name: "Coverage-Class-Light"
+description: "Determines whether or not to apply the bonding agent."
+priority: 1
+condition: "job.getCoverageSize() <= 15"
+actions:
+  - "job.setCoverageClass('Light');"
+---
+name: "Coverage-Class-Medium"
+description: "Determines whether or not to apply the bonding agent."
+priority: 1
+condition: "job.getCoverageSize() > 15 && job.getCoverageSize() <= 60"
+actions:
+  - "job.setCoverageClass('Medium');"
+---
+name: "Coverage-Class-Heavy"
+description: "Determines whether or not to apply the bonding agent."
+priority: 1
+condition: "job.getCoverageSize() > 60"
+actions:
+  - "job.setCoverageClass('Heavy');"
