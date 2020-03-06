@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
+import javax.servlet.ServletContext;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -11,17 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/new")
 public class Server extends HttpServlet {
-    /*
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/plain");
-        PrintWriter out = response.getWriter();
-        if (isSuspicious(request)) {
-            out.print("Access denied");
-        } else {
-            out.print("Welcome!");
-        }
-    }
-    */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/plain");
         //response.setContentType("application/json");
@@ -30,7 +20,8 @@ public class Server extends HttpServlet {
         Launcher launch = new Launcher();
         BufferedReader reader = request.getReader();
         int i = 0;
-        //String arg[5];
+
+        //Process the input data
         try {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -39,12 +30,16 @@ public class Server extends HttpServlet {
         } finally {
             reader.close();
         }
-        System.out.println(sb.toString());
+	//ServletContext sContext = getServletContext();
+        //sContext.log("Input data:" + sb.toString());
+        System.out.println("Input data:" + sb.toString());
+
         String result = "";
+	//Running Engine
         try{
             result = launch.Cal(sb.toString());
         } catch(Exception e){
-            result = "Please try again!";
+            result = "Error occur: " + e;
             System.out.println("Exception Catched: " + e);
         };
         //out.print("Printing result...\n" + sb.toString());
@@ -56,7 +51,6 @@ public class Server extends HttpServlet {
         PrintWriter out = response.getWriter();
         System.out.println("    ==Print hello");
         out.print("Hi, I am a Smart Job Advisor. Please feed me with your setting. :) \n");
-        //out.print(Launcher(request()));
     }
 
 }

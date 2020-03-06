@@ -1,0 +1,842 @@
+[
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "TargetSpeed": 50
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "TargetSpeed": 25
+  }
+]

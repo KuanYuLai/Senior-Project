@@ -4,3 +4,10 @@ priority: 2
 condition: "true"
 actions:
   - "job.setPrimer(true);"
+---
+name: "CoverageClass-Degrade"
+description: "Determine whether or not to apply primer."
+priority: 3
+condition: "job.getopticalDensity() < 95"
+actions:
+  - "job.CoverageClassDegrade();"

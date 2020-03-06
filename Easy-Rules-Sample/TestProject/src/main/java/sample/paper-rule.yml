@@ -1,6 +1,14 @@
-name: "paper-rule"
-description: "Determines the result of specific paper"
-priority: 1
-condition: "job.checkValidPaperType()"
+---
+name: "Tarnsform-Performance-Mode"
+description: "Transform performance mode into target speed"
+priority: 2
+condition: "job.getpaperType() == 'Coated' && job.getfinish() == 'Glossy'"
 actions:
-  - "job.setBA(false);"
+  - "job.setCoatingClass('Exposed Fiber');"
+---
+name: "Tarnsform-Quality-Mode"
+description: "Transform quality mode into target speed"
+priority: 2
+condition: "job.getpaperType() == 'Coated' && job.getfinish() == 'Smooth'"
+actions:
+  - "job.setCoatingClass('Closed Surface');"

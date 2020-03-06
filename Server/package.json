@@ -1,0 +1,29 @@
+{
+  "name": "server-setup",
+  "version": "1.0.0",
+  "description": "Serving with Express and Node.js",
+  "main": "server.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "figlet": "^1.2.1",
+    "moment": "^2.24.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.11"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "NODE_ENV=development nodemon server.js"
+  },
+  "keywords": [
+    "Node",
+    "express"
+  ],
+  "author": "Hess <hessro@oregonstate.edu>",
+  "license": "MIT"
+}

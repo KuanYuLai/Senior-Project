@@ -1,0 +1,826 @@
+[
+  {
+    "jobID": 1,
+    "jobTime": "March 06 2020, 08:28",
+    "input": {
+      "jobName": "Setting Advice",
+      "qualityMode": "Performance",
+      "maxCoverage": 50,
+      "opticalDensity": 100,
+      "papertype": "Coated",
+      "papersubtype": "Cover",
+      "weightgsm": 300,
+      "finish": "Dull",
+      "pressUnwinderBrand": "EMT",
+      "ruleset": "Default"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Closed Surface",
+      "WeightClass": "High",
+      "TargetSpeed": 50,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1.5,
+      "PrintZone": 1.5,
+      "Unwinder": 1.5,
+      "Rewinder": 1.5,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 2,
+    "jobTime": "March 06 2020, 09:39",
+    "input": {
+      "jobName": "Setting Advice",
+      "qualityMode": "Performance",
+      "maxCoverage": 50,
+      "opticalDensity": 100,
+      "papertype": "Coated",
+      "papersubtype": "Cover",
+      "weightgsm": 300,
+      "finish": "Dull",
+      "pressUnwinderBrand": "EMT",
+      "ruleset": "Default"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Closed Surface",
+      "WeightClass": "High",
+      "TargetSpeed": 50,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1.5,
+      "PrintZone": 1.5,
+      "Unwinder": 1.5,
+      "Rewinder": 1.5,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 3,
+    "jobTime": "March 06 2020, 09:53",
+    "input": {
+      "jobName": "TEST 1",
+      "ruleset": "Default",
+      "qualityMode": "Performance",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 90,
+      "opticalDensity": 95,
+      "manufacturer": "Burgo",
+      "productname": "Tecno Plus",
+      "papertype": "Coated",
+      "papersubtype": "Text",
+      "weightgsm": 115,
+      "finish": "Satin"
+    },
+    "output": {
+      "CoverageClass": "Heavy",
+      "CoatingClass": "Closed Surface",
+      "WeightClass": "Medium",
+      "TargetSpeed": 50,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1.25,
+      "PrintZone": 1.25,
+      "Unwinder": 1.25,
+      "Rewinder": 1.25,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 4,
+    "jobTime": "March 06 2020, 09:56",
+    "input": {
+      "jobName": "Setting Advice",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 100,
+      "opticalDensity": 50,
+      "manufacturer": "UPM ",
+      "productname": "Profil Primaset",
+      "papertype": "Coated",
+      "papersubtype": "Text",
+      "weightgsm": 70,
+      "finish": "Matte"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Exposed Fiber",
+      "WeightClass": "Low",
+      "TargetSpeed": 250,
+      "DryerSpeed": "Can't Find data",
+      "DryerZone": 1,
+      "PrintZone": 1,
+      "Unwinder": 1,
+      "Rewinder": 1,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 5,
+    "jobTime": "March 06 2020, 10:01",
+    "input": {
+      "jobName": "TEST 3",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 70,
+      "opticalDensity": 70,
+      "manufacturer": "Verso ",
+      "productname": "Liberty",
+      "papertype": "Coated",
+      "papersubtype": "Text",
+      "weightgsm": 59,
+      "finish": "Gloss"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Closed Surface",
+      "WeightClass": "Low",
+      "TargetSpeed": 25,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1,
+      "PrintZone": 1,
+      "Unwinder": 1,
+      "Rewinder": 1,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 6,
+    "jobTime": "March 06 2020, 10:04",
+    "input": {
+      "jobName": "TEST 4",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 75,
+      "opticalDensity": 95,
+      "manufacturer": "Mondi",
+      "productname": "DNS",
+      "papertype": "Uncoated Treated Inkjet",
+      "papersubtype": "Cover",
+      "weightgsm": 250,
+      "finish": "Smooth"
+    },
+    "output": {
+      "CoverageClass": "Heavy",
+      "CoatingClass": "Inkjet Treated Surface",
+      "WeightClass": "High",
+      "TargetSpeed": 250,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1.5,
+      "PrintZone": 1.5,
+      "Unwinder": 1.5,
+      "Rewinder": 1.5,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 7,
+    "jobTime": "March 06 2020, 10:05",
+    "input": {
+      "jobName": "TEST 5",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 50,
+      "opticalDensity": 100,
+      "manufacturer": "Mondi",
+      "productname": "DNS",
+      "papertype": "Uncoated ColorPRO",
+      "papersubtype": "Cover",
+      "weightgsm": 200,
+      "finish": "Super Smooth"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Most Surfaces",
+      "WeightClass": "High",
+      "TargetSpeed": 250,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1.5,
+      "PrintZone": 1.5,
+      "Unwinder": 1.5,
+      "Rewinder": 1.5,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 8,
+    "jobTime": "March 06 2020, 10:08",
+    "input": {
+      "jobName": "TEST 6",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 100,
+      "opticalDensity": 80,
+      "manufacturer": "Verso ",
+      "productname": "Liberty",
+      "papertype": "Coated",
+      "papersubtype": "Text",
+      "weightgsm": 59,
+      "finish": "Gloss"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Closed Surface",
+      "WeightClass": "Low",
+      "TargetSpeed": 25,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1,
+      "PrintZone": 1,
+      "Unwinder": 1,
+      "Rewinder": 1,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 9,
+    "jobTime": "March 06 2020, 10:12",
+    "input": {
+      "jobName": "TEST 6",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 75,
+      "opticalDensity": 90,
+      "manufacturer": "HP Inc",
+      "productname": "HP Premium Plus Photo Paper",
+      "papertype": "Coated Inkjet",
+      "papersubtype": "Cover",
+      "weightgsm": 300,
+      "finish": "Gloss"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "null",
+      "WeightClass": "High",
+      "TargetSpeed": 250,
+      "DryerSpeed": "Can't Find data",
+      "DryerZone": 1.5,
+      "PrintZone": 1.5,
+      "Unwinder": 1.5,
+      "Rewinder": 1.5,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 10,
+    "jobTime": "March 06 2020, 10:15",
+    "input": {
+      "jobName": "TEST 7",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 60,
+      "opticalDensity": 75,
+      "manufacturer": "Arjowiggins",
+      "productname": "Cocoon Jet",
+      "papertype": "Uncoated Treated Inkjet",
+      "papersubtype": "Text",
+      "weightgsm": 90,
+      "finish": "Matte"
+    },
+    "output": {
+      "CoverageClass": "Light",
+      "CoatingClass": "Inkjet Treated Surface",
+      "WeightClass": "Medium",
+      "TargetSpeed": 250,
+      "DryerSpeed": "40%-75%",
+      "DryerZone": 1.25,
+      "PrintZone": 1.25,
+      "Unwinder": 1.25,
+      "Rewinder": 1.25,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 11,
+    "jobTime": "March 06 2020, 10:17",
+    "input": {
+      "jobName": "TEST 8",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 50,
+      "opticalDensity": 100,
+      "manufacturer": "Austrialian Paper",
+      "productname": "PrintRight Inkjet Premium",
+      "papertype": "Uncoated Treated Inkjet",
+      "papersubtype": "Text",
+      "weightgsm": 115,
+      "finish": "Smooth"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Inkjet Treated Surface",
+      "WeightClass": "Medium",
+      "TargetSpeed": 250,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1.25,
+      "PrintZone": 1.25,
+      "Unwinder": 1.25,
+      "Rewinder": 1.25,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 12,
+    "jobTime": "March 06 2020, 10:18",
+    "input": {
+      "jobName": "TEST 9",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 50,
+      "opticalDensity": 80,
+      "manufacturer": "Boise Paper",
+      "productname": "Boise Polaris",
+      "papertype": "Uncoated",
+      "papersubtype": "Bond",
+      "weightgsm": 74,
+      "finish": "Smooth"
+    },
+    "output": {
+      "CoverageClass": "Light",
+      "CoatingClass": "Most Surfaces",
+      "WeightClass": "Low",
+      "TargetSpeed": 25,
+      "DryerSpeed": "40%-75%",
+      "DryerZone": 1,
+      "PrintZone": 1,
+      "Unwinder": 1,
+      "Rewinder": 1,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 13,
+    "jobTime": "March 06 2020, 10:22",
+    "input": {
+      "jobName": "TEST 10",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 100,
+      "opticalDensity": 50,
+      "manufacturer": "Clairfontaine",
+      "productname": "ClairJet 400",
+      "papertype": "Uncoated Treated Inkjet",
+      "papersubtype": "Text",
+      "weightgsm": 90,
+      "finish": "Smooth"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Inkjet Treated Surface",
+      "WeightClass": "Medium",
+      "TargetSpeed": 250,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1.25,
+      "PrintZone": 1.25,
+      "Unwinder": 1.25,
+      "Rewinder": 1.25,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 14,
+    "jobTime": "March 06 2020, 10:25",
+    "input": {
+      "jobName": "TEST 11",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 80,
+      "opticalDensity": 60,
+      "manufacturer": "Twin Rivers",
+      "productname": "Twin Rivers Opaque",
+      "papertype": "Uncoated",
+      "papersubtype": "Text",
+      "weightgsm": 74,
+      "finish": "Vellum"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Most Surfaces",
+      "WeightClass": "Low",
+      "TargetSpeed": 25,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1,
+      "PrintZone": 1,
+      "Unwinder": 1,
+      "Rewinder": 1,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 15,
+    "jobTime": "March 06 2020, 10:26",
+    "input": {
+      "jobName": "TEST 12",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 80,
+      "opticalDensity": 100,
+      "manufacturer": "Zanders",
+      "productname": "Zanjet",
+      "papertype": "Coated ColorPRO",
+      "papersubtype": "Cover",
+      "weightgsm": 250,
+      "finish": "Gloss"
+    },
+    "output": {
+      "CoverageClass": "Heavy",
+      "CoatingClass": "null",
+      "WeightClass": "High",
+      "TargetSpeed": 250,
+      "DryerSpeed": "Can't Find data",
+      "DryerZone": 1.5,
+      "PrintZone": 1.5,
+      "Unwinder": 1.5,
+      "Rewinder": 1.5,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 16,
+    "jobTime": "March 06 2020, 10:27",
+    "input": {
+      "jobName": "TEST 13",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 100,
+      "opticalDensity": 100,
+      "manufacturer": "Boise Paper",
+      "productname": "Boise Polaris",
+      "papertype": "Uncoated",
+      "papersubtype": "Bond",
+      "weightgsm": 105,
+      "finish": "Smooth"
+    },
+    "output": {
+      "CoverageClass": "Heavy",
+      "CoatingClass": "Most Surfaces",
+      "WeightClass": "Medium",
+      "TargetSpeed": 25,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1.25,
+      "PrintZone": 1.25,
+      "Unwinder": 1.25,
+      "Rewinder": 1.25,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 17,
+    "jobTime": "March 06 2020, 10:28",
+    "input": {
+      "jobName": "Gaming Poster",
+      "qualityMode": "Performance",
+      "maxCoverage": 70,
+      "opticalDensity": 90,
+      "papertype": "Coated",
+      "papersubtype": "Bond",
+      "weightgsm": 100,
+      "finish": "Silk",
+      "pressUnwinderBrand": "EMT"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Exposed Fiber",
+      "WeightClass": "Medium",
+      "TargetSpeed": 500,
+      "DryerSpeed": "Can't Find data",
+      "DryerZone": 1.25,
+      "PrintZone": 1.25,
+      "Unwinder": 1.25,
+      "Rewinder": 1.25,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 18,
+    "jobTime": "March 06 2020, 10:29",
+    "input": {
+      "jobName": "TEST 14",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 70,
+      "opticalDensity": 70,
+      "manufacturer": "Austrialian Paper",
+      "productname": "PrintRight Inkjet Premium",
+      "papertype": "Uncoated Treated Inkjet",
+      "papersubtype": "Text",
+      "weightgsm": 104,
+      "finish": "Smooth"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Inkjet Treated Surface",
+      "WeightClass": "Medium",
+      "TargetSpeed": 250,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1.25,
+      "PrintZone": 1.25,
+      "Unwinder": 1.25,
+      "Rewinder": 1.25,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 19,
+    "jobTime": "March 06 2020, 10:33",
+    "input": {
+      "jobName": "TEST 15",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 80,
+      "opticalDensity": 90,
+      "manufacturer": "Arjowiggins",
+      "productname": "Cocoon Jet",
+      "papertype": "Uncoated Treated Inkjet",
+      "papersubtype": "Text",
+      "weightgsm": 120,
+      "finish": "Matte"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Inkjet Treated Surface",
+      "WeightClass": "Medium",
+      "TargetSpeed": 250,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1.25,
+      "PrintZone": 1.25,
+      "Unwinder": 1.25,
+      "Rewinder": 1.25,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 20,
+    "jobTime": "March 06 2020, 10:34",
+    "input": {
+      "jobName": "TEST 16",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 50,
+      "opticalDensity": 100,
+      "manufacturer": "Clairfontaine",
+      "productname": "ClairJet 400",
+      "papertype": "Uncoated Treated Inkjet",
+      "papersubtype": "Text",
+      "weightgsm": 60,
+      "finish": "Smooth"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Inkjet Treated Surface",
+      "WeightClass": "Low",
+      "TargetSpeed": 250,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1,
+      "PrintZone": 1,
+      "Unwinder": 1,
+      "Rewinder": 1,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 21,
+    "jobTime": "March 06 2020, 10:35",
+    "input": {
+      "jobName": "TEST 17",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 50,
+      "opticalDensity": 100,
+      "manufacturer": "Boise Paper",
+      "productname": "Boise Polaris",
+      "papertype": "Uncoated",
+      "papersubtype": "Bond",
+      "weightgsm": 105,
+      "finish": "Smooth"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Most Surfaces",
+      "WeightClass": "Medium",
+      "TargetSpeed": 25,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1.25,
+      "PrintZone": 1.25,
+      "Unwinder": 1.25,
+      "Rewinder": 1.25,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 22,
+    "jobTime": "March 06 2020, 10:36",
+    "input": {
+      "jobName": "Gaming Poster",
+      "qualityMode": "Performance",
+      "maxCoverage": 70,
+      "opticalDensity": 90,
+      "papertype": "Coated",
+      "papersubtype": "Bond",
+      "weightgsm": 100,
+      "finish": "Silk",
+      "pressUnwinderBrand": "EMT"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Exposed Fiber",
+      "WeightClass": "Medium",
+      "TargetSpeed": 500,
+      "DryerSpeed": "Can't Find data",
+      "DryerZone": 1.25,
+      "PrintZone": 1.25,
+      "Unwinder": 1.25,
+      "Rewinder": 1.25,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 23,
+    "jobTime": "March 06 2020, 10:36",
+    "input": {
+      "jobName": "Setting Advice",
+      "qualityMode": "Performance",
+      "maxCoverage": 50,
+      "opticalDensity": 100,
+      "papertype": "Coated",
+      "papersubtype": "Cover",
+      "weightgsm": 300,
+      "finish": "Dull",
+      "pressUnwinderBrand": "EMT",
+      "ruleset": "Default"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Closed Surface",
+      "WeightClass": "High",
+      "TargetSpeed": 50,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1.5,
+      "PrintZone": 1.5,
+      "Unwinder": 1.5,
+      "Rewinder": 1.5,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 24,
+    "jobTime": "March 06 2020, 10:36",
+    "input": {
+      "jobName": "Setting Advice",
+      "qualityMode": "Quality",
+      "maxCoverage": 50,
+      "opticalDensity": 100,
+      "papertype": "Coated",
+      "papersubtype": "Cover",
+      "weightgsm": 300,
+      "finish": "Dull",
+      "pressUnwinderBrand": "EMT",
+      "ruleset": "Default"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Closed Surface",
+      "WeightClass": "High",
+      "TargetSpeed": 25,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1.5,
+      "PrintZone": 1.5,
+      "Unwinder": 1.5,
+      "Rewinder": 1.5,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 25,
+    "jobTime": "March 06 2020, 10:37",
+    "input": {
+      "jobName": "TEST 18",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 80,
+      "opticalDensity": 90,
+      "manufacturer": "Crown Van Gelder BV",
+      "productname": "Crown Letsgo Universal Pigment",
+      "papertype": "Uncoated ColorPRO",
+      "papersubtype": "Text",
+      "weightgsm": 160,
+      "finish": "Dull"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Most Surfaces",
+      "WeightClass": "High",
+      "TargetSpeed": 250,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1.5,
+      "PrintZone": 1.5,
+      "Unwinder": 1.5,
+      "Rewinder": 1.5,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 26,
+    "jobTime": "March 06 2020, 10:38",
+    "input": {
+      "jobName": "TEST 19",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 50,
+      "opticalDensity": 100,
+      "manufacturer": "Burgo",
+      "productname": "Evo Sky",
+      "papertype": "Uncoated Treated Inkjet",
+      "papersubtype": "Text",
+      "weightgsm": 160,
+      "finish": "Smooth"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Inkjet Treated Surface",
+      "WeightClass": "High",
+      "TargetSpeed": 250,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1.5,
+      "PrintZone": 1.5,
+      "Unwinder": 1.5,
+      "Rewinder": 1.5,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 27,
+    "jobTime": "March 06 2020, 10:39",
+    "input": {
+      "jobName": "Setting Advice",
+      "qualityMode": "Quality",
+      "maxCoverage": 50,
+      "opticalDensity": 100,
+      "papertype": "Uncoated",
+      "papersubtype": "Cover",
+      "weightgsm": 40,
+      "finish": "Dull",
+      "pressUnwinderBrand": "EMT",
+      "ruleset": "Default"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Most Surfaces",
+      "WeightClass": "Very Low",
+      "TargetSpeed": 25,
+      "DryerSpeed": "15% - 50%",
+      "DryerZone": 0.75,
+      "PrintZone": 0.75,
+      "Unwinder": 0.75,
+      "Rewinder": 0.75,
+      "Primer": true
+    }
+  },
+  {
+    "jobID": 28,
+    "jobTime": "March 06 2020, 10:59",
+    "input": {
+      "jobName": "Setting Advice Test",
+      "ruleset": "Default",
+      "qualityMode": "Quality",
+      "pressUnwinderBrand": "EMT",
+      "maxCoverage": 80,
+      "opticalDensity": 60,
+      "manufacturer": "International Paper",
+      "productname": "Williamsburg Plus with ColorPRO Technology",
+      "papertype": "Uncoated ColorPRO",
+      "papersubtype": "Text",
+      "weightgsm": 116,
+      "finish": "Smooth"
+    },
+    "output": {
+      "CoverageClass": "Medium",
+      "CoatingClass": "Most Surfaces",
+      "WeightClass": "Medium",
+      "TargetSpeed": 250,
+      "DryerSpeed": "70%-85%",
+      "DryerZone": 1.25,
+      "PrintZone": 1.25,
+      "Unwinder": 1.25,
+      "Rewinder": 1.25,
+      "Primer": true
+    }
+  }
+]

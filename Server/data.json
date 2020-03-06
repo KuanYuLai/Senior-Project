@@ -1,0 +1,50 @@
+[
+	  {
+		      "jobid": 1,
+		          "jobTime": "January 13 2020, 12:07",
+			      "jobName": "Gaming Poster",
+			          "qualityMode": "Quality",
+				      "maxCoverage": 100,
+				          "opticalDensity": 0,
+					      "papertype": "Uncoated",
+					          "papersubtype": "Bond",
+						      "weightgsm": 100,
+						          "finish": "Glossy"
+							    },
+							      {
+								          "jobid": 3,
+									      "jobTime": "February 13 2020, 8:07",
+									          "jobName": "High School Textbook",
+										      "qualityMode": "Quality",
+										          "maxCoverage": 50,
+											      "opticalDensity": 100,
+											          "papertype": "Coated",
+												      "papersubtype": "Bond",
+												          "weightgsm": 90,
+													      "finish": "Egg shell"
+													        },
+														  {
+															      "jobid": 10,
+															          "jobTime": "February 20 2020, 14:07",
+																      "jobName": "Bible",
+																          "qualityMode": "Quality",
+																	      "maxCoverage": 80,
+																	          "opticalDensity": 100,
+																		      "papertype": "Coated",
+																		          "papersubtype": "Bond",
+																			      "weightgsm": 50,
+																			          "finish": "Smooth"
+																				    },
+																				      {
+																					          "jobid": 15,
+																						      "jobTime": "February 27 2020, 23:07",
+																						          "jobName": "Art Book",
+																							      "qualityMode": "Quality",
+																							          "maxCoverage": 60,
+																								      "opticalDensity": 100,
+																								          "papertype": "Uncoated",
+																									      "papersubtype": "Bond",
+																									          "weightgsm": 40,
+																										      "finish": "Smooth"
+																										        }
+]

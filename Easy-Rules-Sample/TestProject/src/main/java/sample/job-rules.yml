@@ -1,42 +1,143 @@
 ---
-name: "large-job-rule"
-description: "Sets the job size to Large."
+name: "High-Media-Weight-Class"
+description: "Sets the weight class to high."
 priority: 1
-condition: "job.getPageCount() >= 200"
+condition: "job.getweightgsm() > 150"
 actions:
-  - "job.setJobSize('Large');"
+  - "job.setWeightClass('High');"
 ---
-name: "medium-job-rule"
-description: "Sets the job size to Medium."
+name: "Medium-Media-Weight-Class"
+description: "Sets the weight class to medium."
 priority: 1
-condition: "job.getPageCount() < 200"
+condition: "job.getweightgsm() <= 150 && job.getweightgsm() > 75"
 actions:
-  - "job.setJobSize('Medium');"
+  - "job.setWeightClass('Medium');"
 ---
-name: "small-job-rule"
-description: "Sets the job size to Small."
+name: "Low-Media-Weight-Class"
+description: "Sets the weight class to low."
 priority: 1
-condition: "job.getPageCount() < 100"
+condition: "job.getweightgsm() <= 75 && job.getweightgsm() >= 45"
 actions:
-  - "job.setJobSize('Small');"
+  - "job.setWeightClass('Low');"
 ---
-name: "high-coverage-rule"
-description: "Sets the coverage size to \"High\"."
-priority: 2
-condition: "job.getMaxCoverage() >= 70.0"
+name: "Very-Low-Media-Weight-Class"
+description: "Sets the weight class to very low."
+priority: 1
+condition: "job.getweightgsm() < 45"
 actions:
-  - "job.setCoverageAmt('High');"
+  - "job.setWeightClass('Very Low');"
 ---
-name: "medium-coverage-rule"
-description: "Sets the coverage size to \"Medium\"."
+name: "Coating-Coated-Exposed-Fiber"
+description: "Transform performance mode into target speed"
 priority: 2
-condition: "job.getMaxCoverage() >= 30.0 && job.getMaxCoverage() < 70.0"
+condition: "job.getpaperType() == 'Coated' && (job.getfinish() == 'High Bulk' || job.getfinish() == 'Matte' || job.getfinish() == 'Silk' || job.getfinish() == 'Vellum')"
 actions:
-  - "job.setCoverageAmt('Medium');"
+  - "job.setCoatingClass('Exposed Fiber');"
 ---
-name: "low-coverage-rule"
-description: "Sets the coverage size to \"Low\"."
+name: "Coating-Coated-Closed-Surface"
+description: "Transform quality mode into target speed"
 priority: 2
-condition: "job.getMaxCoverage() < 30.0"
+condition: "job.getpaperType() == 'Coated' && (job.getfinish() == 'Dull' || job.getfinish() == 'Eggshell' || job.getfinish() == 'Gloss' || job.getfinish() == 'Satin' || job.getfinish() == 'Smooth' || job.getfinish() == 'SuperSmooth')"
 actions:
-  - "job.setCoverageAmt('Low');"
+  - "job.setCoatingClass('Closed Surface');"
+---
+name: "Coating-Coated-Uncoated-Inkjet-Treated Surface"
+description: "Transform quality mode into target speed"
+priority: 2
+condition: "(job.getpaperType().contains('Uncoated') || job.getpaperType().contains('Coated')) && (job.getpaperType().contains('Treated') || job.getpaperType().contains('Pro'))"
+actions:
+  - "job.setCoatingClass('Inkjet Treated Surface');"
+---
+name: "Coating-Uncoated-Most-Surface"
+description: "Transform quality mode into target speed"
+priority: 2
+condition: "job.getpaperType().contains('Uncoated') && job.getfinish() != '' && !(job.getpaperType().contains('Treated') || job.getpaperType().contains('Pro')) "
+actions:
+  - "job.setCoatingClass('Most Surfaces');"
+---
+name: "Coating-Coated-Uncoated-Unknown-Surface"
+description: "Transform quality mode into target speed"
+priority: 3
+condition: "(job.getpaperType().contains('Uncoated') || job.getpaperType().contains('Coated')) && job.getfinish() == '' "
+actions:
+  - "job.setCoatingClass('Unknown Surface');"
+---
+name: "EMT-Very-Low"
+description: "Set Unwinder"
+priority: 3
+condition: "job.getWeightClass() == 'Very Low' && job.getUnwinder() == 'EMT'"
+actions:
+  - "job.setDryerZone(0.75);"
+  - "job.setPrintZone(0.75);"
+  - "job.setUnwinder(0.75);"
+  - "job.setRewinder(0.75);"
+---
+name: "EMT-Low"
+description: "Set Unwinder"
+priority: 3
+condition: "job.getWeightClass() == 'Low' && job.getUnwinder() == 'EMT'"
+actions:
+  - "job.setDryerZone(1);"
+  - "job.setPrintZone(1);"
+  - "job.setUnwinder(1);"
+  - "job.setRewinder(1);"
+---
+name: "EMT-Medium"
+description: "Set Unwinder"
+priority: 3
+condition: "job.getWeightClass() == 'Medium' && job.getUnwinder() == 'EMT'"
+actions:
+  - "job.setDryerZone(1.25);"
+  - "job.setPrintZone(1.25);"
+  - "job.setUnwinder(1.25);"
+  - "job.setRewinder(1.25);"
+---
+name: "EMT-High"
+description: "Set Unwinder"
+priority: 3
+condition: "job.getWeightClass() == 'High' && job.getUnwinder() == 'EMT'"
+actions:
+  - "job.setDryerZone(1.5);"
+  - "job.setPrintZone(1.5);"
+  - "job.setUnwinder(1.5);"
+  - "job.setRewinder(1.5);"
+---
+name: "HNK-Very-Low"
+description: "Set Unwinder"
+priority: 3
+condition: "job.getWeightClass() == 'Very Low' && job.getUnwinder() == 'HNK'"
+actions:
+  - "job.setDryerZone(0.75);"
+  - "job.setPrintZone(0.75);"
+  - "job.setUnwinder(0.375);"
+  - "job.setRewinder(0.375);"
+---
+name: "HNK-Low"
+description: "Set Unwinder"
+priority: 3
+condition: "job.getWeightClass() == 'Low' && job.getUnwinder() == 'HNK'"
+actions:
+  - "job.setDryerZone(1);"
+  - "job.setPrintZone(1);"
+  - "job.setUnwinder(0.5);"
+  - "job.setRewinder(0.5);"
+---
+name: "HNK-Medium"
+description: "Set Unwinder"
+priority: 3
+condition: "job.getWeightClass() == 'Medium' && job.getUnwinder() == 'HNK'"
+actions:
+  - "job.setDryerZone(1.25);"
+  - "job.setPrintZone(1.25);"
+  - "job.setUnwinder(0.625);"
+  - "job.setRewinder(0.625);"
+---
+name: "HNK-High"
+description: "Set Unwinder"
+priority: 3
+condition: "job.getWeightClass() == 'High' && job.getUnwinder() == 'HNK'"
+actions:
+  - "job.setDryerZone(1.5);"
+  - "job.setPrintZone(1.5);"
+  - "job.setUnwinder(0.75);"
+  - "job.setRewinder(0.75);"
