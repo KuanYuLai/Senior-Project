@@ -6,6 +6,7 @@ import { Home } from './components/Home';
 
 import { NewJob } from './components/NewJob';
 import { JobHistory } from './components/JobHistory';
+import { JobResults } from './components/JobResults';
 
 import 'antd/dist/antd.css';
 import Style from './CSS/App.module.css'
@@ -32,6 +33,8 @@ export default class App extends Component {
             this.state = { currentPage: 'new-job' };
 		} else if (URL.includes('job-history')) {
             this.state = { currentPage: 'job-history' };
+		} else if (URL.includes('job-results')) {
+			this.state = { currentPage: 'job-results' };
 		} else {
 			this.state = { currentPage: 'home' };
 		}
@@ -87,7 +90,8 @@ export default class App extends Component {
 						<div className={Style.mainContent}>
 							<Route exact path='/' render={(props) => <Home {...props} callback={this.handleMenuClick} />} />
                             <Route exact path='/new-job' component={NewJob} />
-                            <Route exact path='/job-history' component={JobHistory} />
+							<Route exact path='/job-history' component={JobHistory} />
+							<Route exact path='/job-results' component={JobResults} />
 						</div>
 					</Content>
 				</Layout>

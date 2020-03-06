@@ -8,6 +8,91 @@ import moment from 'moment';
 import Style from '../CSS/JobHistory.module.css'
 import { ServerURL } from './Home';
 
+
+/* Constructs the spreadsheet containing the job results. Can also compare multiple jobs.
+ * The function will be exported so that the jobResults page can use it as well. */
+export const BuildSpreadsheet = function(keys, jobHistory) {
+	//const { jobHistory } = this.state;
+
+	var spreadsheetData = [];
+	var temp = [];
+
+	/* Get list of all keys in an entry, except for jobID. */
+	var keyList = Object.keys(jobHistory[0]).filter((val) => {
+		return val !== "jobID";
+	});
+
+	/* Get the data from the row in the table, organize it. */
+	var currentData = [];
+
+	/* The first column that holds the labels. Empty. */
+	temp.push({ value: '', width: 150, readOnly: true });
+
+	for (let i = 0; i < keys.length; i++) {
+		currentData = jobHistory.filter(obj => {
+			return obj.jobID === keys[i];
+		})[0];
+
+		/* Column for each job being compared. */
+		temp.push({ value: 'Job ' + currentData.jobID, width: 175, readOnly: true });
+	}
+
+	spreadsheetData.push(temp);
+	temp = [];
+
+	/* Runs through the list of all keys (except jobID), making a row for each. */
+	for (let j = 0; j < keyList.length; j++) {
+
+		if (keyList[j] !== 'input' && keyList[j] !== 'output') {
+			temp.push({ value: keyList[j], readOnly: true });
+
+			/* Runs through the data in each job, pairing it with the label. */
+			for (let k = 0; k < keys.length; k++) {
+				currentData = jobHistory.filter(obj => {
+					return obj.jobID === keys[k];
+				})[0];
+
+				temp.push({ value: currentData[keyList[j]] });
+			}
+
+			spreadsheetData.push(temp);
+			temp = [];
+		}
+		else {
+			temp.push({ value: keyList[j].toLocaleUpperCase(), readOnly: true });
+
+			/* Empty space for that row. */
+			for (let k = 0; k < keys.length; k++)
+				temp.push({ value: '' });
+
+			spreadsheetData.push(temp);
+			temp = [];
+
+			/* Get list of all keys in the sub-object. */
+			var subKeyList = Object.keys(jobHistory[0][keyList[j]]).filter((val) => {
+				return val;
+			});
+
+			for (let n = 0; n < subKeyList.length - 1; n++) {
+				temp.push({ value: subKeyList[n], readOnly: true });
+
+				for (let m = 0; m < keys.length; m++) {
+					currentData = jobHistory.filter(obj => {
+						return obj.jobID === keys[m];
+					})[0];
+
+					temp.push({ value: currentData[keyList[j]][subKeyList[n]] });
+				}
+
+				spreadsheetData.push(temp);
+				temp = [];
+			}
+		}
+	}
+
+	return spreadsheetData;
+}
+
 /* The job history page displays a table of all previously completed jobs, sorted chronologically. */
 export class JobHistory extends Component {
 	constructor() {
@@ -16,9 +101,9 @@ export class JobHistory extends Component {
 		this.sampleColumns = [
 			{
 				title: 'Job ID',
-				dataIndex: 'jobid',
+				dataIndex: 'jobID',
 				width: 100,
-				sorter: (a, b) => a.jobid - b.jobid,
+				sorter: (a, b) => a.jobID - b.jobID,
 			},
 			{
 				title: 'Date',
@@ -26,22 +111,24 @@ export class JobHistory extends Component {
 				width: 200,
                 sorter: (a, b) => moment(a.jobTime).unix() - moment(b.jobTime).unix(),
 				defaultSortOrder: 'descend',
-            },
+			},
+			/*
 			{
 				title: 'Job Name',
 				dataIndex: 'jobName',
 				sorter: (a, b) => { return a.jobName.localeCompare(b.jobName) },
 			},
+			*/
             {
                 title: 'Results',
-				render: (text, row) => <Button className={Style.resultsColumn} onClick={() => this.compareJobs([row.jobid])}>View</Button>,
+				render: (text, row) => <Button className={Style.resultsColumn} onClick={() => this.compareJobs([row.jobID])}>View</Button>,
 				width: 80,
             },
 		];
 
 		this.state = {
 			selectedRowKeys: [],
-			currentJobId: -1,
+			currentJobID: -1,
 			modalVisible: false,
 			modalContent: null,
 		};
@@ -58,7 +145,7 @@ export class JobHistory extends Component {
 
 			for (let i = 0; i < this.state.jobHistory.length; i++) {
 				rowObject = {
-					jobid: this.state.jobHistory[i].jobid,
+					jobID: this.state.jobHistory[i].jobID,
 					jobTime: this.state.jobHistory[i].jobTime,
 					jobName: this.state.jobHistory[i].jobName
 				};
@@ -72,7 +159,7 @@ export class JobHistory extends Component {
 
 	/* Calls the database to request job history. */
 	fetchHistory = async () => {
-		await fetch(ServerURL + "history/", {
+		await fetch(ServerURL + "job-history", {
 			method: "GET",
 			mode: 'cors',
 			headers: {
@@ -80,7 +167,6 @@ export class JobHistory extends Component {
 			}
 		}).then(async (res) => {
 			await res.json().then((data) => {
-				console.log(data);
 				this.setState({ jobHistory: data });
 			});
 		}).catch(err => {
@@ -122,61 +208,10 @@ export class JobHistory extends Component {
 		})
 	}
 
-	/* Constructs the spreadsheet containing the job results. Can also compare multiple jobs. */
-	buildSpreadsheet = (keys) => {
-		const { jobHistory } = this.state;
-
-		var spreadsheetData = [];
-		var temp = [];
-
-		/* Get list of all keys in an entry, except for jobid. */
-		var keyList = Object.keys(jobHistory[0]).filter((val) => {
-			return val !== "jobid";
-		});
-
-		/* Get the data from the row in the table, organize it. */
-		var currentData = [];
-
-		/* The first column that holds the labels. Empty. */
-		temp.push({ value: '', width: 150, readOnly: true });
-
-		for (let i = 0; i < keys.length; i++) {
-			currentData = jobHistory.filter(obj => {
-				return obj.jobid === keys[i];
-			})[0];
-
-			/* Column for each job being compared. */
-			temp.push({ value: 'Job ' + currentData.jobid, width: 175, readOnly: true });
-		}
-
-		spreadsheetData.push(temp);
-		temp = [];
-
-		/* Runs through the list of all keys (except jobid), making a row for each. */
-		for (let j = 0; j < keyList.length; j++) {
-
-			temp.push({ value: keyList[j], readOnly: true });
-
-			/* Runs through the data in each job, pairing it with the label. */
-			for (let k = 0; k < keys.length; k++) {
-				currentData = jobHistory.filter(obj => {
-					return obj.jobid === keys[k];
-				})[0];
-
-				temp.push({ value: currentData[keyList[j]] });
-			}
-
-			spreadsheetData.push(temp);
-			temp = [];
-		}
-
-		return spreadsheetData;
-	}
-
 	/* Constructs the content of the modal. */
 	compareJobs = (keys) => {
 		/* Get the data from the row in the table, organize it. */
-		const spreadsheetData = this.buildSpreadsheet(keys);
+		const spreadsheetData = BuildSpreadsheet(keys, this.state.jobHistory);
 
 		/* Build the ReactDataSheet component using the data returned from buildSpreadsheet(). */
 		var modalInnards =
@@ -188,7 +223,7 @@ export class JobHistory extends Component {
 
 		this.setState({
 			modalContent: modalInnards,
-			currentJobId: keys.length === 1 ? keys[0] : null
+			currentJobID: keys.length === 1 ? keys[0] : null
 		})
 
 		/* Open the modal and display the data. */
@@ -210,7 +245,7 @@ export class JobHistory extends Component {
 
 				<Modal
 					title={selectedRowKeys.length === 1 ?
-						"Job " + this.state.currentJobId + " Results"
+						"Job " + this.state.currentJobID + " Results"
 						:
 						"Job Comparison"
 					}
@@ -219,7 +254,7 @@ export class JobHistory extends Component {
 						this.toggleModal();
 						this.setState({
 							selectedRowKeys: [],
-							currentJobId: -1
+							currentJobID: -1
 						});
 					}}
 					destroyOnClose={true}
@@ -263,7 +298,7 @@ export class JobHistory extends Component {
 				</div>
 
                 <Table
-					rowKey="jobid"
+					rowKey="jobID"
 					rowSelection={rowSelection}
                     dataSource={tableData}
                     columns={this.sampleColumns}
