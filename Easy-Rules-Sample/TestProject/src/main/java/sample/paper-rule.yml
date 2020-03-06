@@ -1,0 +1,6 @@
+name: "paper-rule"
+description: "Determines the result of specific paper"
+priority: 1
+condition: "job.checkValidPaperType()"
+actions:
+  - "job.setBA(false);"
