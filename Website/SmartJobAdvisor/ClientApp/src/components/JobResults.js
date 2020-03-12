@@ -1,9 +1,11 @@
 ﻿import React, { Component, Fragment } from 'react';
-import { Spin } from 'antd';
+import { Button, Icon, Spin } from 'antd';
+import { CSVLink } from "react-csv";
 import ReactDataSheet from "react-datasheet";
 import 'react-datasheet/lib/react-datasheet.css';
 
 import { BuildSpreadsheet } from './JobHistory.js';
+import Style from '../CSS/JobHistory.module.css'
 
 //import Style from '../CSS/JobHistory.module.css'
 import { ServerURL } from './Home';
@@ -14,16 +16,19 @@ export class JobResults extends Component {
 
 		this.state = {
 			jobID: props.location.state.jobID,
-			ready: false
+			ready: false,
 		};
 	}
 
 	componentDidMount = async () => {
 		await this.fetchJob();
 
+		var data = BuildSpreadsheet([this.state.jobID], this.state.jobResult);
+
 		setTimeout(async () => {
 			this.setState({
-				spreadsheetData: BuildSpreadsheet([this.state.jobID], this.state.jobResult),
+				spreadsheetData: data[0],
+				exportData: data[1],
 				ready: true
 			});
 		});
@@ -53,7 +58,8 @@ export class JobResults extends Component {
 		const {
 			ready,
 			jobID,
-			spreadsheetData
+			spreadsheetData,
+			exportData
 		} = this.state;
 
 		if (!ready)
@@ -66,6 +72,12 @@ export class JobResults extends Component {
 					<h1>Job {jobID} Results</h1>
 					<br /><br />
 
+					<CSVLink data={exportData} filename={"Job_" + jobID + ".csv"}>
+						<Button type="primary" style={{ marginBottom: 10 }}>
+							<Icon className={Style.buttonIcon} type="file-excel" />
+							Export to CSV
+						</Button>
+					</CSVLink>
 					<ReactDataSheet
 						data={spreadsheetData}
 						valueRenderer={(cell) => cell.value}

@@ -1,6 +1,7 @@
 ﻿import React, { Component, Fragment } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { Button, Icon, Modal, notification, Table, Row, Col } from 'antd';
+import { CSVLink } from "react-csv";
 import ReactDataSheet from "react-datasheet";
 import 'react-datasheet/lib/react-datasheet.css';
 import moment from 'moment';
@@ -11,11 +12,12 @@ import { ServerURL } from './Home';
 
 /* Constructs the spreadsheet containing the job results. Can also compare multiple jobs.
  * The function will be exported so that the jobResults page can use it as well. */
-export const BuildSpreadsheet = function(keys, jobHistory) {
-	//const { jobHistory } = this.state;
-
+export const BuildSpreadsheet = function (keys, jobHistory) {
+	/* Arrays to hold data. Separate arrays for spreadsheet and export, since format is different. */
 	var spreadsheetData = [];
-	var temp = [];
+	var spreadsheetTemp = [];
+	var exportData = [];
+	var exportTemp = [];
 
 	/* Get list of all keys in an entry, except for jobID. */
 	var keyList = Object.keys(jobHistory[0]).filter((val) => {
@@ -26,7 +28,8 @@ export const BuildSpreadsheet = function(keys, jobHistory) {
 	var currentData = [];
 
 	/* The first column that holds the labels. Empty. */
-	temp.push({ value: '', width: 150, readOnly: true });
+	spreadsheetTemp.push({ value: '', width: 150, readOnly: true });
+	exportTemp.push("");
 
 	for (let i = 0; i < keys.length; i++) {
 		currentData = jobHistory.filter(obj => {
@@ -34,17 +37,27 @@ export const BuildSpreadsheet = function(keys, jobHistory) {
 		})[0];
 
 		/* Column for each job being compared. */
-		temp.push({ value: 'Job ' + currentData.jobID, width: 175, readOnly: true });
+		spreadsheetTemp.push({ value: 'Job ' + currentData.jobID, width: 175, readOnly: true });
+		exportTemp.push('Job ' + currentData.jobID);
+
+		/* Column to separate jobs. */
+		if (i !== keys.length - 1) {
+			spreadsheetTemp.push({ value: '', width: 15, readOnly: true });
+			exportTemp.push("");
+		}
 	}
 
-	spreadsheetData.push(temp);
-	temp = [];
+	spreadsheetData.push(spreadsheetTemp);
+	spreadsheetTemp = [];
+	exportData.push(exportTemp);
+	exportTemp = [];
 
 	/* Runs through the list of all keys (except jobID), making a row for each. */
 	for (let j = 0; j < keyList.length; j++) {
 
 		if (keyList[j] !== 'input' && keyList[j] !== 'output') {
-			temp.push({ value: keyList[j], readOnly: true });
+			spreadsheetTemp.push({ value: keyList[j], readOnly: true });
+			exportTemp.push(keyList[j]);
 
 			/* Runs through the data in each job, pairing it with the label. */
 			for (let k = 0; k < keys.length; k++) {
@@ -52,21 +65,41 @@ export const BuildSpreadsheet = function(keys, jobHistory) {
 					return obj.jobID === keys[k];
 				})[0];
 
-				temp.push({ value: currentData[keyList[j]] });
+				spreadsheetTemp.push({ value: currentData[keyList[j]] });
+				exportTemp.push(currentData[keyList[j]]);
+
+				/* Space for job separator. Dont add one to last job. */
+				if (k !== keys.length - 1) {
+					spreadsheetTemp.push({ value: '' });
+					exportTemp.push("");
+				}
 			}
 
-			spreadsheetData.push(temp);
-			temp = [];
+			spreadsheetData.push(spreadsheetTemp);
+			spreadsheetTemp = [];
+			exportData.push(exportTemp);
+			exportTemp = [];
 		}
 		else {
-			temp.push({ value: keyList[j].toLocaleUpperCase(), readOnly: true });
+			spreadsheetTemp.push({ value: keyList[j].toLocaleUpperCase(), readOnly: true });
+			exportTemp.push(keyList[j].toLocaleUpperCase());
 
 			/* Empty space for that row. */
-			for (let k = 0; k < keys.length; k++)
-				temp.push({ value: '' });
+			for (let k = 0; k < keys.length; k++) {
+				spreadsheetTemp.push({ value: '' });
+				exportTemp.push("");
 
-			spreadsheetData.push(temp);
-			temp = [];
+				/* Space for job separator. Dont add one to last job. */
+				if (k !== keys.length - 1) {
+					spreadsheetTemp.push({ value: '' });
+					exportTemp.push("");
+				}
+			}
+
+			spreadsheetData.push(spreadsheetTemp);
+			spreadsheetTemp = [];
+			exportData.push(exportTemp);
+			exportTemp = [];
 
 			/* Get list of all keys in the sub-object. */
 			var subKeyList = Object.keys(jobHistory[0][keyList[j]]).filter((val) => {
@@ -74,23 +107,33 @@ export const BuildSpreadsheet = function(keys, jobHistory) {
 			});
 
 			for (let n = 0; n < subKeyList.length - 1; n++) {
-				temp.push({ value: subKeyList[n], readOnly: true });
+				spreadsheetTemp.push({ value: subKeyList[n], readOnly: true });
+				exportTemp.push(subKeyList[n]);
 
 				for (let m = 0; m < keys.length; m++) {
 					currentData = jobHistory.filter(obj => {
 						return obj.jobID === keys[m];
 					})[0];
 
-					temp.push({ value: currentData[keyList[j]][subKeyList[n]] });
+					spreadsheetTemp.push({ value: currentData[keyList[j]][subKeyList[n]] });
+					exportTemp.push(currentData[keyList[j]][subKeyList[n]]);
+
+					/* Space for job separator. Dont add one to last job. */
+					if (m !== keys.length - 1) {
+						spreadsheetTemp.push({ value: '' });
+						exportTemp.push("");
+					}
 				}
 
-				spreadsheetData.push(temp);
-				temp = [];
+				spreadsheetData.push(spreadsheetTemp);
+				spreadsheetTemp = [];
+				exportData.push(exportTemp);
+				exportTemp = [];
 			}
 		}
 	}
 
-	return spreadsheetData;
+	return [spreadsheetData, exportData];
 }
 
 /* The job history page displays a table of all previously completed jobs, sorted chronologically. */
@@ -112,13 +155,11 @@ export class JobHistory extends Component {
                 sorter: (a, b) => moment(a.jobTime).unix() - moment(b.jobTime).unix(),
 				defaultSortOrder: 'descend',
 			},
-			/*
 			{
 				title: 'Job Name',
 				dataIndex: 'jobName',
 				sorter: (a, b) => { return a.jobName.localeCompare(b.jobName) },
 			},
-			*/
             {
                 title: 'Results',
 				render: (text, row) => <Button className={Style.resultsColumn} onClick={() => this.compareJobs([row.jobID])}>View</Button>,
@@ -147,7 +188,7 @@ export class JobHistory extends Component {
 				rowObject = {
 					jobID: this.state.jobHistory[i].jobID,
 					jobTime: this.state.jobHistory[i].jobTime,
-					jobName: this.state.jobHistory[i].jobName
+					jobName: this.state.jobHistory[i].input.jobName
 				};
 
 				tableArray.push(rowObject);
@@ -211,15 +252,38 @@ export class JobHistory extends Component {
 	/* Constructs the content of the modal. */
 	compareJobs = (keys) => {
 		/* Get the data from the row in the table, organize it. */
-		const spreadsheetData = BuildSpreadsheet(keys, this.state.jobHistory);
+		const spreadExportData = BuildSpreadsheet(keys, this.state.jobHistory);
+
+		const spreadsheetData = spreadExportData[0];
+		const exportData = spreadExportData[1];
+
+		/* Name of the file generated when the "Export to CSV" button is clicked. */
+		var fileName = "";
+		if (keys.length === 1)
+			fileName = "Job";
+		else
+			fileName = "Compare_Jobs";
+
+		for (let i = 0; i < keys.length; i++)
+			fileName += "_" + keys[i];
+
+		fileName += ".csv";
 
 		/* Build the ReactDataSheet component using the data returned from buildSpreadsheet(). */
 		var modalInnards =
-			<ReactDataSheet
-				data={spreadsheetData}
-				valueRenderer={(cell) => cell.value}
-				onChange={() => { }}
-			/>;
+			<>
+				<CSVLink data={exportData} filename={fileName}>
+					<Button type="primary" style={{ marginBottom: 10 }}>
+						<Icon className={Style.buttonIcon} type="file-excel" />
+						Export to CSV
+					</Button>
+				</CSVLink>
+				<ReactDataSheet
+					data={spreadsheetData}
+					valueRenderer={(cell) => cell.value}
+					onChange={() => { }}
+				/>
+			</>;
 
 		this.setState({
 			modalContent: modalInnards,
@@ -231,11 +295,13 @@ export class JobHistory extends Component {
 	}
 
 	render() {
-		const { tableData, modalContent, selectedRowKeys } = this.state;
+		const { tableData, modalContent, selectedRowKeys, jobHistory } = this.state;
 
 		const rowSelection = {
 			selectedRowKeys,
 			onChange: this.onSelectChange,
+			//columnWidth: 30,
+			//fixed: true
 		};
 
 		return (
@@ -302,8 +368,8 @@ export class JobHistory extends Component {
 					rowSelection={rowSelection}
                     dataSource={tableData}
                     columns={this.sampleColumns}
-					style={{ width: 650 }}
-					scroll={{ y: 1000 }}
+					style={{ width: 700 }}
+					scroll={{ y: 1000, X: 1000 }}
 					bordered
 				/>
 			</Fragment>
