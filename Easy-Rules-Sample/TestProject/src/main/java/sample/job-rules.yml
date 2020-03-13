@@ -141,3 +141,17 @@ actions:
   - "job.setPrintZone(1.5);"
   - "job.setUnwinder(0.75);"
   - "job.setRewinder(0.75);"
+---
+name: "Set-Dryer-Power"
+description: "Set Dryer-Power"
+priority: 4
+condition: "true"
+actions:
+  - "job.setDryerPower();"
+---
+name: "Set-Target-Speed"
+description: "Set Target Speed"
+priority: 4
+condition: "true"
+actions:
+  - "job.setTargetSpeed();"

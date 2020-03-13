@@ -13,8 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/new")
 public class Server extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/plain");
-        //response.setContentType("application/json");
+        //response.setContentType("text/plain");
+        response.setContentType("application/JSON");
         PrintWriter out = response.getWriter();
         StringBuilder sb = new StringBuilder();
         Launcher launch = new Launcher();

@@ -1,6 +1,10 @@
 package sample;
+import java.io.*;
+import java.util.*;
+import java.net.*;
 import org.json.simple.JSONObject;
-
+import org.json.simple.parser.*;
+import org.json.simple.JSONArray;
 
 public class Job {
 	// Variables that will be populated initially
@@ -200,6 +204,78 @@ public class Job {
 		else
 			this.CoverageClass = "Light";
 	}
+
+    public void setTargetSpeed() throws Exception{
+        String host_url = "http://ec2-35-163-184-27.us-west-2.compute.amazonaws.com:8080/rules/";
+        //Getting JSON files
+        URL TargetSpeed_JSON = new URL(host_url + "Target_Speed.json");
+        //Open connection
+        URLConnection yc_targetspeed = TargetSpeed_JSON.openConnection();
+        //Read buffer
+        BufferedReader in_targetspeed = new BufferedReader(new InputStreamReader(yc_targetspeed.getInputStream()));
+
+        Object target_obj = new JSONParser().parse(in_targetspeed);
+        JSONArray target_array = (JSONArray) target_obj;
+
+        //Searching for TargetSpeed matching data
+        for(Object o : target_array){
+            JSONObject target_o = (JSONObject) o;
+            String CoverageClass = (String) target_o.get("CoverageClass");
+            String WeightClass = (String) target_o.get("WeightClass");
+            String CoatingClass = (String) target_o.get("CoatingClass");
+            String QualityMode = (String) target_o.get("QualityMode");
+
+            String coat_compare = "";
+            if (getpaperType().contains("Coated"))
+                coat_compare += "Coated";
+            else if (getpaperType().contains("Uncoated"))
+                coat_compare += "Uncoated";
+
+            coat_compare += " - " + getCoatingClass();
+
+            if (CoverageClass.equals(getCoverageClass()) && WeightClass.equals(getWeightClass()) && CoatingClass.equals(coat_compare) && QualityMode.equals(getqualityMode())){
+                setTargetSpeed((long) target_o.get("TargetSpeed"));
+                break;
+            }
+            setTargetSpeed(0);
+        }
+    }
+
+    public void setDryerPower() throws Exception{
+        String host_url = "http://ec2-35-163-184-27.us-west-2.compute.amazonaws.com:8080/rules/";
+        //Getting JSON files
+        URL dryerpower_JSON= new URL(host_url + "dryer_power.json");
+        //Open connection
+        URLConnection yc_dryerpower = dryerpower_JSON.openConnection();
+        //Read buffer
+        BufferedReader in_dryerpower = new BufferedReader(new InputStreamReader(yc_dryerpower.getInputStream()));
+
+        Object dryer_obj = new JSONParser().parse(in_dryerpower);
+        JSONArray dryer_array = (JSONArray) dryer_obj;
+
+        //Searching for DryerSpeed matching data
+        for(Object o : dryer_array){
+            JSONObject dryer_o = (JSONObject) o;
+            String CoverageClass = (String) dryer_o.get("CoverageClass");
+            String WeightClass = (String) dryer_o.get("WeightClass");
+            String CoatingClass = (String) dryer_o.get("CoatingClass");
+            String QualityMode = (String) dryer_o.get("QualityMode");
+
+            String coat_compare = "";
+            if (getpaperType().contains("Coated"))
+                coat_compare += "Coated";
+            else if (getpaperType().contains("Uncoated"))
+                coat_compare += "Uncoated";
+
+            coat_compare += " - " + getCoatingClass();
+
+            if (CoverageClass.equals(getCoverageClass()) && WeightClass.equals(getWeightClass()) && CoatingClass.equals(coat_compare) && QualityMode.equals(getqualityMode())){
+                setDryerSpeed((String) dryer_o.get("DryerPower"));
+                break;
+            }
+            setDryerSpeed("Can't Find data");
+        }
+    }
 
 	//Return output data in JSON format
 	public String toJSON() {

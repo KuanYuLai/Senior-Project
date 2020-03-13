@@ -1,7 +1,5 @@
 package sample;
 
-import org.json.simple.JSONObject;
-
 import org.jeasy.rules.api.Facts;
 import org.jeasy.rules.api.Rule;
 import org.jeasy.rules.api.Rules;
@@ -19,18 +17,12 @@ import org.jeasy.rules.support.*;
 
 
 import java.io.*;
-import java.io.FileReader;
-import java.io.BufferedReader;
 import java.util.*;
 import java.net.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.*;
 import org.json.simple.JSONArray;
 
-import javax.servlet.ServletContext;
-import javax.servlet.annotation.WebFilter;
-import java.io.IOException;
-//import javax.servlet.http.HttpServletRequest;
 
 public class Launcher {
 
@@ -128,7 +120,7 @@ public class Launcher {
                     //basicrules.register(primerBAGroup);
             }
         }
-
+    /*
     //Generating TargetSpeed, DryerPower
     //Getting JSON files
 	URL dryerpower_JSON= new URL(host_url + "dryer_power.json");
@@ -183,7 +175,7 @@ public class Launcher {
                 break;
             }
         }
-
+        */
         //Return result to SJA Engine
       	System.out.println(job.toJSON());
 
