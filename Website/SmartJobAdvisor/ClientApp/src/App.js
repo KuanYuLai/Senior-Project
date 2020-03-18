@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { Redirect } from 'react-router';
 import { Menu, Icon, Layout } from 'antd';
@@ -11,7 +11,7 @@ import { JobResults } from './components/JobResults';
 import 'antd/dist/antd.css';
 import Style from './CSS/App.module.css'
 
-const { Header, Content, Footer } = Layout;
+const { Content } = Layout;
 
 export default class App extends Component {
 	state = {

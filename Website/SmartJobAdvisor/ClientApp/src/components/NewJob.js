@@ -1,17 +1,15 @@
-﻿import React, { Component, Fragment } from 'react';
+﻿import React, { Component } from 'react';
 //import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { Redirect, Route } from 'react-router';
 import { Button, Checkbox, Form, Icon, Input, InputNumber, notification, Radio, Row, Col, Select, Slider } from 'antd';
 
 import Style from '../CSS/NewJob.module.css'
 import { ServerURL } from './Home';
-import { JobHistory } from './JobHistory';
-//import { JobResults } from './JobResults';
 
 const { Option } = Select;
 
 /* An AntD InputNumber with a label on the right. */
-class BetterInputNumber extends React.Component {
+class BetterInputNumber extends Component {
 	render() {
 		if (this.props.addonAfter) {
 			return (
@@ -35,7 +33,7 @@ class BetterInputNumber extends React.Component {
 }
 
 /* Holds the form that the user fills out and POSTs to the SJA Engine. */
-class NewJobForm extends React.Component {
+class NewJobForm extends Component {
 	constructor() {
 		super();
 
@@ -81,11 +79,11 @@ class NewJobForm extends React.Component {
 			}
 		}).then(async (res) => {
 			await res.json().then((data) => {
-				//this.setState({ paperDatabase: data.paperdb });
+				this.setState({ paperDatabase: data.paperdb });
 
 				// Testing with actual data
-				var realData = require('../PaperData/HP-paper-db-CONFIDENTIAL-2020-02-09.json');
-				this.setState({ paperDatabase: realData.paperdb })
+				//var realData = require('../PaperData/HP-paper-db-CONFIDENTIAL-2020-02-09.json');
+				//this.setState({ paperDatabase: realData.paperdb })
 			});
 		}).catch(err => {
 			this.fetchError("fetch paper database");
@@ -401,6 +399,7 @@ class NewJobForm extends React.Component {
 							createdID: data.id,
 							jobCreated: true
 						});
+
 						//<Link to={{ pathname: '/job-results', state: { jobID: data.id } }} />
 
 						/*

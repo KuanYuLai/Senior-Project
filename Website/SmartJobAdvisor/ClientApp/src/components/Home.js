@@ -1,5 +1,4 @@
-import React, { Component, Fragment } from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import React, { Component } from 'react';
 import { Button, Icon } from 'antd';
 
 import Style from '../CSS/Home.module.css'

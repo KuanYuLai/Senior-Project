@@ -1,6 +1,5 @@
 ﻿import React, { Component, Fragment } from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { Button, Icon, Modal, notification, Table, Row, Col } from 'antd';
+import { Button, Icon, Modal, notification, Table } from 'antd';
 import { CSVLink } from "react-csv";
 import ReactDataSheet from "react-datasheet";
 import 'react-datasheet/lib/react-datasheet.css';
@@ -141,7 +140,7 @@ export class JobHistory extends Component {
 	constructor() {
 		super();
 
-		this.sampleColumns = [
+		this.columns = [
 			{
 				title: 'Job ID',
 				dataIndex: 'jobID',
@@ -151,7 +150,7 @@ export class JobHistory extends Component {
 			{
 				title: 'Date',
 				dataIndex: 'jobTime',
-				width: 200,
+				width: 225,
                 sorter: (a, b) => moment(a.jobTime).unix() - moment(b.jobTime).unix(),
 				defaultSortOrder: 'descend',
 			},
@@ -295,13 +294,11 @@ export class JobHistory extends Component {
 	}
 
 	render() {
-		const { tableData, modalContent, selectedRowKeys, jobHistory } = this.state;
+		const { tableData, modalContent, selectedRowKeys } = this.state;
 
 		const rowSelection = {
 			selectedRowKeys,
 			onChange: this.onSelectChange,
-			//columnWidth: 30,
-			//fixed: true
 		};
 
 		return (
@@ -356,7 +353,7 @@ export class JobHistory extends Component {
 								<Icon className={Style.buttonIcon} type="undo" />
 								Clear
 							</Button>
-							<span>{selectedRowKeys.length} job{selectedRowKeys.length == 1 ? '' : 's'} selected</span>
+							<span>{selectedRowKeys.length} job{selectedRowKeys.length === 1 ? '' : 's'} selected</span>
 						</>
 						:
 						<br />
@@ -367,8 +364,8 @@ export class JobHistory extends Component {
 					rowKey="jobID"
 					rowSelection={rowSelection}
                     dataSource={tableData}
-                    columns={this.sampleColumns}
-					style={{ width: 700 }}
+                    columns={this.columns}
+					style={{ width: 725 }}
 					scroll={{ y: 1000, X: 1000 }}
 					bordered
 				/>
