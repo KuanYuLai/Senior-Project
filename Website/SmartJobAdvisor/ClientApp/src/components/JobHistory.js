@@ -38,12 +38,6 @@ export const BuildSpreadsheet = function (keys, jobHistory) {
 		/* Column for each job being compared. */
 		spreadsheetTemp.push({ value: 'Job ' + currentData.jobID, width: 175, readOnly: true });
 		exportTemp.push('Job ' + currentData.jobID);
-
-		/* Column to separate jobs. */
-		if (i !== keys.length - 1) {
-			spreadsheetTemp.push({ value: '', width: 15, readOnly: true });
-			exportTemp.push("");
-		}
 	}
 
 	spreadsheetData.push(spreadsheetTemp);
@@ -66,12 +60,6 @@ export const BuildSpreadsheet = function (keys, jobHistory) {
 
 				spreadsheetTemp.push({ value: currentData[keyList[j]] });
 				exportTemp.push(currentData[keyList[j]]);
-
-				/* Space for job separator. Dont add one to last job. */
-				if (k !== keys.length - 1) {
-					spreadsheetTemp.push({ value: '' });
-					exportTemp.push("");
-				}
 			}
 
 			spreadsheetData.push(spreadsheetTemp);
@@ -87,12 +75,6 @@ export const BuildSpreadsheet = function (keys, jobHistory) {
 			for (let k = 0; k < keys.length; k++) {
 				spreadsheetTemp.push({ value: '' });
 				exportTemp.push("");
-
-				/* Space for job separator. Dont add one to last job. */
-				if (k !== keys.length - 1) {
-					spreadsheetTemp.push({ value: '' });
-					exportTemp.push("");
-				}
 			}
 
 			spreadsheetData.push(spreadsheetTemp);
@@ -116,12 +98,6 @@ export const BuildSpreadsheet = function (keys, jobHistory) {
 
 					spreadsheetTemp.push({ value: currentData[keyList[j]][subKeyList[n]] });
 					exportTemp.push(currentData[keyList[j]][subKeyList[n]]);
-
-					/* Space for job separator. Dont add one to last job. */
-					if (m !== keys.length - 1) {
-						spreadsheetTemp.push({ value: '' });
-						exportTemp.push("");
-					}
 				}
 
 				spreadsheetData.push(spreadsheetTemp);
@@ -171,6 +147,7 @@ export class JobHistory extends Component {
 			currentJobID: -1,
 			modalVisible: false,
 			modalContent: null,
+			selectedColumns: ["jobID", "jobTime", "jobName"]
 		};
 	}
 
@@ -178,23 +155,9 @@ export class JobHistory extends Component {
 		/* Fetch the job history from the server. Wait unfil fetch is complete to continue. */
 		await this.fetchHistory();
 
-		/* If there was an error fetching the paper database, don't attempt to populat dropdowns/radios. */
-		if (typeof this.state.error === 'undefined' && this.state.error !== true) {
-			var tableArray = [];
-			var rowObject = {};
-
-			for (let i = 0; i < this.state.jobHistory.length; i++) {
-				rowObject = {
-					jobID: this.state.jobHistory[i].jobID,
-					jobTime: this.state.jobHistory[i].jobTime,
-					jobName: this.state.jobHistory[i].input.jobName
-				};
-
-				tableArray.push(rowObject);
-			}
-
-			this.setState({ tableData: tableArray })
-		}
+		/* If there was an error fetching the paper database, don't attempt to populate dropdowns/radios. */
+		if (typeof this.state.error === 'undefined' && this.state.error !== true)
+			this.buildTable();
 	}
 
 	/* Calls the database to request job history. */
@@ -234,6 +197,37 @@ export class JobHistory extends Component {
 		}
 
 		this.setState({ error: true });
+	}
+
+	/* Build the table rows depending on what checkboxes are selected. */
+	buildTable = () => {
+		const { jobHistory, selectedColumns } = this.state;
+
+		var tableArray = [];
+		var rowObject = {};
+
+		console.log(this.state.jobHistory);
+		console.log(this.state.selectedColumns);
+
+		/* Create an entry in the table for each object in jobHistory. */
+		for (let i = 0; i < jobHistory.length; i++) {
+			/* Add data from correct spot. Column data may be surface level, or child of 'input'/'output' */
+			for (let j = 0; j < selectedColumns.length; j++) {
+				if (typeof jobHistory[i][selectedColumns[j]] !== 'undefined')
+					rowObject[selectedColumns[j]] = jobHistory[i][selectedColumns[j]];
+				else if (typeof jobHistory[i].input[selectedColumns[j]] !== 'undefined')
+					rowObject[selectedColumns[j]] = jobHistory[i].input[selectedColumns[j]];
+				else if (typeof jobHistory[i].output[selectedColumns[j]] !== 'undefined')
+					rowObject[selectedColumns[j]] = jobHistory[i].output[selectedColumns[j]];
+			}
+
+			/* Add the row to the table data array, clear the row object for next run. */
+			tableArray.push(rowObject);
+			rowObject = {};
+		}
+
+		/* Save generated table rows to state so they can be used by the table. */
+		this.setState({ tableData: tableArray })
 	}
 
 	/* Called when ticking a checkbox to select a row. */
