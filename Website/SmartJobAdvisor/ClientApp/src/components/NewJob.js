@@ -1,7 +1,8 @@
 ﻿import React, { Component } from 'react';
-//import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { Redirect, Route } from 'react-router';
 import { Button, Checkbox, Form, Icon, Input, InputNumber, notification, Radio, Row, Col, Select, Slider } from 'antd';
+import { instanceOf } from 'prop-types';
+import { withCookies, Cookies } from 'react-cookie';
 
 import Style from '../CSS/NewJob.module.css'
 import { ServerURL } from './Home';
@@ -34,16 +35,31 @@ class BetterInputNumber extends Component {
 
 /* Holds the form that the user fills out and POSTs to the SJA Engine. */
 class NewJobForm extends Component {
-	constructor() {
-		super();
+	static propTypes = {
+		cookies: instanceOf(Cookies).isRequired
+	};
+
+	constructor(props) {
+		super(props);
+
+		/* Get maxCoverage/opticalDensity values from cookies (if they exist, otherwise use defaults). */
+		const { cookies } = props;
+
+		var maxC = 50;
+		var oD = 100;
+
+		if (typeof cookies.get('maxCoverage') !== 'undefined')
+			maxC = parseInt(cookies.get('maxCoverage'));
+		if (typeof cookies.get('opticalDensity') !== 'undefined')
+			oD = parseInt(cookies.get('opticalDensity'));
 
 		/* Initialize all values and populate radios/selects. */
 		this.state = {
 			unknownPaper: false,
 			paperNameMfrDisabled: false,
 			weightgsm: null,
-			maxCoverage: 50,
-			opticalDensity: 100,
+			maxCoverage: maxC,
+			opticalDensity: oD,
 			jobCreated: false,
 			createdID: -1,
 		};
@@ -380,7 +396,18 @@ class NewJobForm extends Component {
 		e.preventDefault();
 		this.props.form.validateFields(async (err, values) => {
 			if (!err) {
+				/* This is here so the values of the form can be seen in the console for debugging. */
 				console.log('Received values of form: ', values);
+
+				/* Set cookies to remember jobName/ruleset/qualityMode/pressUnwinderBrand/maxCoverage/opticalDensity for next time. */
+				const { cookies } = this.props;
+
+				cookies.set('jobName', values.jobName, { path: '/' });
+				cookies.set('ruleset', values.ruleset, { path: '/' });
+				cookies.set('qualityMode', values.qualityMode, { path: '/' });
+				cookies.set('pressUnwinderBrand', values.pressUnwinderBrand, { path: '/' });
+				cookies.set('maxCoverage', values.maxCoverage, { path: '/' });
+				cookies.set('opticalDensity', values.opticalDensity, { path: '/' });
 
 				/* Call database to request paperDatabase object. */
 				await fetch(ServerURL + 'new-job/', {
@@ -399,13 +426,6 @@ class NewJobForm extends Component {
 							createdID: data.id,
 							jobCreated: true
 						});
-
-						//<Link to={{ pathname: '/job-results', state: { jobID: data.id } }} />
-
-						/*
-						<Route exact path='/job-results' render={(props) => <JobResults {...props} jobID={data.id} />} />
-						<Link to="/job-results" />
-						*/
 					});
 				}).catch(() => {
 					this.fetchError("submit job");
@@ -460,6 +480,9 @@ class NewJobForm extends Component {
 			},
 		}
 
+		/* Initialize cookies. */
+		const { cookies } = this.props;
+
 		if (jobCreated) {
 			// Put a loading spinner here or something
 			console.log(createdID);
@@ -486,7 +509,7 @@ class NewJobForm extends Component {
 								<Form.Item label="Job Name:" style={{ marginBottom: -5 }}>
 									{getFieldDecorator('jobName', {
 										rules: [{ required: true, message: 'Please input a job name' }],
-										initialValue: "Setting Advice",
+										initialValue: cookies.get('jobName') || "Setting Advice",
 									})(
 										<Input
 											className={Style.formItemInput}
@@ -499,7 +522,7 @@ class NewJobForm extends Component {
 								<Form.Item label="Ruleset:" style={{ marginBottom: -5 }}>
 									{getFieldDecorator('ruleset', {
 										rules: [{ required: true, message: 'Please choose a ruleset' }],
-										initialValue: "Default",
+										initialValue: cookies.get('ruleset') || "Default",
 									})(
 										<Select className={Style.formItemInput}>
 											<Option value="Default">Default</Option>
@@ -515,7 +538,7 @@ class NewJobForm extends Component {
 								<Form.Item label="Quality Mode:" style={{ marginBottom: -5 }}>
 									{getFieldDecorator('qualityMode', {
 										rules: [{ required: true }],
-										initialValue: "Quality",
+										initialValue: cookies.get('qualityMode') || "Quality",
 									})(
 										<Radio.Group className={Style.formItemPaper}>
 											<Radio.Button value="Quality">Quality</Radio.Button>
@@ -528,7 +551,7 @@ class NewJobForm extends Component {
 								<Form.Item label="Press Unwinder Brand:" style={{ marginBottom: -5 }}>
 									{getFieldDecorator('pressUnwinderBrand', {
 										rules: [{ required: true }],
-										initialValue: "EMT",
+										initialValue: cookies.get('pressUnwinderBrand') || "EMT",
 									})(
 										<Radio.Group className={Style.formItemPaper}>
 											<Radio.Button value="EMT">EMT</Radio.Button>
@@ -541,7 +564,7 @@ class NewJobForm extends Component {
 						<Form.Item style={{ marginBottom: -5 }} label="PDF Max Coverage:">
 							{getFieldDecorator('maxCoverage', {
 								rules: [{ required: true }],
-								initialValue: 50,
+								initialValue: cookies.get('maxCoverage') || 50,
 							})(
 								<div style={{ display: 'flex', marginBottom: '-10px' }} >
 									<Slider
@@ -564,7 +587,7 @@ class NewJobForm extends Component {
 						<Form.Item label="Optical Density:">
 							{getFieldDecorator('opticalDensity', {
 								rules: [{ required: true }],
-								initialValue: 100,
+								initialValue: cookies.get('opticalDensity') || 100,
 							})(
 								<div style={{ display: 'flex', marginBottom: '-10px' }} >
 									<Slider
@@ -742,4 +765,4 @@ class NewJobForm extends Component {
 
 const NewJob = Form.create({ name: 'new-job' })(NewJobForm);
 
-export { NewJob };
+export default withCookies(NewJob);

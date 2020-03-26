@@ -1,5 +1,7 @@
 ﻿import React, { Component, Fragment } from 'react';
 import { Button, Checkbox, Icon, Modal, notification, Table, Row, Col } from 'antd';
+import { instanceOf } from 'prop-types';
+import { withCookies, Cookies } from 'react-cookie';
 import { CSVLink } from "react-csv";
 import ReactDataSheet from "react-datasheet";
 import 'react-datasheet/lib/react-datasheet.css';
@@ -112,9 +114,30 @@ export const BuildSpreadsheet = function (keys, jobHistory) {
 }
 
 /* The job history page displays a table of all previously completed jobs, sorted chronologically. */
-export class JobHistory extends Component {
-	constructor() {
-		super();
+class JobHistory extends Component {
+	static propTypes = {
+		cookies: instanceOf(Cookies).isRequired
+	};
+
+	constructor(props) {
+		super(props);
+
+		/* Get column checkbox values from cookies (if they exist, otherwise use defaults). */
+		const { cookies } = props;
+
+		var defaultCols = ["jobID", "jobTime", "jobName", "results"];
+		var defaultGeneral = ["jobID", "jobTime", "jobName", "results"];
+		var defaultInput = [];
+		var defaultOutput = [];
+
+		if (typeof cookies.get('defaultCols') !== 'undefined')
+			defaultCols = cookies.get('defaultCols');
+		if (typeof cookies.get('defaultGeneral') !== 'undefined')
+			defaultGeneral = cookies.get('defaultGeneral');
+		if (typeof cookies.get('defaultInput') !== 'undefined')
+			defaultInput = cookies.get('defaultInput');
+		if (typeof cookies.get('defaultOutput') !== 'undefined')
+			defaultOutput = cookies.get('defaultOutput');
 
 		/* Set some state values so that the states exist and don't cause an error when referenced. */
 		this.state = {
@@ -124,11 +147,11 @@ export class JobHistory extends Component {
 			spreadsheetModal: null,
 			columnModalVisible: false,
 			columnModal: null,
-			selectedColumns: ["jobID", "jobTime", "jobName", "results"],
 			tableColumns: [],
-			generalCheckboxes: ["jobID", "jobTime", "jobName", "results"],
-			inputCheckboxes: [],
-			outputCheckboxes: []
+			selectedColumns: defaultCols,
+			generalCheckboxes: defaultGeneral,
+			inputCheckboxes: defaultInput,
+			outputCheckboxes: defaultOutput
 		};
 	}
 
@@ -267,13 +290,27 @@ export class JobHistory extends Component {
 	/* When the columnChange modal 'Ok' button is clicked, transfer all checkbox arrays
 	 * to the selectedColumns array, then rebuild the table with the new column list. */
 	columnChangeConfirm = () => {
+		const {
+			generalCheckboxes,
+			inputCheckboxes,
+			outputCheckboxes
+		} = this.state;
+
 		var temp = [];
 
 		/* Collect all checkbox values (except "results"), concat into one array, then append "results" to the end. */
-		temp = temp.concat(this.state.generalCheckboxes.slice(0, -1));
-		temp = temp.concat(this.state.inputCheckboxes);
-		temp = temp.concat(this.state.outputCheckboxes);
+		temp = temp.concat(generalCheckboxes.slice(0, -1));
+		temp = temp.concat(inputCheckboxes);
+		temp = temp.concat(outputCheckboxes);
 		temp = temp.concat("results");
+
+		/* Initialize cookies and set them to remember checkbox selection */
+		const { cookies } = this.props;
+
+		cookies.set('defaultCols', temp, { path: '/' });
+		cookies.set('defaultGeneral', generalCheckboxes, { path: '/' });
+		cookies.set('defaultInput', inputCheckboxes, { path: '/' });
+		cookies.set('defaultOutput', outputCheckboxes, { path: '/' });
 
 		/* Set selected columns, rebuild table. */
 		this.setState({
@@ -587,3 +624,5 @@ export class JobHistory extends Component {
 		);
 	}
 }
+
+export default withCookies(JobHistory);

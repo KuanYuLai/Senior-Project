@@ -4,8 +4,8 @@ import { Redirect } from 'react-router';
 import { Menu, Icon, Layout } from 'antd';
 import { Home } from './components/Home';
 
-import { NewJob } from './components/NewJob';
-import { JobHistory } from './components/JobHistory';
+import NewJob from './components/NewJob';
+import JobHistory from './components/JobHistory';
 import { JobResults } from './components/JobResults';
 
 import 'antd/dist/antd.css';
@@ -89,8 +89,8 @@ export default class App extends Component {
 					<Content style={{ height: 'calc(100vh - 48px)' }}>
 						<div className={Style.mainContent}>
 							<Route exact path='/' render={(props) => <Home {...props} callback={this.handleMenuClick} />} />
-                            <Route exact path='/new-job' component={NewJob} />
-							<Route exact path='/job-history' component={JobHistory} />
+							<Route exact path='/new-job' render={(props) => <NewJob {...props} />} />
+							<Route exact path='/job-history' render={(props) => <JobHistory {...props} />} />
 							<Route exact path='/job-results' component={JobResults} />
 						</div>
 					</Content>
