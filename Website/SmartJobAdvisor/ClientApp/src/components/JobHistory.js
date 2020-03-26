@@ -1,5 +1,5 @@
 ﻿import React, { Component, Fragment } from 'react';
-import { Button, Icon, Modal, notification, Table } from 'antd';
+import { Button, Checkbox, Icon, Modal, notification, Table, Row, Col } from 'antd';
 import { CSVLink } from "react-csv";
 import ReactDataSheet from "react-datasheet";
 import 'react-datasheet/lib/react-datasheet.css';
@@ -116,48 +116,32 @@ export class JobHistory extends Component {
 	constructor() {
 		super();
 
-		this.columns = [
-			{
-				title: 'Job ID',
-				dataIndex: 'jobID',
-				width: 100,
-				sorter: (a, b) => a.jobID - b.jobID,
-			},
-			{
-				title: 'Date',
-				dataIndex: 'jobTime',
-				width: 225,
-                sorter: (a, b) => moment(a.jobTime).unix() - moment(b.jobTime).unix(),
-				defaultSortOrder: 'descend',
-			},
-			{
-				title: 'Job Name',
-				dataIndex: 'jobName',
-				sorter: (a, b) => { return a.jobName.localeCompare(b.jobName) },
-			},
-            {
-                title: 'Results',
-				render: (text, row) => <Button className={Style.resultsColumn} onClick={() => this.compareJobs([row.jobID])}>View</Button>,
-				width: 80,
-            },
-		];
-
+		/* Set some state values so that the states exist and don't cause an error when referenced. */
 		this.state = {
 			selectedRowKeys: [],
 			currentJobID: -1,
-			modalVisible: false,
-			modalContent: null,
-			selectedColumns: ["jobID", "jobTime", "jobName"]
+			spreadsheetModalVisible: false,
+			spreadsheetModal: null,
+			columnModalVisible: false,
+			columnModal: null,
+			selectedColumns: ["jobID", "jobTime", "jobName", "results"],
+			tableColumns: [],
+			generalCheckboxes: ["jobID", "jobTime", "jobName", "results"],
+			inputCheckboxes: [],
+			outputCheckboxes: []
 		};
 	}
 
+	/* Called immediately after the constructor. Allows page to render with empty values before data is added to avoid a crash. */
 	componentDidMount = async () => {
 		/* Fetch the job history from the server. Wait unfil fetch is complete to continue. */
 		await this.fetchHistory();
 
 		/* If there was an error fetching the paper database, don't attempt to populate dropdowns/radios. */
-		if (typeof this.state.error === 'undefined' && this.state.error !== true)
-			this.buildTable();
+		if (typeof this.state.error === 'undefined' && this.state.error !== true) {
+			await this.buildTableColumns();
+			await this.buildTable();
+		}
 	}
 
 	/* Calls the database to request job history. */
@@ -199,15 +183,209 @@ export class JobHistory extends Component {
 		this.setState({ error: true });
 	}
 
+	/* Creates the contents for the column picker modal. */
+	buildColumnChecklist = () => {
+		/* Build the contents of the column select modal. */
+		var colList1 = [
+			{ label: "Job ID", value: "jobID", disabled: true },
+			{ label: "Date", value: "jobTime", disabled: true },
+			{ label: "Job Name", value: "jobName", disabled: true },
+			{ label: "Results", value: "results", disabled: true },
+		];
+		var colList2 = [];
+		var colList3 = [];
+
+		/* Build the list of input values. */
+		for (let i = 0; i < Object.keys(this.state.jobHistory[0].input).length; i++) {
+			var tempTitle = [...this.state.jobHistory][0];
+
+			tempTitle = Object.keys(tempTitle.input)[i].replace(/([a-z])([A-Z])/g, '$1 $2');
+			tempTitle = tempTitle.charAt(0).toUpperCase() + tempTitle.slice(1);
+
+			if (Object.keys(this.state.jobHistory[0].input)[i] !== 'jobName')
+				colList2.push(
+					{
+						label: tempTitle,
+						value: Object.keys(this.state.jobHistory[0].input)[i]
+					},
+				);
+		}
+
+		/* Build the list of output values. */
+		for (let j = 0; j < Object.keys(this.state.jobHistory[0].output).length; j++) {
+			var tempTitle = [...this.state.jobHistory][0];
+
+			tempTitle = Object.keys(tempTitle.output)[j].replace(/([a-z])([A-Z])/g, '$1 $2');
+			tempTitle = tempTitle.charAt(0).toUpperCase() + tempTitle.slice(1);
+
+			if (Object.keys(this.state.jobHistory[0].output)[j] !== 'jobName')
+				colList3.push(
+					{
+						label: tempTitle,
+						value: Object.keys(this.state.jobHistory[0].output)[j]
+					},
+				);
+		}
+
+		/* Build checkbox lists for each section. Helps with formatting. */
+		var alwaysActiveCols = this.buildCheckboxes(colList1, 'general', 6, true);
+		var jobInputCols = this.buildCheckboxes(colList2, 'input');
+		var jobOutputCols = this.buildCheckboxes(colList3, 'output');
+
+		var modalInnards =
+			<>
+				<b>Always-Active Columns</b><br />
+				{alwaysActiveCols}
+				<br /><br />
+
+				<b>Job Input Columns</b>
+				{jobInputCols}
+				<br /><br />
+
+				<b>Job Output Columns</b>
+				{jobOutputCols}
+			</>;
+
+		this.setState({
+			columnModal: modalInnards
+		});
+	}
+
+	/* Holds values in each checkbox, updates immediately when a checkbox is clicked.
+	 * Stores values temporarily before they are committed over to the selectedColumns state array. */
+	onCheckboxChange = (checkedValues, type) => {
+		switch (type) {
+			case 'input':
+				this.setState({ inputCheckboxes: checkedValues });
+				break;
+			case 'output':
+				this.setState({ outputCheckboxes: checkedValues });
+				break;
+		}
+	}
+
+	/* When the columnChange modal 'Ok' button is clicked, transfer all checkbox arrays
+	 * to the selectedColumns array, then rebuild the table with the new column list. */
+	columnChangeConfirm = () => {
+		var temp = [];
+
+		/* Collect all checkbox values (except "results"), concat into one array, then append "results" to the end. */
+		temp = temp.concat(this.state.generalCheckboxes.slice(0, -1));
+		temp = temp.concat(this.state.inputCheckboxes);
+		temp = temp.concat(this.state.outputCheckboxes);
+		temp = temp.concat("results");
+
+		/* Set selected columns, rebuild table. */
+		this.setState({
+			selectedColumns: temp,
+			columnModalVisible: false
+		}, () => {
+			this.buildTableColumns();
+			this.buildTable();
+		});
+	}
+
+	/* Helper function to generate checkbox grids from a list of strings. */
+	buildCheckboxes = (list, type, span = 8, disabled = false) => {
+		return (
+			<Checkbox.Group style={{ width: '100%' }} defaultValue={this.state.selectedColumns} onChange={(vals) => { this.onCheckboxChange(vals, type) }}>
+				<Row>
+					{
+						list.map((item) => {
+							return (
+								<Col key={item.label} span={span}>
+									<Checkbox disabled={disabled} value={item.value}>{item.label}</Checkbox>
+								</Col>
+							);
+						})
+					}
+				</Row>
+			</Checkbox.Group>
+		);
+	}
+
+	/* Builds the column structure of the table based on what columns have been selected. */
+	buildTableColumns = () => {
+		const { selectedColumns, jobHistory } = this.state;
+
+		var tempCol = [];
+		var tempWidth = 800;
+
+		/* Add base columns that cannot be removed. */
+		tempCol.push(
+			{
+				title: 'Job ID',
+				dataIndex: 'jobID',
+				width: 100,
+				sorter: (a, b) => a.jobID - b.jobID,
+				fixed: 'left'
+			},
+			{
+				title: 'Date',
+				dataIndex: 'jobTime',
+				width: 225,
+				sorter: (a, b) => moment(a.jobTime).unix() - moment(b.jobTime).unix(),
+				defaultSortOrder: 'descend',
+			},
+			{
+				title: 'Job Name',
+				dataIndex: 'jobName',
+				sorter: (a, b) => { return a.jobName.localeCompare(b.jobName) },
+			},
+		);
+
+		/* Add the rest of the selected columns. */
+		for (let i = 0; i < selectedColumns.length; i++) {
+			if (selectedColumns[i] !== 'jobID' && selectedColumns[i] !== 'jobTime' && selectedColumns[i] !== 'jobName' && selectedColumns[i] !== 'results') {
+				var tempTitle = selectedColumns[i].replace(/([a-z])([A-Z])/g, '$1 $2');
+				tempTitle = tempTitle.charAt(0).toUpperCase() + tempTitle.slice(1);
+
+				/* Check if value is number or string. If number sort rows by number, if string sort rows by localecompare. */
+				if ((typeof jobHistory[0].input[selectedColumns[i]] === 'string') || (typeof jobHistory[0].output[selectedColumns[i]] === 'string'))
+					tempCol.push(
+						{
+							title: tempTitle,
+							dataIndex: selectedColumns[i],
+							width: 175,
+							sorter: (a, b) => { return a[selectedColumns[i]].localeCompare(b[selectedColumns[i]]) },
+						},
+					);
+				else
+					tempCol.push(
+						{
+							title: tempTitle,
+							dataIndex: selectedColumns[i],
+							width: 175,
+							sorter: (a, b) => a[selectedColumns[i]] - b[selectedColumns[i]],
+						},
+					);
+
+				tempWidth += 175;
+			}
+		}
+
+		/* Add results columns that cannot be removed. */
+		tempCol.push(
+			{
+				title: 'Results',
+				render: (text, row) => <Button className={Style.resultsColumn} onClick={() => { this.compareJobs([row.jobID]) } }>View</Button>,
+				width: 80,
+				fixed: 'right'
+			},
+		);
+
+		this.setState({
+			tableColumns: tempCol,
+			tableWidth: tempWidth
+		});
+	}
+
 	/* Build the table rows depending on what checkboxes are selected. */
 	buildTable = () => {
 		const { jobHistory, selectedColumns } = this.state;
 
 		var tableArray = [];
 		var rowObject = {};
-
-		console.log(this.state.jobHistory);
-		console.log(this.state.selectedColumns);
 
 		/* Create an entry in the table for each object in jobHistory. */
 		for (let i = 0; i < jobHistory.length; i++) {
@@ -236,10 +414,15 @@ export class JobHistory extends Component {
 	}
 
 	/* Toggles the visibility of the job results modal. */
-	toggleModal = () => {
-		this.setState({
-			modalVisible: !this.state.modalVisible
-		})
+	toggleModal = (type) => {
+		if (type === "spreadsheet")
+			this.setState({
+				spreadsheetModalVisible: !this.state.spreadsheetModalVisible
+			});
+		else if (type === "columns")
+			this.setState({
+				columnModalVisible: !this.state.columnModalVisible
+			});
 	}
 
 	/* Constructs the content of the modal. */
@@ -279,20 +462,30 @@ export class JobHistory extends Component {
 			</>;
 
 		this.setState({
-			modalContent: modalInnards,
+			spreadsheetModal: modalInnards,
 			currentJobID: keys.length === 1 ? keys[0] : null
 		})
 
 		/* Open the modal and display the data. */
-		this.toggleModal();
+		this.toggleModal("spreadsheet");
 	}
 
 	render() {
-		const { tableData, modalContent, selectedRowKeys } = this.state;
+		const {
+			tableData,
+			tableColumns,
+			tableWidth,
+			spreadsheetModal,
+			spreadsheetModalVisible,
+			columnModal,
+			columnModalVisible,
+			selectedRowKeys
+		} = this.state;
 
 		const rowSelection = {
 			selectedRowKeys,
 			onChange: this.onSelectChange,
+			fixed: 'left'
 		};
 
 		return (
@@ -300,15 +493,16 @@ export class JobHistory extends Component {
 				<h1>Job History</h1>
 				<br />
 
+				{/* Modal for job results/comparison spreadsheet. */}
 				<Modal
 					title={selectedRowKeys.length === 1 ?
 						"Job " + this.state.currentJobID + " Results"
 						:
 						"Job Comparison"
 					}
-					visible={this.state.modalVisible}
+					visible={spreadsheetModalVisible}
 					onCancel={() => {
-						this.toggleModal();
+						this.toggleModal("spreadsheet");
 						this.setState({
 							selectedRowKeys: [],
 							currentJobID: -1
@@ -318,11 +512,36 @@ export class JobHistory extends Component {
 					footer={null}
 					width={selectedRowKeys.length === 0 ? 350 : ((selectedRowKeys.length) * 175) + 200}
 				>
-					{modalContent}
+					{spreadsheetModal}
+				</Modal>
+
+				{/* Modal for choosing active column in the jobHistory table. */}
+				<Modal
+					title={"Select Visible Columns"}
+					visible={columnModalVisible}
+					onOk={this.columnChangeConfirm}
+					onCancel={() => {
+						this.toggleModal("columns");
+					}}
+					destroyOnClose={true}
+					width={450}
+				>
+					{columnModal}
 				</Modal>
 
 				{/* Only render the clear button and row selection indication when rows are selected. */}
 				<div className={Style.tableHeader}>
+					<Button
+						className={Style.tableButton}
+						onClick={() => {
+							this.buildColumnChecklist();
+							this.toggleModal("columns");
+						}}
+						type="default"
+					>
+						<Icon className={Style.buttonIcon} type="setting" />
+							Columns
+					</Button>
 					{selectedRowKeys.length > 1 ?
 						<Button
 							className={Style.tableButton}
@@ -357,11 +576,12 @@ export class JobHistory extends Component {
                 <Table
 					rowKey="jobID"
 					rowSelection={rowSelection}
-                    dataSource={tableData}
-                    columns={this.columns}
-					style={{ width: 725 }}
-					scroll={{ y: 1000, X: 1000 }}
+					dataSource={tableData}
+					columns={tableColumns}
+					style={{ width: tableWidth, maxWidth: '100%' }}
+					scroll={{ y: 1000, x: tableWidth - 100 }}
 					bordered
+					pagination={{ defaultPageSize: 10, showQuickJumper: true, showSizeChanger: true, pageSizeOptions: ['10', '20', '30'] }}
 				/>
 			</Fragment>
 		);
