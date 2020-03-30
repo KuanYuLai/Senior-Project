@@ -1,5 +1,5 @@
 ﻿import React, { Component } from 'react';
-import { Redirect, Route } from 'react-router';
+import { Redirect } from 'react-router';
 import { Button, Checkbox, Form, Icon, Input, InputNumber, notification, Radio, Row, Col, Select, Slider } from 'antd';
 import { instanceOf } from 'prop-types';
 import { withCookies, Cookies } from 'react-cookie';
@@ -214,7 +214,7 @@ class NewJobForm extends Component {
 		var currentPapers = [...currentPaperNames];
 
 		/* If weightgsm, need to set state. Else assign 'e.target.value' to 'e'. Saves a few lines. */
-		if (field == "weightgsm")
+		if (field === "weightgsm")
 			this.setState({ weightgsm: e });
 		else
 			e = e.target.value;
@@ -224,17 +224,17 @@ class NewJobForm extends Component {
 
 		/* Filter remaining fields to apply constraints. */
 		if (typeof getFieldValue("manufacturer") !== 'undefined' && field !== "manufacturer")
-			currentPapers = currentPapers.filter((a) => a.manufacturer == getFieldValue("manufacturer"));
+			currentPapers = currentPapers.filter((a) => a.manufacturer === getFieldValue("manufacturer"));
 		if (typeof getFieldValue("productname") !== 'undefined' && field !== "productname")
-			currentPapers = currentPapers.filter((a) => a.productname == getFieldValue("productname"));
+			currentPapers = currentPapers.filter((a) => a.productname === getFieldValue("productname"));
 		if (typeof getFieldValue("papertype") !== 'undefined' && field !== "papertype")
-			currentPapers = currentPapers.filter((a) => a.papertype == getFieldValue("papertype"));
+			currentPapers = currentPapers.filter((a) => a.papertype === getFieldValue("papertype"));
 		if (typeof getFieldValue("papersubtype") !== 'undefined' && field !== "papersubtype")
-			currentPapers = currentPapers.filter((a) => a.papersubtype == getFieldValue("papersubtype"));
+			currentPapers = currentPapers.filter((a) => a.papersubtype === getFieldValue("papersubtype"));
 		if (typeof getFieldValue("weightgsm") !== 'undefined' && getFieldValue("weightgsm") !== null && field !== "weightgsm")
-			currentPapers = currentPapers.filter((a) => a.weightgsm == getFieldValue("weightgsm"));
+			currentPapers = currentPapers.filter((a) => a.weightgsm === getFieldValue("weightgsm"));
 		if (typeof getFieldValue("finish") !== 'undefined' && field !== "finish")
-			currentPapers = currentPapers.filter((a) => a.finish == getFieldValue("finish"));
+			currentPapers = currentPapers.filter((a) => a.finish === getFieldValue("finish"));
 
 		var paperMfrs = [];
 		var paperNames = [];

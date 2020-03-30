@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { Redirect } from 'react-router';
+import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
 import { Menu, Icon, Layout } from 'antd';
 import { Home } from './components/Home';
 
@@ -16,54 +15,43 @@ const { Content } = Layout;
 export default class App extends Component {
 	state = {
 		currentPage: 'home',
-		redirect: false,
 	};
 
-	constructor() {
-		super();
-
-        this.redirect = false;
-        this.redirectTarget = '';
-
+	/* Highlights the proper tab in the navigation bar, even after page refresh. */
+	componentDidMount = () => {
 		// Get the current page for the menu
 		var URL = window.location.href;
 
 		/* This is a really messy way of doing this, but it doesn't really matter. */
 		if (URL.includes('new-job')) {
-            this.state = { currentPage: 'new-job' };
+			this.setState({ currentPage: 'new-job' });
 		} else if (URL.includes('job-history')) {
-            this.state = { currentPage: 'job-history' };
+			this.setState({currentPage: 'job-history' });
 		} else if (URL.includes('job-results')) {
-			this.state = { currentPage: 'job-results' };
+			this.setState({currentPage: 'job-results' });
 		} else {
-			this.state = { currentPage: 'home' };
+			this.setState({ currentPage: 'home' });
 		}
 	}
 
-	handleMenuClick = (page, buttonClick = false) => {
+	handleMenuClick = (page) => {
 		if (page === "navImage")
 			this.setState({ currentPage: 'home' });
 		else
 			this.setState({ currentPage: page });
-
-        if (buttonClick) {
-            this.redirect = true;
-            this.redirectTarget = page;
-        }
 	};
 
 	render() {
-		if (this.redirect === true) {
-            this.redirect = false;
-            return <Redirect push to={"/" + this.redirectTarget} />;
-		}
-
 		return (
 			<Router>
 				<Layout>
 					<Menu onClick={(e) => {this.handleMenuClick(e.key)}} selectedKeys={[this.state.currentPage]} mode="horizontal">
 						<Menu.Item key="navImage">
-							<img className={Style.navIcon} src={require('./Images/SJA-logo.svg')} height="30px" />
+							<img
+								className={Style.navIcon}
+								src={require('./Images/SJA-logo.svg')} height="30px"
+								alt="Smart Job Advisor"
+							/>
 							<Link to="/" />
 						</Menu.Item>
 
@@ -88,10 +76,12 @@ export default class App extends Component {
 
 					<Content style={{ height: 'calc(100vh - 48px)' }}>
 						<div className={Style.mainContent}>
-							<Route exact path='/' render={(props) => <Home {...props} callback={this.handleMenuClick} />} />
-							<Route exact path='/new-job' render={(props) => <NewJob {...props} />} />
-							<Route exact path='/job-history' render={(props) => <JobHistory {...props} />} />
-							<Route exact path='/job-results' component={JobResults} />
+							<Switch>
+								<Route exact path='/' render={(props) => <Home {...props} callback={this.handleMenuClick} />} />
+								<Route exact path='/new-job' render={(props) => <NewJob {...props} />} />
+								<Route exact path='/job-history' render={(props) => <JobHistory {...props} />} />
+								<Route exact path='/job-results' component={JobResults} />
+							</Switch>
 						</div>
 					</Content>
 				</Layout>

@@ -51,7 +51,7 @@ export const BuildSpreadsheet = function (keys, jobHistory) {
 	for (let j = 0; j < keyList.length; j++) {
 
 		if (keyList[j] !== 'input' && keyList[j] !== 'output') {
-			spreadsheetTemp.push({ value: keyList[j], readOnly: true });
+			spreadsheetTemp.push({ value: keyList[j], width: 150, readOnly: true });
 			exportTemp.push(keyList[j]);
 
 			/* Runs through the data in each job, pairing it with the label. */
@@ -60,7 +60,7 @@ export const BuildSpreadsheet = function (keys, jobHistory) {
 					return obj.jobID === keys[k];
 				})[0];
 
-				spreadsheetTemp.push({ value: currentData[keyList[j]] });
+				spreadsheetTemp.push({ value: currentData[keyList[j]], width: 175 });
 				exportTemp.push(currentData[keyList[j]]);
 			}
 
@@ -70,12 +70,12 @@ export const BuildSpreadsheet = function (keys, jobHistory) {
 			exportTemp = [];
 		}
 		else {
-			spreadsheetTemp.push({ value: keyList[j].toLocaleUpperCase(), readOnly: true });
+			spreadsheetTemp.push({ value: keyList[j].toLocaleUpperCase(), width: 150, readOnly: true });
 			exportTemp.push(keyList[j].toLocaleUpperCase());
 
 			/* Empty space for that row. */
 			for (let k = 0; k < keys.length; k++) {
-				spreadsheetTemp.push({ value: '' });
+				spreadsheetTemp.push({ value: '', width: 175 });
 				exportTemp.push("");
 			}
 
@@ -90,7 +90,7 @@ export const BuildSpreadsheet = function (keys, jobHistory) {
 			});
 
 			for (let n = 0; n < subKeyList.length - 1; n++) {
-				spreadsheetTemp.push({ value: subKeyList[n], readOnly: true });
+				spreadsheetTemp.push({ value: subKeyList[n], width: 150, readOnly: true });
 				exportTemp.push(subKeyList[n]);
 
 				for (let m = 0; m < keys.length; m++) {
@@ -98,7 +98,7 @@ export const BuildSpreadsheet = function (keys, jobHistory) {
 						return obj.jobID === keys[m];
 					})[0];
 
-					spreadsheetTemp.push({ value: currentData[keyList[j]][subKeyList[n]] });
+					spreadsheetTemp.push({ value: currentData[keyList[j]][subKeyList[n]], width: 175 });
 					exportTemp.push(currentData[keyList[j]][subKeyList[n]]);
 				}
 
@@ -151,8 +151,12 @@ class JobHistory extends Component {
 			selectedColumns: defaultCols,
 			generalCheckboxes: defaultGeneral,
 			inputCheckboxes: defaultInput,
-			outputCheckboxes: defaultOutput
+			outputCheckboxes: defaultOutput,
+			windowWidth: 0,
+			windowHeight: 0
 		};
+
+		this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
 	}
 
 	/* Called immediately after the constructor. Allows page to render with empty values before data is added to avoid a crash. */
@@ -165,6 +169,21 @@ class JobHistory extends Component {
 			await this.buildTableColumns();
 			await this.buildTable();
 		}
+
+		/* Add event listener for window resize. Helps with table formatting on small screens. */
+		this.updateWindowDimensions();
+		window.addEventListener('resize', this.updateWindowDimensions);
+	}
+
+	/* Called when the component is unmounted. Removes the event listener. */
+	componentWillUnmount = () => {
+		window.removeEventListener('resize', this.updateWindowDimensions);
+	}
+
+	/* Gets window dimensions. */
+	updateWindowDimensions = () => {
+		this.setState({ windowWidth: window.innerWidth, windowHeight: window.innerHeight });
+		this.buildTableColumns();
 	}
 
 	/* Calls the database to request job history. */
@@ -236,24 +255,33 @@ class JobHistory extends Component {
 
 		/* Build the list of output values. */
 		for (let j = 0; j < Object.keys(this.state.jobHistory[0].output).length; j++) {
-			var tempTitle = [...this.state.jobHistory][0];
+			var tempTitle2 = [...this.state.jobHistory][0];
 
-			tempTitle = Object.keys(tempTitle.output)[j].replace(/([a-z])([A-Z])/g, '$1 $2');
-			tempTitle = tempTitle.charAt(0).toUpperCase() + tempTitle.slice(1);
+			tempTitle2 = Object.keys(tempTitle2.output)[j].replace(/([a-z])([A-Z])/g, '$1 $2');
+			tempTitle2 = tempTitle2.charAt(0).toUpperCase() + tempTitle2.slice(1);
 
 			if (Object.keys(this.state.jobHistory[0].output)[j] !== 'jobName')
 				colList3.push(
 					{
-						label: tempTitle,
+						label: tempTitle2,
 						value: Object.keys(this.state.jobHistory[0].output)[j]
 					},
 				);
 		}
 
+		/* If window width is small, do 2 per row instead of 3 (helps with formatting). */
+		var activeColSpan = 6;
+		var colSpan = 8;
+
+		if (this.state.windowWidth < 500) {
+			activeColSpan = 12;
+			colSpan = 12;
+		}
+
 		/* Build checkbox lists for each section. Helps with formatting. */
-		var alwaysActiveCols = this.buildCheckboxes(colList1, 'general', 6, true);
-		var jobInputCols = this.buildCheckboxes(colList2, 'input');
-		var jobOutputCols = this.buildCheckboxes(colList3, 'output');
+		var alwaysActiveCols = this.buildCheckboxes(colList1, 'general', activeColSpan, true);
+		var jobInputCols = this.buildCheckboxes(colList2, 'input', colSpan);
+		var jobOutputCols = this.buildCheckboxes(colList3, 'output', colSpan);
 
 		var modalInnards =
 			<>
@@ -274,6 +302,25 @@ class JobHistory extends Component {
 		});
 	}
 
+	/* Helper function to generate checkbox grids from a list of strings. */
+	buildCheckboxes = (list, type, span, disabled = false) => {
+		return (
+			<Checkbox.Group style={{ width: '100%' }} defaultValue={this.state.selectedColumns} onChange={(vals) => { this.onCheckboxChange(vals, type) }}>
+				<Row>
+					{
+						list.map((item) => {
+							return (
+								<Col key={item.label} span={span}>
+									<Checkbox disabled={disabled} value={item.value}>{item.label}</Checkbox>
+								</Col>
+							);
+						})
+					}
+				</Row>
+			</Checkbox.Group>
+		);
+	}
+
 	/* Holds values in each checkbox, updates immediately when a checkbox is clicked.
 	 * Stores values temporarily before they are committed over to the selectedColumns state array. */
 	onCheckboxChange = (checkedValues, type) => {
@@ -281,7 +328,7 @@ class JobHistory extends Component {
 			case 'input':
 				this.setState({ inputCheckboxes: checkedValues });
 				break;
-			case 'output':
+			default:
 				this.setState({ outputCheckboxes: checkedValues });
 				break;
 		}
@@ -322,28 +369,9 @@ class JobHistory extends Component {
 		});
 	}
 
-	/* Helper function to generate checkbox grids from a list of strings. */
-	buildCheckboxes = (list, type, span = 8, disabled = false) => {
-		return (
-			<Checkbox.Group style={{ width: '100%' }} defaultValue={this.state.selectedColumns} onChange={(vals) => { this.onCheckboxChange(vals, type) }}>
-				<Row>
-					{
-						list.map((item) => {
-							return (
-								<Col key={item.label} span={span}>
-									<Checkbox disabled={disabled} value={item.value}>{item.label}</Checkbox>
-								</Col>
-							);
-						})
-					}
-				</Row>
-			</Checkbox.Group>
-		);
-	}
-
 	/* Builds the column structure of the table based on what columns have been selected. */
 	buildTableColumns = () => {
-		const { selectedColumns, jobHistory } = this.state;
+		const { selectedColumns, jobHistory, windowWidth } = this.state;
 
 		var tempCol = [];
 		var tempWidth = 800;
@@ -355,7 +383,7 @@ class JobHistory extends Component {
 				dataIndex: 'jobID',
 				width: 100,
 				sorter: (a, b) => a.jobID - b.jobID,
-				fixed: 'left'
+				fixed: windowWidth < 350 ? false : 'left'
 			},
 			{
 				title: 'Date',
@@ -404,9 +432,9 @@ class JobHistory extends Component {
 		/* Add results columns that cannot be removed. */
 		tempCol.push(
 			{
-				title: 'Results',
-				render: (text, row) => <Button className={Style.resultsColumn} onClick={() => { this.compareJobs([row.jobID]) } }>View</Button>,
-				width: 80,
+				title: 'View',
+				render: (text, row) => <Button className={windowWidth < 350 ? null : Style.resultsColumn} onClick={() => { this.compareJobs([row.jobID]) }}><Icon className={Style.buttonIcon} type="search" /></Button>,
+				width: 65,
 				fixed: 'right'
 			},
 		);
@@ -491,11 +519,15 @@ class JobHistory extends Component {
 						Export to CSV
 					</Button>
 				</CSVLink>
-				<ReactDataSheet
-					data={spreadsheetData}
-					valueRenderer={(cell) => cell.value}
-					onChange={() => { }}
-				/>
+				<div style={{ width: '100%', overflowX: 'scroll' }}>
+					<div style={{ width: (150 + (175 * keys.length)) }}>
+						<ReactDataSheet
+							data={spreadsheetData}
+							valueRenderer={(cell) => cell.value}
+							onChange={() => { }}
+						/>
+					</div>
+				</div>
 			</>;
 
 		this.setState({
@@ -516,18 +548,33 @@ class JobHistory extends Component {
 			spreadsheetModalVisible,
 			columnModal,
 			columnModalVisible,
-			selectedRowKeys
+			selectedRowKeys,
+			windowWidth
 		} = this.state;
 
 		const rowSelection = {
 			selectedRowKeys,
 			onChange: this.onSelectChange,
-			fixed: 'left'
+			fixed: windowWidth < 350 ? null : 'left',
 		};
 
 		return (
 			<Fragment>
 				<h1>Job History</h1>
+
+				{/* Button for column configuration. Separate from the others. */}
+				<Button
+					className={Style.settingsButton}
+					onClick={() => {
+						this.buildColumnChecklist();
+						this.toggleModal("columns");
+					}}
+					type="default"
+				>
+					<Icon className={Style.buttonIcon} type="setting" />
+					Columns
+				</Button>
+
 				<br />
 
 				{/* Modal for job results/comparison spreadsheet. */}
@@ -547,7 +594,9 @@ class JobHistory extends Component {
 					}}
 					destroyOnClose={true}
 					footer={null}
-					width={selectedRowKeys.length === 0 ? 350 : ((selectedRowKeys.length) * 175) + 200}
+					width={selectedRowKeys.length < 2 ? 345 : ((selectedRowKeys.length) * 175) + 170}
+					style={{ maxWidth: '95%' }}
+					bodyStyle={{ padding: '10px' }}
 				>
 					{spreadsheetModal}
 				</Modal>
@@ -568,17 +617,6 @@ class JobHistory extends Component {
 
 				{/* Only render the clear button and row selection indication when rows are selected. */}
 				<div className={Style.tableHeader}>
-					<Button
-						className={Style.tableButton}
-						onClick={() => {
-							this.buildColumnChecklist();
-							this.toggleModal("columns");
-						}}
-						type="default"
-					>
-						<Icon className={Style.buttonIcon} type="setting" />
-							Columns
-					</Button>
 					{selectedRowKeys.length > 1 ?
 						<Button
 							className={Style.tableButton}
@@ -603,7 +641,7 @@ class JobHistory extends Component {
 								<Icon className={Style.buttonIcon} type="undo" />
 								Clear
 							</Button>
-							<span>{selectedRowKeys.length} job{selectedRowKeys.length === 1 ? '' : 's'} selected</span>
+							<span>{selectedRowKeys.length} selected</span>
 						</>
 						:
 						<br />
@@ -616,9 +654,25 @@ class JobHistory extends Component {
 					dataSource={tableData}
 					columns={tableColumns}
 					style={{ width: tableWidth, maxWidth: '100%' }}
-					scroll={{ y: 1000, x: tableWidth - 100 }}
-					bordered
+					scroll={{ y: '60vh', x: tableWidth - 100 }}
 					pagination={{ defaultPageSize: 10, showQuickJumper: true, showSizeChanger: true, pageSizeOptions: ['10', '20', '30'] }}
+					size={windowWidth < 350 ? "small" : "large"}
+					bordered
+					onRow={(record, rowIndex) => {
+						return {
+							onClick: () => {
+								var tempRowKeys = [...this.state.selectedRowKeys];
+
+								if (tempRowKeys.indexOf(record.jobID) === -1)
+									tempRowKeys.push(record.jobID)
+								else
+									tempRowKeys.splice(tempRowKeys.indexOf(record.jobID), 1);
+
+								this.setState({ selectedRowKeys: tempRowKeys });
+								this.forceUpdate();
+							}
+						}
+					}}
 				/>
 			</Fragment>
 		);
