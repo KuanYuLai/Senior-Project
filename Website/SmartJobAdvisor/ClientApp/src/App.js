@@ -80,7 +80,7 @@ export default class App extends Component {
 								<Route exact path='/' render={(props) => <Home {...props} callback={this.handleMenuClick} />} />
 								<Route exact path='/new-job' render={(props) => <NewJob {...props} />} />
 								<Route exact path='/job-history' render={(props) => <JobHistory {...props} />} />
-								<Route exact path='/job-results' component={JobResults} />
+								<Route path='/job-results' component={JobResults} />
 							</Switch>
 						</div>
 					</Content>

@@ -80,6 +80,7 @@ class NewJobForm extends Component {
 				paperTypeRadio: this.getRadio(this.state.paperDatabase, "papertype"),
 				paperSubTypeRadio: this.getRadio(this.state.paperDatabase, "papersubtype"),
 				paperFinishRadio: this.getRadio(this.state.paperDatabase, "finish"),
+				prevPaperDropdown: this.getPrevPaperCookie()
 			});
 		}
 	}
@@ -391,6 +392,110 @@ class NewJobForm extends Component {
 		});
 	}
 
+	/* Auto-fills Paper Selection section with the paper chosen from the "Recent papers" dropdown (cookie). */
+	handlePrevPaper = (val) => {
+		const { cookies } = this.props;
+		const { setFieldsValue } = this.props.form;
+
+		/* Get the list of previously-used papers from the cookie. */
+		var paperList = cookies.get("prevPapers");
+
+		/* Apply its values to auto-fill the form. */
+		setFieldsValue({ manufacturer: paperList[val].manufacturer });
+		setFieldsValue({ productname: paperList[val].productname });
+		setFieldsValue({ papertype: paperList[val].papertype });
+		setFieldsValue({ papersubtype: paperList[val].papersubtype });
+		setFieldsValue({ weightgsm: paperList[val].weightgsm });
+		setFieldsValue({ finish: paperList[val].finish });
+
+		/* Need to set a state value for weightgsm since the select component is dependent on it. */
+		this.setState({ weightgsm: paperList[val].weightgsm });
+	}
+
+	/* Constructs the dropdown for selection of commonly-used paper, gotten from the cookie. */
+	getPrevPaperCookie = () => {
+		const { cookies } = this.props;
+
+		/* Initialize the arrays to hold values scraped from data source and Select component Options. */
+		var vals = [];
+		var dropdown = [];
+
+		vals = cookies.get('prevPapers');
+
+		if (typeof vals !== 'undefined') {
+			/* Create the dropdown for the Select using the list of names. */
+			for (let i = 0; i < vals.length; i++) {
+				var name =
+					vals[i].manufacturer + ' - ' +
+					vals[i].productname + ' | ' +
+					vals[i].papertype + ' | ' +
+					vals[i].papersubtype + ' | ' +
+					vals[i].weightgsm + ' gsm | ' +
+					vals[i].finish;
+
+				dropdown.push(<Option key={i}>{name}</Option>);
+			}
+
+			return dropdown;
+		} else {
+			return null;
+		}
+	}
+
+	/* Set cookies to remember jobName/ruleset/qualityMode/pressUnwinderBrand/maxCoverage/opticalDensity for next time. */
+	setCookies = (values) => {
+		const { cookies } = this.props;
+
+		/* Set cookies for General Info section. */
+		cookies.set('jobName', values.jobName, { path: '/' });
+		cookies.set('ruleset', values.ruleset, { path: '/' });
+		cookies.set('qualityMode', values.qualityMode, { path: '/' });
+		cookies.set('pressUnwinderBrand', values.pressUnwinderBrand, { path: '/' });
+		cookies.set('maxCoverage', values.maxCoverage, { path: '/' });
+		cookies.set('opticalDensity', values.opticalDensity, { path: '/' });
+
+		/* Set cookie for recently-used papers in the Paper Selection section. This list will hold the
+		 * last five selected papers. When an item is chosen from the list, it is moved to the top. If
+		 * a new paper is used instead that it not on the list, push it to the front, pop off the last one. */
+		var paperList = [];
+		if (typeof cookies.get('prevPapers') !== 'undefined')
+			paperList = cookies.get('prevPapers');
+
+		/* Create object for the paper that was selected. */
+		var usedPaper = {};
+
+		usedPaper.manufacturer = values.manufacturer;
+		usedPaper.productname = values.productname;
+		usedPaper.papertype = values.papertype;
+		usedPaper.papersubtype = values.papersubtype;
+		usedPaper.weightgsm = values.weightgsm;
+		usedPaper.finish = values.finish;
+
+		/* Compare the newly-created usedPaper object to the existing objects in the cookie. */
+		var exists = false;
+		for (let i = 0; i < paperList.length; i++) {
+			/* If the item already exists in the array, move it to the front. */
+			if (JSON.stringify(usedPaper) === JSON.stringify(paperList[i])) {
+				paperList.splice(i, 1);
+				paperList.unshift(usedPaper);
+				exists = true;
+				break;
+			}
+		}
+
+		/* If the newly-created usedPaper object was not found in the list:
+		 *     If < 5 items, just add usedPaper to the list
+		 *     If = 5 items, remove oldest, then push usedPaper */
+		if (!exists) {
+			if (paperList.length === 5)
+				paperList.splice(4, 1);
+
+			paperList.unshift(usedPaper);
+		}
+
+		cookies.set('prevPapers', paperList, { path: '/' });
+	}
+
 	/* Gathers and validates form data, then makes a POST call to the rules engine. */
 	handleSubmit = e => {
 		e.preventDefault();
@@ -399,15 +504,8 @@ class NewJobForm extends Component {
 				/* This is here so the values of the form can be seen in the console for debugging. */
 				console.log('Received values of form: ', values);
 
-				/* Set cookies to remember jobName/ruleset/qualityMode/pressUnwinderBrand/maxCoverage/opticalDensity for next time. */
-				const { cookies } = this.props;
-
-				cookies.set('jobName', values.jobName, { path: '/' });
-				cookies.set('ruleset', values.ruleset, { path: '/' });
-				cookies.set('qualityMode', values.qualityMode, { path: '/' });
-				cookies.set('pressUnwinderBrand', values.pressUnwinderBrand, { path: '/' });
-				cookies.set('maxCoverage', values.maxCoverage, { path: '/' });
-				cookies.set('opticalDensity', values.opticalDensity, { path: '/' });
+				/* Set cookies for next time. */
+				this.setCookies(values);
 
 				/* Call database to request paperDatabase object. */
 				await fetch(ServerURL + 'new-job/', {
@@ -420,8 +518,6 @@ class NewJobForm extends Component {
 					}
 				}).then(async (res) => {
 					await res.json().then((data) => {
-						console.log(data);
-
 						this.setState({
 							createdID: data.id,
 							jobCreated: true
@@ -487,7 +583,7 @@ class NewJobForm extends Component {
 			// Put a loading spinner here or something
 			console.log(createdID);
 
-			return <Redirect to={{ pathname: '/job-results', state: { jobID: createdID } }} />
+			return <Redirect to={{ pathname: '/job-results', search: '?IDs=' + createdID }} />
 		}
 		else
 			return (
@@ -569,7 +665,7 @@ class NewJobForm extends Component {
 								<div style={{ display: 'flex', marginBottom: '-10px' }} >
 									<Slider
 										className={Style.formItemInput}
-										style={{ width: 'calc(100% - 112px)' }}
+										style={{ width: 'calc(100% - 152px)', marginRight: 15 }}
 										min={0}
 										max={100}
 										onChange={(e) => this.onSliderChange(e, "maxCoverage")}
@@ -592,7 +688,7 @@ class NewJobForm extends Component {
 								<div style={{ display: 'flex', marginBottom: '-10px' }} >
 									<Slider
 										className={Style.formItemInput}
-										style={{ width: 'calc(100% - 112px)' }}
+										style={{ width: 'calc(100% - 152px)', marginRight: 15 }}
 										step={5}
 										min={0}
 										max={100}
@@ -609,7 +705,7 @@ class NewJobForm extends Component {
 							)}
 						</Form.Item>
 
-						<div style={{ display: 'inline-block' }}>
+						<div style={{ display: 'inline-block', width: '100%' }}>
 							<h5>
 								Paper Selection
 								<Button className={Style.resetButton} onClick={() => this.paperReset()} type="default" >
@@ -617,12 +713,25 @@ class NewJobForm extends Component {
 									Reset
 								</Button>
 								<Checkbox
-									style={{ position: 'relative', bottom: 2 }}
+									style={{ position: 'relative', bottom: 2, marginRight: 16, marginBottom: 10 }}
 									onChange={() => this.handleUnknownPaper()}
 									checked={unknownPaper}
 								>
 									Unknown Paper?
 								</Checkbox>
+								{!unknownPaper ?
+									<Select
+										className={Style.formItemPaper}
+										style={{ maxWidth: 175 }}
+										onChange={(val) => this.handlePrevPaper(val)}
+										dropdownMatchSelectWidth={false}
+										placeholder="Recent papers"
+									>
+										{this.state.prevPaperDropdown}
+									</Select>
+									:
+									null
+								}
 							</h5>
 						</div>
 						<Form.Item label="Mfr:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
@@ -704,7 +813,7 @@ class NewJobForm extends Component {
 									<div style={{ display: 'flex', marginBottom: '-20px' }} >
 										<Slider
 											className={Style.formItemInput}
-											style={{ width: 'calc(100% - 127px)' }}
+											style={{ width: 'calc(100% - 167px)', marginRight: 15 }}
 											min={0}
 											max={500}
 											value={weightgsm || 0}

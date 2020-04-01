@@ -2,6 +2,7 @@
 import { Button, Checkbox, Icon, Modal, notification, Table, Row, Col } from 'antd';
 import { instanceOf } from 'prop-types';
 import { withCookies, Cookies } from 'react-cookie';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { CSVLink } from "react-csv";
 import ReactDataSheet from "react-datasheet";
 import 'react-datasheet/lib/react-datasheet.css';
@@ -89,7 +90,7 @@ export const BuildSpreadsheet = function (keys, jobHistory) {
 				return val;
 			});
 
-			for (let n = 0; n < subKeyList.length - 1; n++) {
+			for (let n = 0; n < subKeyList.length; n++) {
 				spreadsheetTemp.push({ value: subKeyList[n], width: 150, readOnly: true });
 				exportTemp.push(subKeyList[n]);
 
@@ -98,8 +99,12 @@ export const BuildSpreadsheet = function (keys, jobHistory) {
 						return obj.jobID === keys[m];
 					})[0];
 
-					spreadsheetTemp.push({ value: currentData[keyList[j]][subKeyList[n]], width: 175 });
-					exportTemp.push(currentData[keyList[j]][subKeyList[n]]);
+					var tempVal = currentData[keyList[j]][subKeyList[n]];
+					if (typeof tempVal === 'boolean')
+						tempVal = tempVal.toString();
+
+					spreadsheetTemp.push({ value: tempVal, width: 175 });
+					exportTemp.push(tempVal);
 				}
 
 				spreadsheetData.push(spreadsheetTemp);
@@ -153,7 +158,8 @@ class JobHistory extends Component {
 			inputCheckboxes: defaultInput,
 			outputCheckboxes: defaultOutput,
 			windowWidth: 0,
-			windowHeight: 0
+			windowHeight: 0,
+			copied: false
 		};
 
 		this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
@@ -382,6 +388,7 @@ class JobHistory extends Component {
 				title: 'Job ID',
 				dataIndex: 'jobID',
 				width: 100,
+				sortOrder: 'descend',
 				sorter: (a, b) => a.jobID - b.jobID,
 				fixed: windowWidth < 350 ? false : 'left'
 			},
@@ -405,14 +412,24 @@ class JobHistory extends Component {
 				var tempTitle = selectedColumns[i].replace(/([a-z])([A-Z])/g, '$1 $2');
 				tempTitle = tempTitle.charAt(0).toUpperCase() + tempTitle.slice(1);
 
-				/* Check if value is number or string. If number sort rows by number, if string sort rows by localecompare. */
-				if ((typeof jobHistory[0].input[selectedColumns[i]] === 'string') || (typeof jobHistory[0].output[selectedColumns[i]] === 'string'))
+				/* Check if value is number, boolean, or string. If number sort rows by number, if string sort rows by localecompare. */
+				if ((typeof jobHistory[0].input[selectedColumns[i]] === 'number') || (typeof jobHistory[0].output[selectedColumns[i]] === 'number'))
 					tempCol.push(
 						{
 							title: tempTitle,
 							dataIndex: selectedColumns[i],
 							width: 175,
-							sorter: (a, b) => { return a[selectedColumns[i]].localeCompare(b[selectedColumns[i]]) },
+							sorter: (a, b) => a[selectedColumns[i]] - b[selectedColumns[i]],
+						},
+					);
+				else if ((typeof jobHistory[0].input[selectedColumns[i]] === 'boolean') || (typeof jobHistory[0].output[selectedColumns[i]] === 'boolean'))
+					tempCol.push(
+						{
+							title: tempTitle,
+							dataIndex: selectedColumns[i],
+							width: 175,
+							sorter: (a, b) => { return a[selectedColumns[i]].toString().localeCompare(b[selectedColumns[i]].toString()) },
+							render: (text) => { return text.toString() }
 						},
 					);
 				else
@@ -421,7 +438,7 @@ class JobHistory extends Component {
 							title: tempTitle,
 							dataIndex: selectedColumns[i],
 							width: 175,
-							sorter: (a, b) => a[selectedColumns[i]] - b[selectedColumns[i]],
+							sorter: (a, b) => { return a[selectedColumns[i]].localeCompare(b[selectedColumns[i]]) },
 						},
 					);
 
@@ -494,19 +511,29 @@ class JobHistory extends Component {
 	compareJobs = (keys) => {
 		/* Get the data from the row in the table, organize it. */
 		const spreadExportData = BuildSpreadsheet(keys, this.state.jobHistory);
+		//const spreadExportData = BuildSpreadsheet(keys, this.state.tableData);
 
 		const spreadsheetData = spreadExportData[0];
 		const exportData = spreadExportData[1];
 
-		/* Name of the file generated when the "Export to CSV" button is clicked. */
+		/* Build the name of the file generated when the "Export to CSV" button is clicked.
+		 * Also build the target URL for the 'Copy Link to Clipboard' button.*/
+		var copyURL = window.location.href.split('job-history')[0];
+		copyURL += 'job-results?IDs='
+
 		var fileName = "";
 		if (keys.length === 1)
 			fileName = "Job";
 		else
 			fileName = "Compare_Jobs";
 
-		for (let i = 0; i < keys.length; i++)
+		for (let i = 0; i < keys.length; i++) {
+			copyURL += keys[i];
+			if (i !== keys.length - 1)
+				copyURL += ",";
+
 			fileName += "_" + keys[i];
+		}
 
 		fileName += ".csv";
 
@@ -514,11 +541,20 @@ class JobHistory extends Component {
 		var modalInnards =
 			<>
 				<CSVLink data={exportData} filename={fileName}>
-					<Button type="primary" style={{ marginBottom: 10 }}>
+					<Button type="primary" style={{ marginBottom: 10, marginRight: 10 }}>
 						<Icon className={Style.buttonIcon} type="file-excel" />
 						Export to CSV
 					</Button>
 				</CSVLink>
+				<CopyToClipboard text={copyURL}>
+					<Button
+						type="default"
+						style={{ marginBottom: 10 }}
+					>
+						<Icon className={Style.buttonIcon} type="copy" />
+						Copy Link to Clipboard
+						</Button>
+				</CopyToClipboard>
 				<div style={{ width: '100%', overflowX: 'scroll' }}>
 					<div style={{ width: (150 + (175 * keys.length)) }}>
 						<ReactDataSheet
