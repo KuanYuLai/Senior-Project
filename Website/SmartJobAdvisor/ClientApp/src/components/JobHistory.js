@@ -1,5 +1,5 @@
 ﻿import React, { Component, Fragment } from 'react';
-import { Button, Checkbox, Icon, Modal, notification, Table, Row, Col } from 'antd';
+import { Button, Checkbox, Icon, Modal, notification, Table, Tooltip, Row, Col } from 'antd';
 import { instanceOf } from 'prop-types';
 import { withCookies, Cookies } from 'react-cookie';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -511,7 +511,6 @@ class JobHistory extends Component {
 	compareJobs = (keys) => {
 		/* Get the data from the row in the table, organize it. */
 		const spreadExportData = BuildSpreadsheet(keys, this.state.jobHistory);
-		//const spreadExportData = BuildSpreadsheet(keys, this.state.tableData);
 
 		const spreadsheetData = spreadExportData[0];
 		const exportData = spreadExportData[1];
@@ -541,19 +540,24 @@ class JobHistory extends Component {
 		var modalInnards =
 			<>
 				<CSVLink data={exportData} filename={fileName}>
-					<Button type="primary" style={{ marginBottom: 10, marginRight: 10 }}>
+					<Button
+						type="primary"
+						style={{ marginBottom: 10, marginRight: 10, paddingLeft: 10, paddingRight: 10 }}
+					>
 						<Icon className={Style.buttonIcon} type="file-excel" />
 						Export to CSV
 					</Button>
 				</CSVLink>
 				<CopyToClipboard text={copyURL}>
-					<Button
-						type="default"
-						style={{ marginBottom: 10 }}
-					>
-						<Icon className={Style.buttonIcon} type="copy" />
-						Copy Link to Clipboard
+					<Tooltip placement="top" trigger="focus" title="Copied!">
+						<Button
+							type="default"
+							style={{ marginBottom: 10, paddingLeft: 10, paddingRight: 10 }}
+						>
+							<Icon className={Style.buttonIcon} type="copy" />
+							Copy Link to Clipboard
 						</Button>
+					</Tooltip>
 				</CopyToClipboard>
 				<div style={{ width: '100%', overflowX: 'scroll' }}>
 					<div style={{ width: (150 + (175 * keys.length)) }}>

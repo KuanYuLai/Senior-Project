@@ -457,43 +457,46 @@ class NewJobForm extends Component {
 		/* Set cookie for recently-used papers in the Paper Selection section. This list will hold the
 		 * last five selected papers. When an item is chosen from the list, it is moved to the top. If
 		 * a new paper is used instead that it not on the list, push it to the front, pop off the last one. */
-		var paperList = [];
-		if (typeof cookies.get('prevPapers') !== 'undefined')
-			paperList = cookies.get('prevPapers');
+		/* Only do this if a known paper was selected! */
+		if (!this.state.unknownPaper) {
+			var paperList = [];
+			if (typeof cookies.get('prevPapers') !== 'undefined')
+				paperList = cookies.get('prevPapers');
 
-		/* Create object for the paper that was selected. */
-		var usedPaper = {};
+			/* Create object for the paper that was selected. */
+			var usedPaper = {};
 
-		usedPaper.manufacturer = values.manufacturer;
-		usedPaper.productname = values.productname;
-		usedPaper.papertype = values.papertype;
-		usedPaper.papersubtype = values.papersubtype;
-		usedPaper.weightgsm = values.weightgsm;
-		usedPaper.finish = values.finish;
+			usedPaper.manufacturer = values.manufacturer;
+			usedPaper.productname = values.productname;
+			usedPaper.papertype = values.papertype;
+			usedPaper.papersubtype = values.papersubtype;
+			usedPaper.weightgsm = values.weightgsm;
+			usedPaper.finish = values.finish;
 
-		/* Compare the newly-created usedPaper object to the existing objects in the cookie. */
-		var exists = false;
-		for (let i = 0; i < paperList.length; i++) {
-			/* If the item already exists in the array, move it to the front. */
-			if (JSON.stringify(usedPaper) === JSON.stringify(paperList[i])) {
-				paperList.splice(i, 1);
-				paperList.unshift(usedPaper);
-				exists = true;
-				break;
+			/* Compare the newly-created usedPaper object to the existing objects in the cookie. */
+			var exists = false;
+			for (let i = 0; i < paperList.length; i++) {
+				/* If the item already exists in the array, move it to the front. */
+				if (JSON.stringify(usedPaper) === JSON.stringify(paperList[i])) {
+					paperList.splice(i, 1);
+					paperList.unshift(usedPaper);
+					exists = true;
+					break;
+				}
 			}
+
+			/* If the newly-created usedPaper object was not found in the list:
+			 *     If < 5 items, just add usedPaper to the list
+			 *     If = 5 items, remove oldest, then push usedPaper */
+			if (!exists) {
+				if (paperList.length === 5)
+					paperList.splice(4, 1);
+
+				paperList.unshift(usedPaper);
+			}
+
+			cookies.set('prevPapers', paperList, { path: '/' });
 		}
-
-		/* If the newly-created usedPaper object was not found in the list:
-		 *     If < 5 items, just add usedPaper to the list
-		 *     If = 5 items, remove oldest, then push usedPaper */
-		if (!exists) {
-			if (paperList.length === 5)
-				paperList.splice(4, 1);
-
-			paperList.unshift(usedPaper);
-		}
-
-		cookies.set('prevPapers', paperList, { path: '/' });
 	}
 
 	/* Gathers and validates form data, then makes a POST call to the rules engine. */

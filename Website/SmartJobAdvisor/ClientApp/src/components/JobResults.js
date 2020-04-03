@@ -1,5 +1,5 @@
 ﻿import React, { Component, Fragment } from 'react';
-import { Button, Icon, notification, Spin } from 'antd';
+import { Button, Icon, notification, Spin, Tooltip } from 'antd';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { CSVLink } from "react-csv";
 import ReactDataSheet from "react-datasheet";
@@ -21,7 +21,6 @@ export class JobResults extends Component {
 		});
 
 		this.state = {
-			//jobID: props.location.state.jobID,
 			jobIDs: IDs,
 			jobResults: [],
 			ready: false,
@@ -129,26 +128,22 @@ export class JobResults extends Component {
 					<br /><br />
 
 					<CSVLink data={exportData} filename={fileName}>
-						<Button type="primary" style={{ marginBottom: 10, marginRight: 10 }}>
+						<Button type="primary" style={{ marginBottom: 10, marginRight: 10, paddingLeft: 10, paddingRight: 10 }}>
 							<Icon className={Style.buttonIcon} type="file-excel" />
 							Export to CSV
 						</Button>
 					</CSVLink>
 					<CopyToClipboard text={window.location.href}>
-						<Button
-							type="default"
-							style={{ marginBottom: 10, marginRight: 10 }}
-							onClick={() => this.setState({ copied: true })}
-						>
-							<Icon className={Style.buttonIcon} type="copy" />
-							Copy Link to Clipboard
+						<Tooltip placement="top" trigger="focus" title="Copied!">
+							<Button
+								type="default"
+								style={{ marginBottom: 10, paddingLeft: 10, paddingRight: 10 }}
+							>
+								<Icon className={Style.buttonIcon} type="copy" />
+								Copy Link to Clipboard
 						</Button>
+						</Tooltip>
 					</CopyToClipboard>
-					{copied ?
-						<span style={{ color: 'blue' }}>Copied!</span>
-						:
-						null
-					}
 					<div style={{ width: (150 + (175 * jobIDs.length)), maxWidth: '100%', overflowX: 'scroll' }}>
 						<div style={{ width: (150 + (175 * jobIDs.length)) }}>
 							<ReactDataSheet
