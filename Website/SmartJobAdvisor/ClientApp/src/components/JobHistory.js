@@ -551,9 +551,6 @@ class JobHistory extends Component {
 		var exportData = spreadExportData[1];
 		var spreadsheetWidth = spreadExportData[2];
 
-		console.log(spreadExportData[1]);
-		console.log(exportData);
-
 		/* Build the name of the file generated when the "Export to CSV" button is clicked.
 		 * Also build the target URL for the 'Copy Link to Clipboard' button.*/
 		var copyURL = window.location.href.split('job-history')[0];
@@ -602,7 +599,7 @@ class JobHistory extends Component {
 					</Tooltip>
 				</CopyToClipboard>
 				<Checkbox
-					style={{ marginLeft: (justifications && selectedRowKeys.length === 1) ? 10 : 0, marginBottom: 10 }}
+					style={{ marginLeft: spreadsheetWidth > 350 ? 10 : 0, marginBottom: 10 }}
 					onChange={() => this.handleJustifications()}
 					checked={justifications}
 				>
