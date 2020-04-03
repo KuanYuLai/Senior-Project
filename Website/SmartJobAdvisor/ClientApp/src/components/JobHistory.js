@@ -14,7 +14,7 @@ import { ServerURL } from './Home';
 
 /* Constructs the spreadsheet containing the job results. Can also compare multiple jobs.
  * The function will be exported so that the jobResults page can use it as well. */
-export const BuildSpreadsheet = function (keys, jobHistory) {
+export const BuildSpreadsheet = function (keys, jobHistory, justifications) {
 	/* Arrays to hold data. Separate arrays for spreadsheet and export, since format is different. */
 	var spreadsheetData = [];
 	var spreadsheetTemp = [];
@@ -38,9 +38,16 @@ export const BuildSpreadsheet = function (keys, jobHistory) {
 			return obj.jobID === keys[i];
 		})[0];
 
-		/* Column for each job being compared. */
-		spreadsheetTemp.push({ value: 'Job ' + currentData.jobID, width: 175, readOnly: true });
-		exportTemp.push('Job ' + currentData.jobID);
+		/* Column for each job being compared. If justifications are on,
+		 * additionalcolumn to the right and the header column (Job #) spans two columns. */
+		if (justifications) {
+			spreadsheetTemp.push({ value: 'Job ' + currentData.jobID, colSpan: 2, readOnly: true });
+			exportTemp.push('Job ' + currentData.jobID);
+			exportTemp.push('Job ' + currentData.jobID + ' Justifications');
+		} else {
+			spreadsheetTemp.push({ value: 'Job ' + currentData.jobID, width: 175, readOnly: true });
+			exportTemp.push('Job ' + currentData.jobID);
+		}
 	}
 
 	spreadsheetData.push(spreadsheetTemp);
@@ -63,6 +70,12 @@ export const BuildSpreadsheet = function (keys, jobHistory) {
 
 				spreadsheetTemp.push({ value: currentData[keyList[j]], width: 175 });
 				exportTemp.push(currentData[keyList[j]]);
+
+				/* Justifications for output. */
+				if (justifications) {
+					spreadsheetTemp.push({ value: "", width: 175 });
+					exportTemp.push("");
+				}
 			}
 
 			spreadsheetData.push(spreadsheetTemp);
@@ -76,8 +89,15 @@ export const BuildSpreadsheet = function (keys, jobHistory) {
 
 			/* Empty space for that row. */
 			for (let k = 0; k < keys.length; k++) {
-				spreadsheetTemp.push({ value: '', width: 175 });
-				exportTemp.push("");
+				if (justifications) {
+					/* Justifications for output. */
+					spreadsheetTemp.push({ value: "", colSpan: 2 });
+					exportTemp.push("");
+					exportTemp.push("");
+				} else {
+					spreadsheetTemp.push({ value: '', width: 175 });
+					exportTemp.push("");
+				}
 			}
 
 			spreadsheetData.push(spreadsheetTemp);
@@ -105,6 +125,12 @@ export const BuildSpreadsheet = function (keys, jobHistory) {
 
 					spreadsheetTemp.push({ value: tempVal, width: 175 });
 					exportTemp.push(tempVal);
+
+					/* Justifications for output. */
+					if (justifications) {
+						spreadsheetTemp.push({ value: "TEMP", width: 175 });
+						exportTemp.push("TEMP");
+					}
 				}
 
 				spreadsheetData.push(spreadsheetTemp);
@@ -115,7 +141,11 @@ export const BuildSpreadsheet = function (keys, jobHistory) {
 		}
 	}
 
-	return [spreadsheetData, exportData];
+	var spreadsheetWidth = 150 + (175 * keys.length);
+	if (justifications)
+		spreadsheetWidth += 175 * keys.length;
+
+	return [spreadsheetData, exportData, spreadsheetWidth];
 }
 
 /* The job history page displays a table of all previously completed jobs, sorted chronologically. */
@@ -150,6 +180,7 @@ class JobHistory extends Component {
 			currentJobID: -1,
 			spreadsheetModalVisible: false,
 			spreadsheetModal: null,
+			justifications: true,
 			columnModalVisible: false,
 			columnModal: null,
 			tableColumns: [],
@@ -450,7 +481,7 @@ class JobHistory extends Component {
 		tempCol.push(
 			{
 				title: 'View',
-				render: (text, row) => <Button className={windowWidth < 350 ? null : Style.resultsColumn} onClick={() => { this.compareJobs([row.jobID]) }}><Icon className={Style.buttonIcon} type="search" /></Button>,
+				render: (text, row) => <Button className={windowWidth < 350 ? null : Style.resultsColumn} onClick={() => { setTimeout(() => { this.compareJobs([row.jobID]) }, 100) }}><Icon className={Style.buttonIcon} type="search" /></Button>,
 				width: 65,
 				fixed: 'right'
 			},
@@ -509,16 +540,27 @@ class JobHistory extends Component {
 
 	/* Constructs the content of the modal. */
 	compareJobs = (keys) => {
-		/* Get the data from the row in the table, organize it. */
-		const spreadExportData = BuildSpreadsheet(keys, this.state.jobHistory);
+		var { justifications, selectedRowKeys } = this.state;
 
-		const spreadsheetData = spreadExportData[0];
-		const exportData = spreadExportData[1];
+
+		/* Get the data from the row in the table, organize it. */
+		var spreadExportData = [];
+		spreadExportData = BuildSpreadsheet(keys, this.state.jobHistory, justifications);
+
+		var spreadsheetData = spreadExportData[0];
+		var exportData = spreadExportData[1];
+		var spreadsheetWidth = spreadExportData[2];
+
+		console.log(spreadExportData[1]);
+		console.log(exportData);
 
 		/* Build the name of the file generated when the "Export to CSV" button is clicked.
 		 * Also build the target URL for the 'Copy Link to Clipboard' button.*/
 		var copyURL = window.location.href.split('job-history')[0];
-		copyURL += 'job-results?IDs='
+		if (justifications)
+			copyURL += 'job-results?justifications=true?IDs='
+		else
+			copyURL += 'job-results?justifications=false?IDs='
 
 		var fileName = "";
 		if (keys.length === 1)
@@ -559,8 +601,15 @@ class JobHistory extends Component {
 						</Button>
 					</Tooltip>
 				</CopyToClipboard>
+				<Checkbox
+					style={{ marginLeft: (justifications && selectedRowKeys.length === 1) ? 10 : 0, marginBottom: 10 }}
+					onChange={() => this.handleJustifications()}
+					checked={justifications}
+				>
+					Justifications?
+				</Checkbox>
 				<div style={{ width: '100%', overflowX: 'scroll' }}>
-					<div style={{ width: (150 + (175 * keys.length)) }}>
+					<div style={{ width: spreadsheetWidth }}>
 						<ReactDataSheet
 							data={spreadsheetData}
 							valueRenderer={(cell) => cell.value}
@@ -571,6 +620,7 @@ class JobHistory extends Component {
 			</>;
 
 		this.setState({
+			spreadsheetWidth: spreadExportData[2],
 			spreadsheetModal: modalInnards,
 			currentJobID: keys.length === 1 ? keys[0] : null
 		})
@@ -579,11 +629,21 @@ class JobHistory extends Component {
 		this.toggleModal("spreadsheet");
 	}
 
+	/* Triggered when checkbox is clicked. Toggles justification column. */
+	handleJustifications = async () => {
+		this.toggleModal("spreadsheet");
+
+		await this.setState({ justifications: !this.state.justifications });
+
+		setTimeout(() => { this.compareJobs(this.state.selectedRowKeys); this.forceUpdate(); }, 300);
+	}
+
 	render() {
 		const {
 			tableData,
 			tableColumns,
 			tableWidth,
+			spreadsheetWidth,
 			spreadsheetModal,
 			spreadsheetModalVisible,
 			columnModal,
@@ -597,6 +657,9 @@ class JobHistory extends Component {
 			onChange: this.onSelectChange,
 			fixed: windowWidth < 350 ? null : 'left',
 		};
+
+		//var jobCompareModalWidth = selectedRowKeys.length < 2 ? 345 : ((selectedRowKeys.length) * 175) + 170;
+		//if ()
 
 		return (
 			<Fragment>
@@ -634,7 +697,7 @@ class JobHistory extends Component {
 					}}
 					destroyOnClose={true}
 					footer={null}
-					width={selectedRowKeys.length < 2 ? 345 : ((selectedRowKeys.length) * 175) + 170}
+					width={spreadsheetWidth + 20}
 					style={{ maxWidth: '95%' }}
 					bodyStyle={{ padding: '10px' }}
 				>
@@ -660,7 +723,9 @@ class JobHistory extends Component {
 					{selectedRowKeys.length > 1 ?
 						<Button
 							className={Style.tableButton}
-							onClick={() => this.compareJobs(selectedRowKeys)}
+							onClick={() => {
+								this.setState({ justifications: !this.state.justifications }, () => this.compareJobs(selectedRowKeys));
+							}}
 							type="primary"
 						>
 							<Icon className={Style.buttonIcon} type="diff" />

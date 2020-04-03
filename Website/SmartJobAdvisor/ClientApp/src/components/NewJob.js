@@ -586,7 +586,7 @@ class NewJobForm extends Component {
 			// Put a loading spinner here or something
 			console.log(createdID);
 
-			return <Redirect to={{ pathname: '/job-results', search: '?IDs=' + createdID }} />
+			return <Redirect to={{ pathname: '/job-results', search: '?justifications=true?IDs=' + createdID }} />
 		}
 		else
 			return (
@@ -725,7 +725,7 @@ class NewJobForm extends Component {
 								{!unknownPaper ?
 									<Select
 										className={Style.formItemPaper}
-										style={{ maxWidth: 175 }}
+										style={{ maxWidth: 175, postition: 'relative', bottom: 2 }}
 										onChange={(val) => this.handlePrevPaper(val)}
 										dropdownMatchSelectWidth={false}
 										placeholder="Recent papers"

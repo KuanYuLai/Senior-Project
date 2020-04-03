@@ -1,5 +1,5 @@
 ﻿import React, { Component, Fragment } from 'react';
-import { Button, Icon, notification, Spin, Tooltip } from 'antd';
+import { Button, Checkbox, Icon, notification, Spin, Tooltip } from 'antd';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { CSVLink } from "react-csv";
 import ReactDataSheet from "react-datasheet";
@@ -20,43 +20,28 @@ export class JobResults extends Component {
 			return parseInt(v, 10);
 		});
 
+		/* Get URL of the page, snip the '?justifications=' section to get 'true' or 'false'. */
+		var justifications = window.location.href.split('?justifications=')[1].split('?IDs=')[0];
+		justifications = (justifications === 'true');
+
 		this.state = {
 			jobIDs: IDs,
 			jobResults: [],
+			justifications: justifications,
+			spreadsheetWidth: 0,
 			ready: false,
-			copied: false,
 			error: false
 		};
 	}
 
+	/* Calls after the component mounts, fetches data and generates spreadsheet/export. */
 	componentDidMount = async () => {
 		const { jobIDs } = this.state;
 
 		for (let i = 0; i < jobIDs.length; i++)
 			await this.fetchJob(jobIDs[i]);
 
-		if (!this.state.error) {
-			var data = BuildSpreadsheet(jobIDs, this.state.jobResults);
-
-			/* Name of the file generated when the "Export to CSV" button is clicked. */
-			var fileName = "";
-			if (jobIDs.length === 1)
-				fileName = "Job";
-			else
-				fileName = "Compare_Jobs";
-
-			for (let i = 0; i < jobIDs.length; i++)
-				fileName += "_" + jobIDs[i];
-
-			fileName += ".csv";
-
-			this.setState({
-				spreadsheetData: data[0],
-				exportData: data[1],
-				ready: true,
-				fileName: fileName
-			});
-		}
+		this.generateData();
 	}
 
 	/* Calls the database to request job history. */
@@ -103,13 +88,60 @@ export class JobResults extends Component {
 		this.setState({ error: true });
 	}
 
+	/* Generate the data for the spreadsheet/export. */
+	generateData = () => {
+		const { jobIDs, jobResults, justifications } = this.state;
+
+		if (!this.state.error) {
+			var copyURL = window.location.href.split('job-results')[0];
+			if (justifications)
+				copyURL += 'job-results?justifications=true?IDs='
+			else
+				copyURL += 'job-results?justifications=false?IDs='
+
+			copyURL += window.location.href.split('?IDs=')[1];
+
+			var data = BuildSpreadsheet(jobIDs, jobResults, justifications);
+
+			/* Name of the file generated when the "Export to CSV" button is clicked. */
+			var fileName = "";
+			if (jobIDs.length === 1)
+				fileName = "Job";
+			else
+				fileName = "Compare_Jobs";
+
+			for (let i = 0; i < jobIDs.length; i++)
+				fileName += "_" + jobIDs[i];
+
+			fileName += ".csv";
+
+			this.setState({
+				spreadsheetData: data[0],
+				exportData: data[1],
+				spreadsheetWidth: data[2],
+				copyURL: copyURL,
+				ready: true,
+				fileName: fileName
+			});
+		}
+	}
+
+	/* Triggered when checkbox is clicked. Toggles justification column. */
+	handleJustifications = async () => {
+		await this.setState({ justifications: !this.state.justifications });
+
+		setTimeout(() => { this.generateData(); this.forceUpdate(); }, 50);
+	}
+
 	render() {
 		const {
 			ready,
-			copied,
 			jobIDs,
+			justifications,
+			copyURL,
 			fileName,
 			spreadsheetData,
+			spreadsheetWidth,
 			exportData
 		} = this.state;
 
@@ -133,7 +165,7 @@ export class JobResults extends Component {
 							Export to CSV
 						</Button>
 					</CSVLink>
-					<CopyToClipboard text={window.location.href}>
+					<CopyToClipboard text={copyURL}>
 						<Tooltip placement="top" trigger="focus" title="Copied!">
 							<Button
 								type="default"
@@ -144,8 +176,15 @@ export class JobResults extends Component {
 						</Button>
 						</Tooltip>
 					</CopyToClipboard>
-					<div style={{ width: (150 + (175 * jobIDs.length)), maxWidth: '100%', overflowX: 'scroll' }}>
-						<div style={{ width: (150 + (175 * jobIDs.length)) }}>
+					<Checkbox
+						style={{ marginLeft: 16, marginBottom: 10 }}
+						onChange={() => this.handleJustifications()}
+						checked={justifications}
+					>
+						Justifications?
+					</Checkbox>
+					<div style={{ width: spreadsheetWidth, maxWidth: '100%', overflowX: 'scroll' }}>
+						<div style={{ width: spreadsheetWidth }}>
 							<ReactDataSheet
 								data={spreadsheetData}
 								valueRenderer={(cell) => cell.value}
