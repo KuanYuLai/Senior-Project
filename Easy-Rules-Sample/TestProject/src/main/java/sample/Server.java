@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 public class Server extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //response.setContentType("text/plain");
-        response.setContentType("application/JSON");
+        response.setContentType("application/json");
         PrintWriter out = response.getWriter();
         StringBuilder sb = new StringBuilder();
         Launcher launch = new Launcher();

@@ -1,69 +1,101 @@
 ---
 name: "High-Media-Weight-Class"
-description: "Sets the weight class to high."
+description: "Sets the weight class to High."
 priority: 1
 condition: "job.getweightgsm() > 150"
 actions:
   - "job.setWeightClass('High');"
+  - "job.setDescription('WeightClass', job.setValue('Weight class', 'High') + job.setInitReason('weight', 'greater than 150'));"
 ---
 name: "Medium-Media-Weight-Class"
-description: "Sets the weight class to medium."
+description: "Sets the weight class to Medium."
 priority: 1
 condition: "job.getweightgsm() <= 150 && job.getweightgsm() > 75"
 actions:
   - "job.setWeightClass('Medium');"
+  - "job.setDescription('WeightClass', job.setValue('Weight class', 'Medium') + job.setInitReason('weight', 150, 75));"
 ---
 name: "Low-Media-Weight-Class"
-description: "Sets the weight class to low."
+description: "Sets the weight class to Low."
 priority: 1
 condition: "job.getweightgsm() <= 75 && job.getweightgsm() >= 45"
 actions:
   - "job.setWeightClass('Low');"
+  - "job.setDescription('WeightClass', job.setValue('Weight class', 'Low') + job.setInitReason('weight', 75, 45));"
 ---
 name: "Very-Low-Media-Weight-Class"
-description: "Sets the weight class to very low."
+description: "Sets the weight class to Very Low."
 priority: 1
 condition: "job.getweightgsm() < 45"
 actions:
   - "job.setWeightClass('Very Low');"
+  - "job.setDescription('WeightClass', job.setValue('Weight class', 'Very Low') + job.setInitReason('weight', 'less than 45'));"
+---
+name: "Coverage-Class-Light"
+description: "Set Coverage Class to Light based on coverage size"
+priority: 1
+condition: "job.getCoverageSize() <= 15"
+actions:
+  - "job.setCoverageClass('Light');"
+  - "job.setDescription('CoverageClass', job.setValue('Coverage class', 'Light') + job.setInitReason('coverage class', 'lower than 15'));"
+---
+name: "Coverage-Class-Medium"
+description: "Set Coverage Class to Medium based on coverage size"
+priority: 1
+condition: "job.getCoverageSize() > 15 && job.getCoverageSize() <= 60"
+actions:
+  - "job.setCoverageClass('Medium');"
+  - "job.setDescription('CoverageClass', job.setValue('Coverage class', 'Medium') + job.setInitReason('coverage class', 15, 60));"
+---
+name: "Coverage-Class-Heavy"
+description: "Set Coverage Class to High based on coverage size"
+priority: 1
+condition: "job.getCoverageSize() > 60"
+actions:
+  - "job.setCoverageClass('Heavy');"
+  - "job.setDescription('CoverageClass', job.setValue('Coverage class', 'Heavy') + job.setInitReason('coverage class', 'greater than 60'));"
 ---
 name: "Coating-Coated-Exposed-Fiber"
-description: "Transform performance mode into target speed"
+description: "Set Coating Class to 'Exposed Fiber'"
 priority: 2
 condition: "job.getpaperType() == 'Coated' && (job.getfinish() == 'High Bulk' || job.getfinish() == 'Matte' || job.getfinish() == 'Silk' || job.getfinish() == 'Vellum')"
 actions:
   - "job.setCoatingClass('Exposed Fiber');"
+  - "job.setDescription('CoatingClass', job.setValue('Coating class', job.getpaperType() + ' - Exposed Fiber') + job.setInitReason('paper type', job.getpaperType()) + job.setSubReason('finish', job.getfinish()));"
 ---
 name: "Coating-Coated-Closed-Surface"
-description: "Transform quality mode into target speed"
+description: "Set Coating Class to 'Closed Surface'"
 priority: 2
 condition: "job.getpaperType() == 'Coated' && (job.getfinish() == 'Dull' || job.getfinish() == 'Eggshell' || job.getfinish() == 'Gloss' || job.getfinish() == 'Satin' || job.getfinish() == 'Smooth' || job.getfinish() == 'SuperSmooth')"
 actions:
   - "job.setCoatingClass('Closed Surface');"
+  - "job.setDescription('CoatingClass', job.setValue('Coating class', job.getpaperType() + ' - Closed Surface') + job.setInitReason('paper type', job.getpaperType()) + job.setSubReason('finish', job.getfinish()));"
 ---
 name: "Coating-Coated-Uncoated-Inkjet-Treated Surface"
-description: "Transform quality mode into target speed"
+description: "Set Coating Class to 'Inkjet Treated Surface'"
 priority: 2
 condition: "(job.getpaperType().contains('Uncoated') || job.getpaperType().contains('Coated')) && (job.getpaperType().contains('Treated') || job.getpaperType().contains('Pro'))"
 actions:
   - "job.setCoatingClass('Inkjet Treated Surface');"
+  - "job.setDescription('CoatingClass', job.setValue('Coating class', job.getpaperType() + ' - Inkjet Treated Surface') + job.setInitReason('paper type', job.getpaperType()) + job.setSubReason('finish', job.getfinish()));"
 ---
 name: "Coating-Uncoated-Most-Surface"
-description: "Transform quality mode into target speed"
+description: "Set Coating Class to 'Most Surfaces'"
 priority: 2
 condition: "job.getpaperType().contains('Uncoated') && job.getfinish() != '' && !(job.getpaperType().contains('Treated') || job.getpaperType().contains('Pro')) "
 actions:
   - "job.setCoatingClass('Most Surfaces');"
+  - "job.setDescription('CoatingClass', job.setValue('Coating class', job.getpaperType() + ' - Most Surfaces') + job.setInitReason('paper type', job.getpaperType()) + job.setSubReason('finish', job.getfinish()));"
 ---
 name: "Coating-Coated-Uncoated-Unknown-Surface"
-description: "Transform quality mode into target speed"
+description: "Set Coating Class to 'Unknown Surface'"
 priority: 3
 condition: "(job.getpaperType().contains('Uncoated') || job.getpaperType().contains('Coated')) && job.getfinish() == '' "
 actions:
   - "job.setCoatingClass('Unknown Surface');"
 ---
 name: "EMT-Very-Low"
-description: "Set Unwinder"
+description: "Set tension value when Unwinder is EMT and Weight Class is Very Low"
 priority: 3
 condition: "job.getWeightClass() == 'Very Low' && job.getUnwinder() == 'EMT'"
 actions:
@@ -71,9 +103,13 @@ actions:
   - "job.setPrintZone(0.75);"
   - "job.setUnwinder(0.75);"
   - "job.setRewinder(0.75);"
+  - "job.setDescription('DryerZone', job.setValue('Dryer Zone', 0.75) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('PrintZone', job.setValue('Print Zone', 0.75) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Unwinder', job.setValue('Unwinder', 0.75) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Rewinder', job.setValue('Rewinder', 0.75) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
 ---
 name: "EMT-Low"
-description: "Set Unwinder"
+description: "Set tension value when Unwinder is EMT and Weight Class is Low"
 priority: 3
 condition: "job.getWeightClass() == 'Low' && job.getUnwinder() == 'EMT'"
 actions:
@@ -81,9 +117,13 @@ actions:
   - "job.setPrintZone(1);"
   - "job.setUnwinder(1);"
   - "job.setRewinder(1);"
+  - "job.setDescription('DryerZone', job.setValue('Dryer Zone', 1) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('PrintZone', job.setValue('Print Zone', 1) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Unwinder', job.setValue('Unwinder', 1) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Rewinder', job.setValue('Rewinder', 1) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
 ---
 name: "EMT-Medium"
-description: "Set Unwinder"
+description: "Set tension value when Unwinder is EMT and Weight Class is Medium"
 priority: 3
 condition: "job.getWeightClass() == 'Medium' && job.getUnwinder() == 'EMT'"
 actions:
@@ -91,9 +131,13 @@ actions:
   - "job.setPrintZone(1.25);"
   - "job.setUnwinder(1.25);"
   - "job.setRewinder(1.25);"
+  - "job.setDescription('DryerZone', job.setValue('Dryer Zone', 1.25) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('PrintZone', job.setValue('Print Zone', 1.25) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Unwinder', job.setValue('Unwinder', 1.25) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Rewinder', job.setValue('Rewinder', 1.25) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
 ---
 name: "EMT-High"
-description: "Set Unwinder"
+description: "Set tension value when Unwinder is EMT and Weight Class is High"
 priority: 3
 condition: "job.getWeightClass() == 'High' && job.getUnwinder() == 'EMT'"
 actions:
@@ -101,57 +145,98 @@ actions:
   - "job.setPrintZone(1.5);"
   - "job.setUnwinder(1.5);"
   - "job.setRewinder(1.5);"
+  - "job.setDescription('DryerZone', job.setValue('Dryer Zone', 1.5) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('PrintZone', job.setValue('Print Zone', 1.5) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Unwinder', job.setValue('Unwinder', 1.5) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Rewinder', job.setValue('Rewinder', 1.5) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
 ---
 name: "HNK-Very-Low"
-description: "Set Unwinder"
+description: "Set tension value when Unwinder is HNK and Weight Class is Very Low"
 priority: 3
 condition: "job.getWeightClass() == 'Very Low' && job.getUnwinder() == 'HNK'"
 actions:
   - "job.setDryerZone(0.75);"
   - "job.setPrintZone(0.75);"
-  - "job.setUnwinder(0.375);"
-  - "job.setRewinder(0.375);"
+  - "job.setUnwinder(0.75 * 0.5);"
+  - "job.setRewinder(0.75 * 0.5);"
+  - "job.setDescription('DryerZone', job.setValue('Dryer Zone', 0.75) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('PrintZone', job.setValue('Print Zone', 0.75) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Unwinder', job.setValue('Unwinder', 0.375) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Rewinder', job.setValue('Rewinder', 0.375) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
 ---
 name: "HNK-Low"
-description: "Set Unwinder"
+description: "Set tension value when Unwinder is HNK and Weight Class is Low"
 priority: 3
 condition: "job.getWeightClass() == 'Low' && job.getUnwinder() == 'HNK'"
 actions:
   - "job.setDryerZone(1);"
   - "job.setPrintZone(1);"
-  - "job.setUnwinder(0.5);"
-  - "job.setRewinder(0.5);"
+  - "job.setUnwinder(1 * 0.7);"
+  - "job.setRewinder(1 * 0.7);"
+  - "job.setDescription('DryerZone', job.setValue('Dryer Zone', 1) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('PrintZone', job.setValue('Print Zone', 1) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Unwinder', job.setValue('Unwinder', 0.5) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Rewinder', job.setValue('Rewinder', 0.5) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
 ---
 name: "HNK-Medium"
-description: "Set Unwinder"
+description: "Set tension value when Unwinder is HNK and Weight Class is Medium"
 priority: 3
 condition: "job.getWeightClass() == 'Medium' && job.getUnwinder() == 'HNK'"
 actions:
   - "job.setDryerZone(1.25);"
   - "job.setPrintZone(1.25);"
-  - "job.setUnwinder(0.625);"
-  - "job.setRewinder(0.625);"
+  - "job.setUnwinder(1.25 * 0.8);"
+  - "job.setRewinder(1.25 * 0.8);"
+  - "job.setDescription('DryerZone', job.setValue('Dryer Zone', 1.25) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('PrintZone', job.setValue('Print Zone', 1.25) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Unwinder', job.setValue('Unwinder', 0.625) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Rewinder', job.setValue('Rewinder', 0.625) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
 ---
 name: "HNK-High"
-description: "Set Unwinder"
+description: "Set tension value when Unwinder is HNK and Weight Class is High"
 priority: 3
 condition: "job.getWeightClass() == 'High' && job.getUnwinder() == 'HNK'"
 actions:
   - "job.setDryerZone(1.5);"
   - "job.setPrintZone(1.5);"
-  - "job.setUnwinder(0.75);"
-  - "job.setRewinder(0.75);"
+  - "job.setUnwinder(1.5 * 1);"
+  - "job.setRewinder(1.5 * 1);"
+  - "job.setDescription('DryerZone', job.setValue('Dryer Zone', 1.5) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('PrintZone', job.setValue('Print Zone', 1.5) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Unwinder', job.setValue('Unwinder', 0.75) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Rewinder', job.setValue('Rewinder', 0.75) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
 ---
 name: "Set-Dryer-Power"
-description: "Set Dryer-Power"
+description: "Set Dryer Power value"
 priority: 4
 condition: "true"
 actions:
   - "job.setDryerPower();"
 ---
 name: "Set-Target-Speed"
-description: "Set Target Speed"
+description: "Set Target Speed value"
 priority: 4
 condition: "true"
 actions:
   - "job.setTargetSpeed();"
+---
+name: "Tension-Value-Degrade"
+description: "Redue tension value when Coverage Class is High"
+priority: 5
+condition: "job.getCoverageClass() == 'Heavy'"
+actions:
+  - "job.DryerZoneReduce(0.25);"
+  - "job.PrintZoneReduce(0.25);"
+  - "job.UnwinderReduce(0.25);"
+  - "job.RewinderReduce(0.25);"
+  - "job.AppendDescription('DryerZone', 'Coverage Class is High')"
+  - "job.AppendDescription('PrintZone', 'Coverage Class is High')"
+  - "job.AppendDescription('Unwinder', 'Coverage Class is High')"
+  - "job.AppendDescription('Rewinder', 'Coverage Class is High')"
+---
+name: "CoverageClass-Degrade"
+description: "Degrade Coverage Class if Optical Density is smaller than 95"
+priority: 5
+condition: "job.getopticalDensity() < 95"
+actions:
+  - "job.CoverageClassDegrade();"

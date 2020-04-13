@@ -1,13 +1,7 @@
 name: "primer-rule"
 description: "Determine whether or not to apply primer."
-priority: 2
-condition: "true"
+priority: 5
+condition: "job.CoatingClass() == 'Inkjet Treated Surface'"
 actions:
   - "job.setPrimer(true);"
----
-name: "CoverageClass-Degrade"
-description: "Determine whether or not to apply primer."
-priority: 3
-condition: "job.getopticalDensity() < 95"
-actions:
-  - "job.CoverageClassDegrade();"
+  - "job.setDescription('Primer', job.setInitReason('Primer', 'Coating Class is Inkjet Surface'))"
