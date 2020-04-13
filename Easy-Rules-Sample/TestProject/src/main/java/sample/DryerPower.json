@@ -1,0 +1,842 @@
+[
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "DryerPower": "5% - 20%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Light",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "40%-75%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Medium",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Very Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Low",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "Medium",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Most Surfaces",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Closed Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Exposed Fiber Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Uncoated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Performance",
+    "DryerPower": "85-%-95%"
+  },
+  {
+    "CoverageClass": "Heavy",
+    "WeightClass": "High",
+    "CoatingClass": "Coated - Inkjet Treated Surface",
+    "QualityMode": "Quality",
+    "DryerPower": "85-%-95%"
+  }
+]

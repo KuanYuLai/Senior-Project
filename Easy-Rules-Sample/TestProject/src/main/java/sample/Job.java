@@ -17,6 +17,7 @@ public class Job {
 	private long weightgsm;
 	private String finish;
 	private String Unwinder;
+    private Map<String, String> Description = new HashMap<String, String>();
 
 
 	//Set Variables
@@ -24,7 +25,7 @@ public class Job {
 	private String WeightClass;
 	private String CoatingClass;
 	private long TargetSpeed;
-	private String DryerSpeed;
+	private String DryerPower;
     private double Unwinder_out;
     private double Rewinder_out;
     private double DryerZone;
@@ -53,7 +54,7 @@ public class Job {
 		this.Unwinder = Unwinder;
 
 		//------old------
-		this.BA = true;
+		this.BA = false;
 		this.primer = false;
 		this.jobSize = new String();
 		this.coverageAmt = new String();
@@ -77,7 +78,6 @@ public class Job {
 	}
 
 	public String getpaperType() {
-		System.out.println("getpaperType called");
 		return paperType;
 	}
 
@@ -151,8 +151,8 @@ public class Job {
 		this.TargetSpeed = fpm;
 	}
 
-	public void setDryerSpeed(String speed) {
-		this.DryerSpeed = speed;
+	public void setDryerPower(String speed) {
+		this.DryerPower = speed;
 	}
 
 	public void setUnwinder(double value) {
@@ -170,6 +170,16 @@ public class Job {
     public void setPrintZone(double value) {
         this.PrintZone = value;
     }
+
+    public void setDescription(String key, String value){
+        this.Description.put(key, value);
+    }
+
+    public void AppendDescription(String key, String value){
+        String temp  = this.Description.get(key);
+        temp = temp  + ", " + value;
+        this.Description.put(key, temp);
+        }
 
 
 	// old ---Setters
@@ -197,7 +207,7 @@ public class Job {
 			return false;
 		}
 	}
-	// Function for degrade CoverageClass
+	// Degrader
 	public void CoverageClassDegrade() {
 		if (this.CoverageClass.equals( "Heavy"))
 			this.CoverageClass = "Medium";
@@ -205,10 +215,26 @@ public class Job {
 			this.CoverageClass = "Light";
 	}
 
+    public void DryerZoneReduce(double value){
+        this.DryerZone -= value;
+    }
+
+    public void PrintZoneReduce(double value){
+        this.PrintZone -= value;
+    }
+
+    public void RewinderReduce(double value){
+        this.Rewinder_out -= value;
+    }
+
+    public void UnwinderReduce(double value){
+        this.Unwinder_out -= value;
+    }
+
     public void setTargetSpeed() throws Exception{
         String host_url = "http://ec2-35-163-184-27.us-west-2.compute.amazonaws.com:8080/rules/";
         //Getting JSON files
-        URL TargetSpeed_JSON = new URL(host_url + "Target_Speed.json");
+        URL TargetSpeed_JSON = new URL(host_url + "TargetSpeed.json");
         //Open connection
         URLConnection yc_targetspeed = TargetSpeed_JSON.openConnection();
         //Read buffer
@@ -237,14 +263,17 @@ public class Job {
                 setTargetSpeed((long) target_o.get("TargetSpeed"));
                 break;
             }
-            setTargetSpeed(0);
+            setTargetSpeed(-1);
         }
+    //Set Description
+    setDescription("TargetSpeed", setValue("Target speed", TargetSpeed) + setInitReason("coverage class", CoverageClass) + setSubReason("weight class", WeightClass) +setSubReason("coating class", CoatingClass) + setSubReason("quality mode", qualityMode));
+
     }
 
     public void setDryerPower() throws Exception{
         String host_url = "http://ec2-35-163-184-27.us-west-2.compute.amazonaws.com:8080/rules/";
         //Getting JSON files
-        URL dryerpower_JSON= new URL(host_url + "dryer_power.json");
+        URL dryerpower_JSON= new URL(host_url + "DryerPower.json");
         //Open connection
         URLConnection yc_dryerpower = dryerpower_JSON.openConnection();
         //Read buffer
@@ -253,7 +282,7 @@ public class Job {
         Object dryer_obj = new JSONParser().parse(in_dryerpower);
         JSONArray dryer_array = (JSONArray) dryer_obj;
 
-        //Searching for DryerSpeed matching data
+        //Searching for DryerPower matching data
         for(Object o : dryer_array){
             JSONObject dryer_o = (JSONObject) o;
             String CoverageClass = (String) dryer_o.get("CoverageClass");
@@ -270,26 +299,92 @@ public class Job {
             coat_compare += " - " + getCoatingClass();
 
             if (CoverageClass.equals(getCoverageClass()) && WeightClass.equals(getWeightClass()) && CoatingClass.equals(coat_compare) && QualityMode.equals(getqualityMode())){
-                setDryerSpeed((String) dryer_o.get("DryerPower"));
+                setDryerPower((String) dryer_o.get("DryerPower"));
                 break;
             }
-            setDryerSpeed("Can't Find data");
+            setDryerPower("Can't Find data");
+            //Debugger
+            //setDryerPower(getCoverageClass() + getWeightClass() + coat_compare+getqualityMode());
         }
+    setDescription("DryerPower", setValue("Dryer power", DryerPower) + setInitReason("coverage class", CoverageClass) + setSubReason("weight class", WeightClass) +setSubReason("coating class", CoatingClass) + setSubReason("quality mode", qualityMode));
     }
 
+    //Description
+    public String setValue(String vname, long value){
+        return vname + " is " + Long.toString(value);
+    }
+
+    public String setValue(String vname, double value){
+        return vname + " is " + Double.toString(value);
+    }
+
+    public String setValue(String vname, String value){
+        return vname + " is " + value;
+    }
+
+    public String setInitReason(String vname, long value){
+        return ", because " + setValue(vname, value);
+    }
+
+    public String setInitReason(String vname, String value){
+        return ", because " + setValue(vname, value);
+    }
+
+    public String setInitReason(String vname, int upper, int lower){
+        return ", because " + vname + " is between " + Integer.toString(upper) + " and " + Integer.toString(lower);
+    }
+
+    public String setSubReason(String vname, long value){
+        return ", " + this.setValue(vname, value);
+    }
+
+    public String setSubReason(String vname, String value){
+        return ", " + this.setValue(vname, value);
+    }
+
+    public String setSubReason(String vname, int upper, int lower){
+        return ", " + vname + " is between " + Integer.toString(upper) + " and " + Integer.toString(lower);
+    }
+
+    public String setEndReason(String vname, long value){
+        return ",and  " + this.setValue(vname, value);
+    }
+
+    public String setEndReason(String vname, String value){
+        return ",and  " + this.setValue(vname, value);
+    }
+
+    public String setEndReason(String vname, int upper, int lower){
+        return ",and " + vname + " is between " + Integer.toString(upper) + " and " + Integer.toString(lower);
+    }
 	//Return output data in JSON format
 	public String toJSON() {
+
+            int haveNext = Description.size();
+            int size = haveNext;
+            String Description_out = "";
+            for (String key: Description.keySet()){
+                Description_out += "\"" + key + "\" : \"" + Description.get(key) + "\"";
+
+                haveNext -= 1;
+                if (haveNext != 0){
+                    Description_out += ", ";
+                }
+            }
+
 		return "{" +
 			"\"CoverageClass\":\"" + CoverageClass + "\"," +
 			"\"CoatingClass\":\"" + CoatingClass + "\"," +
 			"\"WeightClass\":\"" + WeightClass + "\"," +
 			"\"TargetSpeed\":" + TargetSpeed + "," +
-			"\"DryerSpeed\":\"" + DryerSpeed + "\"," +
+			"\"DryerPower\":\"" + DryerPower + "\"," +
             "\"DryerZone\":" + DryerZone + "," +
             "\"PrintZone\":" + PrintZone + "," +
             "\"Unwinder\":" + Unwinder_out + "," +
             "\"Rewinder\":" + Rewinder_out + "," +
-			"\"Primer\": " + primer +
+			"\"Primer\": " + primer + "," +
+            "\"BA\": " + BA + "," +
+            "\"Description\": {" + Description_out + "}" +
 			"}";
 	}
 
