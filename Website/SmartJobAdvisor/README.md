@@ -68,7 +68,7 @@ The Job Results page contains the output of the Rules Engine for the job that wa
 
 There are three buttons on this page:
 - **Export to CSV:**  exports the current contents of the spreadsheet into a CSV named "Job_#.csv"
-- **Copy Link to Clipboad:**  copies the link to the page, for each of sharing
+- **Copy Link to Clipboard:**  copies the link to the page, for each of sharing
 - **Justifications?:**  toggles the justifications column (enabled by default)
 
 The URL for this page determines what job is being displayed and if justifications are on<br/>
@@ -87,5 +87,5 @@ To compare multiple jobs, select jobs by clicking on the row or checkbox. Two bu
 - **Compare:** opens the jobs (like the magnifying glass) in a spreadsheet side-by-side for ease of comparison. Justifications off by default
 - **Clear:** clears the row selection
 
-There is also a 'Columns' button to choose the default columns to display (remembered with cookie). The default columns are Job ID, Date, and Job Name.
+There is also a 'Columns' button to choose the default columns to display (remembered with cookie). The default columns are Job ID, Date, and Job Name. They cannot be unselected.
 
