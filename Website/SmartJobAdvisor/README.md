@@ -18,13 +18,10 @@ A hosted version of the site exists if you are unable to build it: <br/>
 `git clone https://github.com/KuanYuLai/Senior-Project.git`
 2. Move into the SmartJobAdvisor folder: <br/>
 `cd Senior-Project/Website/SmartJobAdvisor`
-3. Build node modules by running the command: <br/>
-`npm i`
+3. Build node modules by running the command `npm i`
 4. (optional) Run the command `npm audit fix`
-5. Move into the ClientApp folder: <br/>
-`cd ClientApp`
-6. Build node modules by running the command: <br/>
-`npm i`
+5. Move into the ClientApp folder: `cd ClientApp`
+6. Build node modules by running the command `npm i`
 7. (optional) Run the command `npm audit fix`
 8. Open the file `SmartJobAdvisor.sln` with Visual Studio 2019
 9. Render the site by clicking `IIS Express` at the top of VS (Green 'play' button)
