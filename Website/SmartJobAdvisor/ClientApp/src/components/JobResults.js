@@ -187,7 +187,7 @@ export class JobResults extends Component {
 						<div style={{ width: spreadsheetWidth }}>
 							<ReactDataSheet
 								data={spreadsheetData}
-								valueRenderer={(cell) => cell.value}
+								valueRenderer={(cell) => <div style={{ textAlign: 'center' }}>{cell.value}</div>}
 								onChange={() => { }}
 							/>
 						</div>

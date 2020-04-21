@@ -50,6 +50,7 @@ export const BuildSpreadsheet = function (keys, jobHistory, justifications) {
 		}
 	}
 
+	/* Push temp data to main object, clear temp data. */
 	spreadsheetData.push(spreadsheetTemp);
 	spreadsheetTemp = [];
 	exportData.push(exportTemp);
@@ -68,22 +69,26 @@ export const BuildSpreadsheet = function (keys, jobHistory, justifications) {
 					return obj.jobID === keys[k];
 				})[0];
 
-				spreadsheetTemp.push({ value: currentData[keyList[j]], width: 175 });
-				exportTemp.push(currentData[keyList[j]]);
-
-				/* Justifications for output. */
+				/* If justifications are enabled, make 'input' span 2 columns.
+				 * Otherwise, make it only one column of width 175px. */
 				if (justifications) {
-					spreadsheetTemp.push({ value: "", width: 175 });
+					spreadsheetTemp.push({ value: currentData[keyList[j]], colSpan: 2 });
+					exportTemp.push(currentData[keyList[j]]);
 					exportTemp.push("");
+				} else {
+					spreadsheetTemp.push({ value: currentData[keyList[j]], width: 175 });
+					exportTemp.push(currentData[keyList[j]]);
 				}
 			}
 
+			/* Push temp data to main object, clear temp data. */
 			spreadsheetData.push(spreadsheetTemp);
 			spreadsheetTemp = [];
 			exportData.push(exportTemp);
 			exportTemp = [];
 		}
 		else {
+			/* Add the row header for the key. */
 			spreadsheetTemp.push({ value: keyList[j].toLocaleUpperCase(), width: 150, readOnly: true });
 			exportTemp.push(keyList[j].toLocaleUpperCase());
 
@@ -100,6 +105,7 @@ export const BuildSpreadsheet = function (keys, jobHistory, justifications) {
 				}
 			}
 
+			/* Push temp data to main object, clear temp data. */
 			spreadsheetData.push(spreadsheetTemp);
 			spreadsheetTemp = [];
 			exportData.push(exportTemp);
@@ -110,29 +116,47 @@ export const BuildSpreadsheet = function (keys, jobHistory, justifications) {
 				return val;
 			});
 
+			/* Remove 'Descriptions' key from subKeyList as it is used differently. */
+			subKeyList.splice(subKeyList.indexOf("Description"), 1);
+
+			/* Run through subKeyList object, adding rows and values for each key. */
 			for (let n = 0; n < subKeyList.length; n++) {
+				/* Add the row header for the key. */
 				spreadsheetTemp.push({ value: subKeyList[n], width: 150, readOnly: true });
 				exportTemp.push(subKeyList[n]);
 
+				/* Append info to row for each job. */
 				for (let m = 0; m < keys.length; m++) {
+					/* Get the data for the job based on the currently selected key. */
 					currentData = jobHistory.filter(obj => {
 						return obj.jobID === keys[m];
 					})[0];
 
+					/* Convert booleans to strings if need be. */
 					var tempVal = currentData[keyList[j]][subKeyList[n]];
 					if (typeof tempVal === 'boolean')
 						tempVal = tempVal.toString();
 
-					spreadsheetTemp.push({ value: tempVal, width: 175 });
-					exportTemp.push(tempVal);
-
-					/* Justifications for output. */
+					/* If justifications are active, make 'input' values span 2 columns (since there's no justification for them),
+					 * handle output values normally. If justifications are not active, don't make input values span 2 columns. */
 					if (justifications) {
-						spreadsheetTemp.push({ value: "TEMP", width: 175 });
-						exportTemp.push("TEMP");
+						if (keyList[j] === 'input') {
+							spreadsheetTemp.push({ value: tempVal, colSpan: 2 });
+							exportTemp.push(tempVal);
+							exportTemp.push("");
+						} else {
+							spreadsheetTemp.push({ value: tempVal, width: 175 });
+							exportTemp.push(tempVal);
+							spreadsheetTemp.push({ value: currentData.output.Description[subKeyList[n]], width: 250 });
+							exportTemp.push(currentData.output.Description[subKeyList[n]]);
+						}
+					} else {
+						spreadsheetTemp.push({ value: tempVal, width: 175 });
+						exportTemp.push(tempVal);
 					}
 				}
 
+				/* Push temp data to main object, clear temp data. */
 				spreadsheetData.push(spreadsheetTemp);
 				spreadsheetTemp = [];
 				exportData.push(exportTemp);
@@ -141,9 +165,11 @@ export const BuildSpreadsheet = function (keys, jobHistory, justifications) {
 		}
 	}
 
+	/* Calculate width for spreadsheet based on number of jobs
+	 * and whether or not justifications are being displayed. */
 	var spreadsheetWidth = 150 + (175 * keys.length);
 	if (justifications)
-		spreadsheetWidth += 175 * keys.length;
+		spreadsheetWidth += 250 * keys.length;
 
 	return [spreadsheetData, exportData, spreadsheetWidth];
 }
@@ -540,8 +566,7 @@ class JobHistory extends Component {
 
 	/* Constructs the content of the modal. */
 	compareJobs = (keys) => {
-		var { justifications, selectedRowKeys } = this.state;
-
+		var { justifications } = this.state;
 
 		/* Get the data from the row in the table, organize it. */
 		var spreadExportData = [];
@@ -609,7 +634,7 @@ class JobHistory extends Component {
 					<div style={{ width: spreadsheetWidth }}>
 						<ReactDataSheet
 							data={spreadsheetData}
-							valueRenderer={(cell) => cell.value}
+							valueRenderer={(cell) => <div style={{ textAlign: 'center' }}>{cell.value}</div>}
 							onChange={() => { }}
 						/>
 					</div>
@@ -654,9 +679,6 @@ class JobHistory extends Component {
 			onChange: this.onSelectChange,
 			fixed: windowWidth < 350 ? null : 'left',
 		};
-
-		//var jobCompareModalWidth = selectedRowKeys.length < 2 ? 345 : ((selectedRowKeys.length) * 175) + 170;
-		//if ()
 
 		return (
 			<Fragment>
