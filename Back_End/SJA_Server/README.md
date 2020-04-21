@@ -55,14 +55,14 @@ localhost:8000
 
 To deploy the SJA server to your cloud server. First, you have to make sure your server has **Node.js** and **npm**.
 
-Next, install screen in your machine:
-Ubuntu & Debian
+Next, install screen in your machine:  
+- Ubuntu & Debian
 
 ```
 sudo apt install screen
 ```
 
-Fedora & CentOS
+- Fedora & CentOS
 
 ```
 sudo yum install screen
@@ -94,4 +94,4 @@ When you re-enter the termianl, simply run:
 screen -r
 ```
 
-to open the old session
+to open the old session.
