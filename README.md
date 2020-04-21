@@ -1,7 +1,7 @@
 # Senior Project
 
 There are two major parts to the project:
-- Server   (~/Server)
+- Servers  (~/Back_End)
 - Website  (~/Website/SmartJobAdvisor)
 
 Each part has its own README.md within its respective folder.
