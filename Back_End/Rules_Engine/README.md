@@ -26,6 +26,26 @@ mvn install
 
 to install all of the require packages.
 
+## Set up file serving folder
+
+The Rules Engine server requires additional files to operate. In order to do that you have to set up a static file serving folder. You can find the instruction [here](https://www.moreofless.co.uk/static-content-web-pages-images-tomcat-outside-war/).
+
+After that move all the Json and YML file to that folder to serve it to the server.
+
+## Change server URL
+
+By default, both server is point to each other from our domain. You can update the URL in **host_url** variable to
+
+```
+Your_Domain:8080/serving_folder_path_name/
+```
+
+in file
+
+```
+TestProject/src/main/java/sample/Launcher.java
+```
+
 ## Deploy Locally
 
 Run:
@@ -58,3 +78,9 @@ TestProject/target/TestProject-3.4.0-SNAPSHOT.war
 ```
 
 . Upload the war file to your tomcat server to deploy the Rules Engine server.
+
+**Note**: When deploying the war file, tomcat server manager will ask you to set your preferred path name. So the complete URL will be:
+
+```
+Your_Domain:8080/preferred_path_name/new
+```

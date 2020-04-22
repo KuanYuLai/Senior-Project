@@ -22,6 +22,20 @@ Things SJA Engine do:
 
 - **/new-job**: Takes the input of the user settings and forward to the rules engine. Send back the rules engine output with the given user settings. Both input and output are in JSON format.
 
+## Change server URL
+
+By default, both server is point to each other from our domain. You can update the URL in **url** variable in **get_engine_data** function to
+
+```
+Your_Domain:8080/path_of_your_rules_engine_server/new
+```
+
+in file
+
+```
+server.js
+```
+
 ## Node.js
 
 First, download and install Node.js with this [link](https://nodejs.org/en/).
@@ -55,7 +69,8 @@ localhost:8000
 
 To deploy the SJA server to your cloud server. First, you have to make sure your server has **Node.js** and **npm**.
 
-Next, install screen in your machine:  
+Next, install screen in your machine:
+
 - Ubuntu & Debian
 
 ```
