@@ -7,4 +7,3 @@ site/_site
 .classpath
 **/.gradle/*
 **/build/*
-pom.xml
