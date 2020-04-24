@@ -447,12 +447,12 @@ class NewJobForm extends Component {
 		const { cookies } = this.props;
 
 		/* Set cookies for General Info section. */
-		cookies.set('jobName', values.jobName, { path: '/' });
-		cookies.set('ruleset', values.ruleset, { path: '/' });
-		cookies.set('qualityMode', values.qualityMode, { path: '/' });
-		cookies.set('pressUnwinderBrand', values.pressUnwinderBrand, { path: '/' });
-		cookies.set('maxCoverage', values.maxCoverage, { path: '/' });
-		cookies.set('opticalDensity', values.opticalDensity, { path: '/' });
+		cookies.set('jobName', values.jobName, { path: '/', maxAge: 31536000 });
+		cookies.set('ruleset', values.ruleset, { path: '/', maxAge: 31536000 });
+		cookies.set('qualityMode', values.qualityMode, { path: '/', maxAge: 31536000 });
+		cookies.set('pressUnwinderBrand', values.pressUnwinderBrand, { path: '/', maxAge: 31536000 });
+		cookies.set('maxCoverage', values.maxCoverage, { path: '/', maxAge: 31536000 });
+		cookies.set('opticalDensity', values.opticalDensity, { path: '/', maxAge: 31536000 });
 
 		/* Set cookie for recently-used papers in the Paper Selection section. This list will hold the
 		 * last five selected papers. When an item is chosen from the list, it is moved to the top. If
@@ -495,7 +495,7 @@ class NewJobForm extends Component {
 				paperList.unshift(usedPaper);
 			}
 
-			cookies.set('prevPapers', paperList, { path: '/' });
+			cookies.set('prevPapers', paperList, { path: '/', maxAge: 31536000 });
 		}
 	}
 
