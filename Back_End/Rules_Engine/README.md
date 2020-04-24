@@ -58,3 +58,61 @@ TestProject/target/TestProject-3.4.0-SNAPSHOT.war
 ```
 
 . Upload the war file to your tomcat server to deploy the Rules Engine server.
+
+## Sample Testing
+
+You can test the server by using [postman](https://www.postman.com/)
+
+First, fire a POST request to the endpoint **/new**
+With Input:
+
+```
+{
+    "jobName": "Setting Advice",
+    "qualityMode": "Performance",
+    "CoverageSize": 50,
+    "opticalDensity": 100,
+    "paperType": "Uncoated Pro",
+    "papersubType": "Cover",
+    "weightgsm": 80,
+    "finish": "Dull",
+    "pressUnwinderBrand": "HNK",
+    "ruleset": [
+    	"job-rule",
+        "paper-rule",
+        "primer-rule",
+        "BA-rule"
+    ]
+ }
+
+```
+
+You should get a output like this:
+
+```
+{
+    "CoverageClass": "Medium",
+    "CoatingClass": "Inkjet Treated Surface",
+    "WeightClass": "Medium",
+    "TargetSpeed": 50,
+    "DryerPower": "85-%-95%",
+    "DryerZone": 1.25,
+    "PrintZone": 1.25,
+    "Unwinder": 1.0,
+    "Rewinder": 1.0,
+    "Primer": true,
+    "BA": false,
+    "Description": {
+        "PrintZone": "Print Zone is 1.25, because unwinder is HNK, weight class is Medium",
+        "Unwinder": "Unwinder is 0.625, because unwinder is HNK, weight class is Medium",
+        "TargetSpeed": "Target speed is 50, because coverage class is Medium, weight class is Medium, coating class is Inkjet Treated Surface, quality mode is Performance",
+        "Primer": ", because Primer is Coating Class is Inkjet Surface",
+        "WeightClass": "Weight class is Medium, because weight is between 150 and 75",
+        "CoatingClass": "Coating class is Uncoated Pro - Inkjet Treated Surface, because paper type is Uncoated Pro, finish is Dull",
+        "Rewinder": "Rewinder is 0.625, because unwinder is HNK, weight class is Medium",
+        "DryerZone": "Dryer Zone is 1.25, because unwinder is HNK, weight class is Medium",
+        "CoverageClass": "Coverage class is Medium, because coverage class is between 15 and 60",
+        "DryerPower": "Dryer power is 85-%-95%, because coverage class is Medium, weight class is Medium, coating class is Inkjet Treated Surface, quality mode is Performance"
+    }
+}
+```
