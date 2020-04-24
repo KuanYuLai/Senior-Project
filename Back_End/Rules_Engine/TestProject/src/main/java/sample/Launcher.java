@@ -95,6 +95,7 @@ public class Launcher {
       	System.out.println("\nStarting...\n");
 
 
+    //Fire all given rules
 	Iterator it = ruleset.iterator();
         while(it.hasNext()){
             //System.out.println("== " + it.toString() + "\n");
@@ -120,62 +121,7 @@ public class Launcher {
                     //basicrules.register(primerBAGroup);
             }
         }
-    /*
-    //Generating TargetSpeed, DryerPower
-    //Getting JSON files
-	URL dryerpower_JSON= new URL(host_url + "dryer_power.json");
-	URL TargetSpeed_JSON = new URL(host_url + "Target_Speed.json");
-	//Open connection
-	URLConnection yc_dryerpower = dryerpower_JSON.openConnection();
-	URLConnection yc_targetspeed = TargetSpeed_JSON.openConnection();
-	//Read buffer
-	BufferedReader in_dryerpower = new BufferedReader(new InputStreamReader(yc_dryerpower.getInputStream()));
-	BufferedReader in_targetspeed = new BufferedReader(new InputStreamReader(yc_targetspeed.getInputStream()));
 
-        Object dryer_obj = new JSONParser().parse(in_dryerpower);
-        Object target_obj = new JSONParser().parse(in_targetspeed);
-        JSONArray dryer_array = (JSONArray) dryer_obj;
-        JSONArray target_array = (JSONArray) target_obj;
-
-        //Searching for DryerSpeed matching data
-        for(Object o : dryer_array){
-            JSONObject dryer_o = (JSONObject) o;
-            String CoverageClass = (String) dryer_o.get("CoverageClass");
-            String WeightClass = (String) dryer_o.get("WeightClass");
-            String CoatingClass = (String) dryer_o.get("CoatingClass");
-            String QualityMode = (String) dryer_o.get("QualityMode");
-
-            String coat_compare = "";
-            if (job.getpaperType().contains("Coated"))
-                coat_compare += "Coated";
-            else if (job.getpaperType().contains("Uncoated"))
-                coat_compare += "Uncoated";
-
-            coat_compare += " - " + job.getCoatingClass();
-
-            if (CoverageClass.equals(job.getCoverageClass()) && WeightClass.equals(job.getWeightClass()) && CoatingClass.equals(coat_compare) && QualityMode.equals(job.getqualityMode())){
-                job.setDryerSpeed((String) dryer_o.get("DryerPower"));
-                break;
-            }
-            job.setDryerSpeed("Can't Find data");
-        }
-
-        //Searching for TargetSpeed matching data
-        for(Object o : target_array){
-            JSONObject target_o = (JSONObject) o;
-            String CoverageClass = (String) target_o.get("CoverageClass");
-            String WeightClass = (String) target_o.get("WeightClass");
-            String CoatingClass = (String) target_o.get("CoatingClass");
-            String QualityMode = (String) target_o.get("QualityMode");
-
-            String coat_compare = job.getpaperType() + " - " + job.getCoatingClass();
-
-            if (CoverageClass.equals(job.getCoverageClass()) && WeightClass.equals(job.getWeightClass()) && CoatingClass.equals(coat_compare) && QualityMode.equals(job.getqualityMode())){
-                job.setTargetSpeed((long) target_o.get("TargetSpeed"));
-                break;
-            }
-        }
-        */
         //Return result to SJA Engine
       	System.out.println(job.toJSON());
 
