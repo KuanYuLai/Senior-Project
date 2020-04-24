@@ -417,10 +417,10 @@ class JobHistory extends Component {
 		/* Initialize cookies and set them to remember checkbox selection */
 		const { cookies } = this.props;
 
-		cookies.set('defaultCols', temp, { path: '/' });
-		cookies.set('defaultGeneral', generalCheckboxes, { path: '/' });
-		cookies.set('defaultInput', inputCheckboxes, { path: '/' });
-		cookies.set('defaultOutput', outputCheckboxes, { path: '/' });
+		cookies.set('defaultCols', temp, { path: '/', maxAge: 31536000 });
+		cookies.set('defaultGeneral', generalCheckboxes, { path: '/', maxAge: 31536000 });
+		cookies.set('defaultInput', inputCheckboxes, { path: '/', maxAge: 31536000 });
+		cookies.set('defaultOutput', outputCheckboxes, { path: '/', maxAge: 31536000 });
 
 		/* Set selected columns, rebuild table. */
 		this.setState({
