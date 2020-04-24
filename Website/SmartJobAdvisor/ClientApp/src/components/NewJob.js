@@ -663,7 +663,7 @@ class NewJobForm extends Component {
 						<Form.Item style={{ marginBottom: -5 }} label="PDF Max Coverage:">
 							{getFieldDecorator('maxCoverage', {
 								rules: [{ required: true }],
-								initialValue: cookies.get('maxCoverage') || 50,
+								initialValue: parseInt(cookies.get('maxCoverage')) || 50,
 							})(
 								<div style={{ display: 'flex', marginBottom: '-10px' }} >
 									<Slider
@@ -686,7 +686,7 @@ class NewJobForm extends Component {
 						<Form.Item label="Optical Density:">
 							{getFieldDecorator('opticalDensity', {
 								rules: [{ required: true }],
-								initialValue: cookies.get('opticalDensity') || 100,
+								initialValue: parseInt(cookies.get('opticalDensity')) || 100,
 							})(
 								<div style={{ display: 'flex', marginBottom: '-10px' }} >
 									<Slider
