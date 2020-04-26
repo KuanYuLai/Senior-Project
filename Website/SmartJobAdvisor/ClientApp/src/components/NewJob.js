@@ -621,7 +621,7 @@ class NewJobForm extends Component {
 								<Form.Item label="Ruleset:" style={{ marginBottom: -5 }}>
 									{getFieldDecorator('ruleset', {
 										rules: [{ required: true, message: 'Please choose a ruleset' }],
-										initialValue: cookies.get('ruleset') || "Default",
+										initialValue: cookies.get('ruleset') || "T24",
 									})(
 										<Select className={Style.formItemInput}>
 											<Option value="T24">T24</Option>
