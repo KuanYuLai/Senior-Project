@@ -624,9 +624,8 @@ class NewJobForm extends Component {
 										initialValue: cookies.get('ruleset') || "Default",
 									})(
 										<Select className={Style.formItemInput}>
-											<Option value="Default">Default</Option>
-											<Option value="Ruleset B">Ruleset B</Option>
-											<Option value="Ruleset C">Ruleset C</Option>
+											<Option value="T24">T24</Option>
+											<Option value="T25">T25</Option>
 										</Select>
 									)}
 								</Form.Item>
