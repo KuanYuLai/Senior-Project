@@ -1,0 +1,6 @@
+name: "BA-rule"
+description: "Determines whether or not to apply the bonding agent."
+priority: 5
+condition: "!(job.getpaperType().contains('Uncoated') && job.getCoatingClass() == 'Inkjet Treated Surface') || (job.getpaperType().contains('Coated') && (job.getCoatingClass() == 'Closed Surface' || job.getCoatingClass() == 'Inkjet Treated Surface'))"
+actions:
+  - "job.setBA(true);"
