@@ -1,17 +1,16 @@
-﻿import React, { Component, Fragment } from 'react';
-//import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { Redirect, Route } from 'react-router';
+﻿import React, { Component } from 'react';
+import { Redirect } from 'react-router';
 import { Button, Checkbox, Form, Icon, Input, InputNumber, notification, Radio, Row, Col, Select, Slider } from 'antd';
+import { instanceOf } from 'prop-types';
+import { withCookies, Cookies } from 'react-cookie';
 
 import Style from '../CSS/NewJob.module.css'
 import { ServerURL } from './Home';
-import { JobHistory } from './JobHistory';
-//import { JobResults } from './JobResults';
 
 const { Option } = Select;
 
 /* An AntD InputNumber with a label on the right. */
-class BetterInputNumber extends React.Component {
+class BetterInputNumber extends Component {
 	render() {
 		if (this.props.addonAfter) {
 			return (
@@ -35,17 +34,32 @@ class BetterInputNumber extends React.Component {
 }
 
 /* Holds the form that the user fills out and POSTs to the SJA Engine. */
-class NewJobForm extends React.Component {
-	constructor() {
-		super();
+class NewJobForm extends Component {
+	static propTypes = {
+		cookies: instanceOf(Cookies).isRequired
+	};
+
+	constructor(props) {
+		super(props);
+
+		/* Get maxCoverage/opticalDensity values from cookies (if they exist, otherwise use defaults). */
+		const { cookies } = props;
+
+		var maxC = 50;
+		var oD = 100;
+
+		if (typeof cookies.get('maxCoverage') !== 'undefined')
+			maxC = parseInt(cookies.get('maxCoverage'));
+		if (typeof cookies.get('opticalDensity') !== 'undefined')
+			oD = parseInt(cookies.get('opticalDensity'));
 
 		/* Initialize all values and populate radios/selects. */
 		this.state = {
 			unknownPaper: false,
 			paperNameMfrDisabled: false,
 			weightgsm: null,
-			maxCoverage: 50,
-			opticalDensity: 100,
+			maxCoverage: maxC,
+			opticalDensity: oD,
 			jobCreated: false,
 			createdID: -1,
 		};
@@ -66,6 +80,7 @@ class NewJobForm extends React.Component {
 				paperTypeRadio: this.getRadio(this.state.paperDatabase, "papertype"),
 				paperSubTypeRadio: this.getRadio(this.state.paperDatabase, "papersubtype"),
 				paperFinishRadio: this.getRadio(this.state.paperDatabase, "finish"),
+				prevPaperDropdown: this.getPrevPaperCookie()
 			});
 		}
 	}
@@ -81,11 +96,11 @@ class NewJobForm extends React.Component {
 			}
 		}).then(async (res) => {
 			await res.json().then((data) => {
-				//this.setState({ paperDatabase: data.paperdb });
+				this.setState({ paperDatabase: data.paperdb });
 
 				// Testing with actual data
-				var realData = require('../PaperData/HP-paper-db-CONFIDENTIAL-2020-02-09.json');
-				this.setState({ paperDatabase: realData.paperdb })
+				//var realData = require('../PaperData/HP-paper-db-CONFIDENTIAL-2020-02-09.json');
+				//this.setState({ paperDatabase: realData.paperdb })
 			});
 		}).catch(err => {
 			this.fetchError("fetch paper database");
@@ -200,7 +215,7 @@ class NewJobForm extends React.Component {
 		var currentPapers = [...currentPaperNames];
 
 		/* If weightgsm, need to set state. Else assign 'e.target.value' to 'e'. Saves a few lines. */
-		if (field == "weightgsm")
+		if (field === "weightgsm")
 			this.setState({ weightgsm: e });
 		else
 			e = e.target.value;
@@ -210,17 +225,17 @@ class NewJobForm extends React.Component {
 
 		/* Filter remaining fields to apply constraints. */
 		if (typeof getFieldValue("manufacturer") !== 'undefined' && field !== "manufacturer")
-			currentPapers = currentPapers.filter((a) => a.manufacturer == getFieldValue("manufacturer"));
+			currentPapers = currentPapers.filter((a) => a.manufacturer === getFieldValue("manufacturer"));
 		if (typeof getFieldValue("productname") !== 'undefined' && field !== "productname")
-			currentPapers = currentPapers.filter((a) => a.productname == getFieldValue("productname"));
+			currentPapers = currentPapers.filter((a) => a.productname === getFieldValue("productname"));
 		if (typeof getFieldValue("papertype") !== 'undefined' && field !== "papertype")
-			currentPapers = currentPapers.filter((a) => a.papertype == getFieldValue("papertype"));
+			currentPapers = currentPapers.filter((a) => a.papertype === getFieldValue("papertype"));
 		if (typeof getFieldValue("papersubtype") !== 'undefined' && field !== "papersubtype")
-			currentPapers = currentPapers.filter((a) => a.papersubtype == getFieldValue("papersubtype"));
+			currentPapers = currentPapers.filter((a) => a.papersubtype === getFieldValue("papersubtype"));
 		if (typeof getFieldValue("weightgsm") !== 'undefined' && getFieldValue("weightgsm") !== null && field !== "weightgsm")
-			currentPapers = currentPapers.filter((a) => a.weightgsm == getFieldValue("weightgsm"));
+			currentPapers = currentPapers.filter((a) => a.weightgsm === getFieldValue("weightgsm"));
 		if (typeof getFieldValue("finish") !== 'undefined' && field !== "finish")
-			currentPapers = currentPapers.filter((a) => a.finish == getFieldValue("finish"));
+			currentPapers = currentPapers.filter((a) => a.finish === getFieldValue("finish"));
 
 		var paperMfrs = [];
 		var paperNames = [];
@@ -377,12 +392,123 @@ class NewJobForm extends React.Component {
 		});
 	}
 
+	/* Auto-fills Paper Selection section with the paper chosen from the "Recent papers" dropdown (cookie). */
+	handlePrevPaper = (val) => {
+		const { cookies } = this.props;
+		const { setFieldsValue } = this.props.form;
+
+		/* Get the list of previously-used papers from the cookie. */
+		var paperList = cookies.get("prevPapers");
+
+		/* Apply its values to auto-fill the form. */
+		setFieldsValue({ manufacturer: paperList[val].manufacturer });
+		setFieldsValue({ productname: paperList[val].productname });
+		setFieldsValue({ papertype: paperList[val].papertype });
+		setFieldsValue({ papersubtype: paperList[val].papersubtype });
+		setFieldsValue({ weightgsm: paperList[val].weightgsm });
+		setFieldsValue({ finish: paperList[val].finish });
+
+		/* Need to set a state value for weightgsm since the select component is dependent on it. */
+		this.setState({ weightgsm: paperList[val].weightgsm });
+	}
+
+	/* Constructs the dropdown for selection of commonly-used paper, gotten from the cookie. */
+	getPrevPaperCookie = () => {
+		const { cookies } = this.props;
+
+		/* Initialize the arrays to hold values scraped from data source and Select component Options. */
+		var vals = [];
+		var dropdown = [];
+
+		vals = cookies.get('prevPapers');
+
+		if (typeof vals !== 'undefined') {
+			/* Create the dropdown for the Select using the list of names. */
+			for (let i = 0; i < vals.length; i++) {
+				var name =
+					vals[i].manufacturer + ' - ' +
+					vals[i].productname + ' | ' +
+					vals[i].papertype + ' | ' +
+					vals[i].papersubtype + ' | ' +
+					vals[i].weightgsm + ' gsm | ' +
+					vals[i].finish;
+
+				dropdown.push(<Option key={i}>{name}</Option>);
+			}
+
+			return dropdown;
+		} else {
+			return null;
+		}
+	}
+
+	/* Set cookies to remember jobName/ruleset/qualityMode/pressUnwinderBrand/maxCoverage/opticalDensity for next time. */
+	setCookies = (values) => {
+		const { cookies } = this.props;
+
+		/* Set cookies for General Info section. */
+		cookies.set('jobName', values.jobName, { path: '/', maxAge: 31536000 });
+		cookies.set('ruleset', values.ruleset, { path: '/', maxAge: 31536000 });
+		cookies.set('qualityMode', values.qualityMode, { path: '/', maxAge: 31536000 });
+		cookies.set('pressUnwinderBrand', values.pressUnwinderBrand, { path: '/', maxAge: 31536000 });
+		cookies.set('maxCoverage', values.maxCoverage, { path: '/', maxAge: 31536000 });
+		cookies.set('opticalDensity', values.opticalDensity, { path: '/', maxAge: 31536000 });
+
+		/* Set cookie for recently-used papers in the Paper Selection section. This list will hold the
+		 * last five selected papers. When an item is chosen from the list, it is moved to the top. If
+		 * a new paper is used instead that it not on the list, push it to the front, pop off the last one. */
+		/* Only do this if a known paper was selected! */
+		if (!this.state.unknownPaper) {
+			var paperList = [];
+			if (typeof cookies.get('prevPapers') !== 'undefined')
+				paperList = cookies.get('prevPapers');
+
+			/* Create object for the paper that was selected. */
+			var usedPaper = {};
+
+			usedPaper.manufacturer = values.manufacturer;
+			usedPaper.productname = values.productname;
+			usedPaper.papertype = values.papertype;
+			usedPaper.papersubtype = values.papersubtype;
+			usedPaper.weightgsm = values.weightgsm;
+			usedPaper.finish = values.finish;
+
+			/* Compare the newly-created usedPaper object to the existing objects in the cookie. */
+			var exists = false;
+			for (let i = 0; i < paperList.length; i++) {
+				/* If the item already exists in the array, move it to the front. */
+				if (JSON.stringify(usedPaper) === JSON.stringify(paperList[i])) {
+					paperList.splice(i, 1);
+					paperList.unshift(usedPaper);
+					exists = true;
+					break;
+				}
+			}
+
+			/* If the newly-created usedPaper object was not found in the list:
+			 *     If < 5 items, just add usedPaper to the list
+			 *     If = 5 items, remove oldest, then push usedPaper */
+			if (!exists) {
+				if (paperList.length === 5)
+					paperList.splice(4, 1);
+
+				paperList.unshift(usedPaper);
+			}
+
+			cookies.set('prevPapers', paperList, { path: '/', maxAge: 31536000 });
+		}
+	}
+
 	/* Gathers and validates form data, then makes a POST call to the rules engine. */
 	handleSubmit = e => {
 		e.preventDefault();
 		this.props.form.validateFields(async (err, values) => {
 			if (!err) {
+				/* This is here so the values of the form can be seen in the console for debugging. */
 				console.log('Received values of form: ', values);
+
+				/* Set cookies for next time. */
+				this.setCookies(values);
 
 				/* Call database to request paperDatabase object. */
 				await fetch(ServerURL + 'new-job/', {
@@ -395,18 +521,10 @@ class NewJobForm extends React.Component {
 					}
 				}).then(async (res) => {
 					await res.json().then((data) => {
-						console.log(data);
-
 						this.setState({
 							createdID: data.id,
 							jobCreated: true
 						});
-						//<Link to={{ pathname: '/job-results', state: { jobID: data.id } }} />
-
-						/*
-						<Route exact path='/job-results' render={(props) => <JobResults {...props} jobID={data.id} />} />
-						<Link to="/job-results" />
-						*/
 					});
 				}).catch(() => {
 					this.fetchError("submit job");
@@ -461,11 +579,14 @@ class NewJobForm extends React.Component {
 			},
 		}
 
+		/* Initialize cookies. */
+		const { cookies } = this.props;
+
 		if (jobCreated) {
 			// Put a loading spinner here or something
 			console.log(createdID);
 
-			return <Redirect to={{ pathname: '/job-results', state: { jobID: createdID } }} />
+			return <Redirect to={{ pathname: '/job-results', search: '?justifications=true?IDs=' + createdID }} />
 		}
 		else
 			return (
@@ -487,7 +608,7 @@ class NewJobForm extends React.Component {
 								<Form.Item label="Job Name:" style={{ marginBottom: -5 }}>
 									{getFieldDecorator('jobName', {
 										rules: [{ required: true, message: 'Please input a job name' }],
-										initialValue: "Setting Advice",
+										initialValue: cookies.get('jobName') || "Setting Advice",
 									})(
 										<Input
 											className={Style.formItemInput}
@@ -500,12 +621,11 @@ class NewJobForm extends React.Component {
 								<Form.Item label="Ruleset:" style={{ marginBottom: -5 }}>
 									{getFieldDecorator('ruleset', {
 										rules: [{ required: true, message: 'Please choose a ruleset' }],
-										initialValue: "Default",
+										initialValue: cookies.get('ruleset') || "T24",
 									})(
 										<Select className={Style.formItemInput}>
-											<Option value="Default">Default</Option>
-											<Option value="Ruleset B">Ruleset B</Option>
-											<Option value="Ruleset C">Ruleset C</Option>
+											<Option value="T24">T24</Option>
+											<Option value="T25">T25</Option>
 										</Select>
 									)}
 								</Form.Item>
@@ -516,7 +636,7 @@ class NewJobForm extends React.Component {
 								<Form.Item label="Quality Mode:" style={{ marginBottom: -5 }}>
 									{getFieldDecorator('qualityMode', {
 										rules: [{ required: true }],
-										initialValue: "Quality",
+										initialValue: cookies.get('qualityMode') || "Quality",
 									})(
 										<Radio.Group className={Style.formItemPaper}>
 											<Radio.Button value="Quality">Quality</Radio.Button>
@@ -529,7 +649,7 @@ class NewJobForm extends React.Component {
 								<Form.Item label="Press Unwinder Brand:" style={{ marginBottom: -5 }}>
 									{getFieldDecorator('pressUnwinderBrand', {
 										rules: [{ required: true }],
-										initialValue: "EMT",
+										initialValue: cookies.get('pressUnwinderBrand') || "EMT",
 									})(
 										<Radio.Group className={Style.formItemPaper}>
 											<Radio.Button value="EMT">EMT</Radio.Button>
@@ -542,12 +662,12 @@ class NewJobForm extends React.Component {
 						<Form.Item style={{ marginBottom: -5 }} label="PDF Max Coverage:">
 							{getFieldDecorator('maxCoverage', {
 								rules: [{ required: true }],
-								initialValue: 50,
+								initialValue: parseInt(cookies.get('maxCoverage')) || 50,
 							})(
 								<div style={{ display: 'flex', marginBottom: '-10px' }} >
 									<Slider
 										className={Style.formItemInput}
-										style={{ width: 'calc(100% - 112px)' }}
+										style={{ width: 'calc(100% - 152px)', marginRight: 15 }}
 										min={0}
 										max={100}
 										onChange={(e) => this.onSliderChange(e, "maxCoverage")}
@@ -565,12 +685,12 @@ class NewJobForm extends React.Component {
 						<Form.Item label="Optical Density:">
 							{getFieldDecorator('opticalDensity', {
 								rules: [{ required: true }],
-								initialValue: 100,
+								initialValue: parseInt(cookies.get('opticalDensity')) || 100,
 							})(
 								<div style={{ display: 'flex', marginBottom: '-10px' }} >
 									<Slider
 										className={Style.formItemInput}
-										style={{ width: 'calc(100% - 112px)' }}
+										style={{ width: 'calc(100% - 152px)', marginRight: 15 }}
 										step={5}
 										min={0}
 										max={100}
@@ -587,7 +707,7 @@ class NewJobForm extends React.Component {
 							)}
 						</Form.Item>
 
-						<div style={{ display: 'inline-block' }}>
+						<div style={{ display: 'inline-block', width: '100%' }}>
 							<h5>
 								Paper Selection
 								<Button className={Style.resetButton} onClick={() => this.paperReset()} type="default" >
@@ -595,12 +715,25 @@ class NewJobForm extends React.Component {
 									Reset
 								</Button>
 								<Checkbox
-									style={{ position: 'relative', bottom: 2 }}
+									style={{ position: 'relative', bottom: 2, marginRight: 16, marginBottom: 10 }}
 									onChange={() => this.handleUnknownPaper()}
 									checked={unknownPaper}
 								>
 									Unknown Paper?
 								</Checkbox>
+								{!unknownPaper ?
+									<Select
+										className={Style.formItemPaper}
+										style={{ maxWidth: 175, postition: 'relative', bottom: 2 }}
+										onChange={(val) => this.handlePrevPaper(val)}
+										dropdownMatchSelectWidth={false}
+										placeholder="Recent papers"
+									>
+										{this.state.prevPaperDropdown}
+									</Select>
+									:
+									null
+								}
 							</h5>
 						</div>
 						<Form.Item label="Mfr:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
@@ -682,7 +815,7 @@ class NewJobForm extends React.Component {
 									<div style={{ display: 'flex', marginBottom: '-20px' }} >
 										<Slider
 											className={Style.formItemInput}
-											style={{ width: 'calc(100% - 127px)' }}
+											style={{ width: 'calc(100% - 167px)', marginRight: 15 }}
 											min={0}
 											max={500}
 											value={weightgsm || 0}
@@ -743,4 +876,4 @@ class NewJobForm extends React.Component {
 
 const NewJob = Form.create({ name: 'new-job' })(NewJobForm);
 
-export { NewJob };
+export default withCookies(NewJob);

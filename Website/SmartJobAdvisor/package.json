@@ -1,0 +1,27 @@
+{
+  "name": "smartjobadvisor",
+  "version": "1.0.0",
+  "description": "Print Job Helper Tool for HP",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "forever": "^2.0.0",
+    "react-csv": "^2.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KuanYuLai/Senior-Project.git"
+  },
+  "author": "Cole Jones and Kuan-Yu Lai",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KuanYuLai/Senior-Project/issues"
+  },
+  "homepage": "https://github.com/KuanYuLai/Senior-Project#readme"
+}

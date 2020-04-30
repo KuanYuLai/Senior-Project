@@ -1,5 +1,6 @@
 ﻿import React, { Component, Fragment } from 'react';
-import { Button, Icon, Spin } from 'antd';
+import { Button, Checkbox, Icon, notification, Spin, Tooltip } from 'antd';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { CSVLink } from "react-csv";
 import ReactDataSheet from "react-datasheet";
 import 'react-datasheet/lib/react-datasheet.css';
@@ -7,36 +8,45 @@ import 'react-datasheet/lib/react-datasheet.css';
 import { BuildSpreadsheet } from './JobHistory.js';
 import Style from '../CSS/JobHistory.module.css'
 
-//import Style from '../CSS/JobHistory.module.css'
 import { ServerURL } from './Home';
 
 export class JobResults extends Component {
 	constructor(props) {
 		super(props);
 
+		/* Get the URL of the page, snip off everything after '?IDs=',
+		 * take remaining string and split on ',' into an array. */
+		var IDs = window.location.href.split('?IDs=')[1].split(',').map(function (v) {
+			return parseInt(v, 10);
+		});
+
+		/* Get URL of the page, snip the '?justifications=' section to get 'true' or 'false'. */
+		var justifications = window.location.href.split('?justifications=')[1].split('?IDs=')[0];
+		justifications = (justifications === 'true');
+
 		this.state = {
-			jobID: props.location.state.jobID,
+			jobIDs: IDs,
+			jobResults: [],
+			justifications: justifications,
+			spreadsheetWidth: 0,
 			ready: false,
+			error: false
 		};
 	}
 
+	/* Calls after the component mounts, fetches data and generates spreadsheet/export. */
 	componentDidMount = async () => {
-		await this.fetchJob();
+		const { jobIDs } = this.state;
 
-		var data = BuildSpreadsheet([this.state.jobID], this.state.jobResult);
+		for (let i = 0; i < jobIDs.length; i++)
+			await this.fetchJob(jobIDs[i]);
 
-		setTimeout(async () => {
-			this.setState({
-				spreadsheetData: data[0],
-				exportData: data[1],
-				ready: true
-			});
-		});
+		this.generateData();
 	}
 
 	/* Calls the database to request job history. */
-	fetchJob = async () => {
-		await fetch(ServerURL + "job-history/" + this.state.jobID, {
+	fetchJob = async (id) => {
+		await fetch(ServerURL + "job-history/" + id, {
 			method: "GET",
 			mode: 'cors',
 			headers: {
@@ -44,21 +54,94 @@ export class JobResults extends Component {
 			}
 		}).then(async (res) => {
 			await res.json().then((data) => {
+				var temp = [...this.state.jobResults];
+				temp.push(data);
+
 				this.setState({
-					jobResult: [data]
+					jobResults: temp
 				});
 			});
 		}).catch(err => {
-			console.log(err);
-			//this.fetchError("fetch job history");
+			this.fetchError("fetch job history");
 		});
+	}
+
+	/* Called when there is an error in a fetch call. */
+	fetchError = (type) => {
+		this.alertPresent = false;
+
+		/* This is for debouncing, so the alert doesn't appear twice. */
+		if (!this.alertPresent) {
+			this.alertPresent = true;
+
+			notification['error']({
+				message: 'Failed to ' + type + '.',
+				description: "The server is probably down. Try again later.",
+				duration: null
+			});
+
+			setTimeout(() => {
+				this.alertPresent = false;
+			}, 1000);
+		}
+
+		this.setState({ error: true });
+	}
+
+	/* Generate the data for the spreadsheet/export. */
+	generateData = () => {
+		const { jobIDs, jobResults, justifications } = this.state;
+
+		if (!this.state.error) {
+			var copyURL = window.location.href.split('job-results')[0];
+			if (justifications)
+				copyURL += 'job-results?justifications=true?IDs='
+			else
+				copyURL += 'job-results?justifications=false?IDs='
+
+			copyURL += window.location.href.split('?IDs=')[1];
+
+			var data = BuildSpreadsheet(jobIDs, jobResults, justifications);
+
+			/* Name of the file generated when the "Export to CSV" button is clicked. */
+			var fileName = "";
+			if (jobIDs.length === 1)
+				fileName = "Job";
+			else
+				fileName = "Compare_Jobs";
+
+			for (let i = 0; i < jobIDs.length; i++)
+				fileName += "_" + jobIDs[i];
+
+			fileName += ".csv";
+
+			this.setState({
+				spreadsheetData: data[0],
+				exportData: data[1],
+				spreadsheetWidth: data[2],
+				copyURL: copyURL,
+				ready: true,
+				fileName: fileName
+			});
+		}
+	}
+
+	/* Triggered when checkbox is clicked. Toggles justification column. */
+	handleJustifications = async () => {
+		await this.setState({ justifications: !this.state.justifications });
+
+		setTimeout(() => { this.generateData(); this.forceUpdate(); }, 50);
 	}
 
 	render() {
 		const {
 			ready,
-			jobID,
+			jobIDs,
+			justifications,
+			copyURL,
+			fileName,
 			spreadsheetData,
+			spreadsheetWidth,
 			exportData
 		} = this.state;
 
@@ -69,20 +152,46 @@ export class JobResults extends Component {
 		else
 			return (
 				<Fragment>
-					<h1>Job {jobID} Results</h1>
+					{jobIDs.length < 2 ?
+						<h1>Job {jobIDs} Results</h1>
+						:
+						<h1>Job Comparison</h1>
+					}
 					<br /><br />
 
-					<CSVLink data={exportData} filename={"Job_" + jobID + ".csv"}>
-						<Button type="primary" style={{ marginBottom: 10 }}>
+					<CSVLink data={exportData} filename={fileName}>
+						<Button type="primary" style={{ marginBottom: 10, marginRight: 10, paddingLeft: 10, paddingRight: 10 }}>
 							<Icon className={Style.buttonIcon} type="file-excel" />
 							Export to CSV
 						</Button>
 					</CSVLink>
-					<ReactDataSheet
-						data={spreadsheetData}
-						valueRenderer={(cell) => cell.value}
-						onChange={() => { }}
-					/>;
+					<CopyToClipboard text={copyURL}>
+						<Tooltip placement="top" trigger="focus" title="Copied!">
+							<Button
+								type="default"
+								style={{ marginBottom: 10, paddingLeft: 10, paddingRight: 10 }}
+							>
+								<Icon className={Style.buttonIcon} type="copy" />
+								Copy Link to Clipboard
+						</Button>
+						</Tooltip>
+					</CopyToClipboard>
+					<Checkbox
+						style={{ marginLeft: 16, marginBottom: 10 }}
+						onChange={() => this.handleJustifications()}
+						checked={justifications}
+					>
+						Justifications?
+					</Checkbox>
+					<div style={{ width: spreadsheetWidth, maxWidth: '100%', overflowX: 'scroll' }}>
+						<div style={{ width: spreadsheetWidth }}>
+							<ReactDataSheet
+								data={spreadsheetData}
+								valueRenderer={(cell) => <div style={{ textAlign: 'center' }}>{cell.value}</div>}
+								onChange={() => { }}
+							/>
+						</div>
+					</div>
 				</Fragment>
 			);
 	}
