@@ -4,4 +4,4 @@ priority: 5
 condition: "job.getCoatingClass() == 'Inkjet Treated Surface'"
 actions:
   - "job.setPrimer(true);"
-  - "job.setDescription('Primer', job.setInitReason('Primer', 'Coating Class is Inkjet Surface'))"
+  - "job.setDescription('Enhancer', job.setValue('Primer', true) + job.setInitReason('Coating Class', 'Inkjet Treated Surface'))"

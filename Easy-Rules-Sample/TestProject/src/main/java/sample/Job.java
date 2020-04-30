@@ -18,6 +18,7 @@ public class Job {
 	private String finish;
 	private String Unwinder;
     private Map<String, String> Description = new HashMap<String, String>();
+    private String ruleclass;
 
 
 	//Set Variables
@@ -30,8 +31,6 @@ public class Job {
     private double Rewinder_out;
     private double DryerZone;
     private double PrintZone;
-	//-----old---------------
-	private long pageCount;
 
 
 
@@ -42,7 +41,7 @@ public class Job {
 	private String coverageAmt;
 
 	// Class initializer
-	public Job(String jobName, String qualityMode, long CoverageSize, long opticalDensity, String paperType, String papersubType, long weightgsm, String finish, String Unwinder) {
+	public Job(String jobName, String qualityMode, long CoverageSize, long opticalDensity, String paperType, String papersubType, long weightgsm, String finish, String Unwinder, String ruleclass) {
 		this.jobName = jobName;
 		this.qualityMode = qualityMode;
 		this.CoverageSize = CoverageSize;
@@ -52,12 +51,9 @@ public class Job {
 		this.weightgsm = weightgsm;
 		this.finish = finish;
 		this.Unwinder = Unwinder;
-
-		//------old------
 		this.BA = false;
 		this.primer = false;
-		this.jobSize = new String();
-		this.coverageAmt = new String();
+        this.ruleclass = ruleclass;
 	}
 
 	// Getters
@@ -97,29 +93,12 @@ public class Job {
 		return Unwinder;
 	}
 
-//---old getter-----
-	public long getPageCount() {
-		return pageCount;
-	}
-
 	public boolean getBA() {
 		return BA;
 	}
 
 	public boolean getPrimer() {
 		return primer;
-	}
-
-	public String getJobSize() {
-		return jobSize;
-	}
-
-	public String getCoverageAmt() {
-		return coverageAmt;
-	}
-
-	public int getint(int i){
-		return i;
 	}
 
     public String getCoverageClass() {
@@ -181,8 +160,6 @@ public class Job {
         this.Description.put(key, temp);
         }
 
-
-	// old ---Setters
 	public void setBA(boolean choice) {
 		this.BA = choice;
 	}
@@ -191,13 +168,6 @@ public class Job {
 		this.primer = choice;
 	}
 
-	public void setJobSize(String size) {
-		this.jobSize = size;
-	}
-
-	public void setCoverageAmt(String coverage) {
-		this.coverageAmt = coverage;
-	}
 
 	// Function for checking if paper type requires bonding agent
 	public boolean checkValidPaperType() {
@@ -207,7 +177,7 @@ public class Job {
 			return false;
 		}
 	}
-	// Degrader
+	//Clas Degrader
 	public void CoverageClassDegrade() {
 		if (this.CoverageClass.equals( "Heavy"))
 			this.CoverageClass = "Medium";
@@ -215,6 +185,8 @@ public class Job {
 			this.CoverageClass = "Light";
 	}
 
+
+    //Value Reducer
     public void DryerZoneReduce(double value){
         this.DryerZone -= value;
     }
@@ -232,7 +204,8 @@ public class Job {
     }
 
     public void setTargetSpeed() throws Exception{
-        String host_url = "http://ec2-35-163-184-27.us-west-2.compute.amazonaws.com:8080/rules/";
+        //Host URL for the JSON file
+        String host_url = "http://ec2-35-163-184-27.us-west-2.compute.amazonaws.com:8080/rules/" + ruleclass + "/";
         //Getting JSON files
         URL TargetSpeed_JSON = new URL(host_url + "TargetSpeed.json");
         //Open connection
@@ -271,7 +244,8 @@ public class Job {
     }
 
     public void setDryerPower() throws Exception{
-        String host_url = "http://ec2-35-163-184-27.us-west-2.compute.amazonaws.com:8080/rules/";
+        //Host URL for the JSON file
+        String host_url = "http://ec2-35-163-184-27.us-west-2.compute.amazonaws.com:8080/rules/" + ruleclass + "/";
         //Getting JSON files
         URL dryerpower_JSON= new URL(host_url + "DryerPower.json");
         //Open connection
@@ -309,7 +283,7 @@ public class Job {
     setDescription("DryerPower", setValue("Dryer power", DryerPower) + setInitReason("coverage class", CoverageClass) + setSubReason("weight class", WeightClass) +setSubReason("coating class", CoatingClass) + setSubReason("quality mode", qualityMode));
     }
 
-    //Description
+    //Description builder
     public String setValue(String vname, long value){
         return vname + " is " + Long.toString(value);
     }
@@ -322,11 +296,19 @@ public class Job {
         return vname + " is " + value;
     }
 
+    public String setValue(String vname, boolean value){
+        return vname + " is " + value;
+    }
+
     public String setInitReason(String vname, long value){
         return ", because " + setValue(vname, value);
     }
 
     public String setInitReason(String vname, String value){
+        return ", because " + setValue(vname, value);
+    }
+
+    public String setInitReason(String vname, boolean value){
         return ", because " + setValue(vname, value);
     }
 
@@ -339,6 +321,10 @@ public class Job {
     }
 
     public String setSubReason(String vname, String value){
+        return ", " + this.setValue(vname, value);
+    }
+
+    public String setSubReason(String vname, boolean value){
         return ", " + this.setValue(vname, value);
     }
 
@@ -357,7 +343,8 @@ public class Job {
     public String setEndReason(String vname, int upper, int lower){
         return ",and " + vname + " is between " + Integer.toString(upper) + " and " + Integer.toString(lower);
     }
-	//Return output data in JSON format
+
+	//JSON formatter
 	public String toJSON() {
 
             int haveNext = Description.size();
@@ -388,7 +375,7 @@ public class Job {
 			"}";
 	}
 
-	// Return detailed output data in beautify JSON format
+	//JSON formatter for Debugging
 	public String tobeautiJSON() {
 		return "{\n" +
 			"\t\"jobName\": \"" + jobName + "\",\n" +
