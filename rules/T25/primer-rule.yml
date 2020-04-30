@@ -1,7 +1,0 @@
-name: "primer-rule"
-description: "Determine whether or not to apply primer."
-priority: 5
-condition: "job.getCoatingClass() != 'Inkjet Treated Surface'"
-actions:
-  - "job.setPrimer(true);"
-  - "job.setDescription('Enhancer', job.setValue('Enhancer', true) + job.setInitReason('Coating Class', 'not Inkjet Treated Surface'))"

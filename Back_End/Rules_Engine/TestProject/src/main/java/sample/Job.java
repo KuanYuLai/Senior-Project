@@ -2,6 +2,7 @@ package sample;
 import java.io.*;
 import java.util.*;
 import java.net.*;
+import java.math.BigDecimal;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.*;
 import org.json.simple.JSONArray;
@@ -35,8 +36,9 @@ public class Job {
 
 
 	// Variables that will be set by rules
-	private boolean BA;
-	private boolean primer;
+	private Boolean BA;
+	private Boolean primer;
+    private Boolean Enhancer;
 	private String jobSize;
 	private String coverageAmt;
 
@@ -51,8 +53,9 @@ public class Job {
 		this.weightgsm = weightgsm;
 		this.finish = finish;
 		this.Unwinder = Unwinder;
-		this.BA = false;
-		this.primer = false;
+		this.BA = null;
+		this.primer = null;
+        this.Enhancer = null;
         this.ruleclass = ruleclass;
 	}
 
@@ -160,13 +163,17 @@ public class Job {
         this.Description.put(key, temp);
         }
 
-	public void setBA(boolean choice) {
+	public void setBA(Boolean choice) {
 		this.BA = choice;
 	}
 
-	public void setPrimer(boolean choice) {
+	public void setPrimer(Boolean choice) {
 		this.primer = choice;
 	}
+
+    public void setEnhancer(Boolean choice){
+        this.Enhancer = choice;
+    }
 
 
 	// Function for checking if paper type requires bonding agent
@@ -187,20 +194,32 @@ public class Job {
 
 
     //Value Reducer
+    private double Reducer(double variable, double value){
+            //Change double type to BigDecimal type
+            BigDecimal var = new BigDecimal(String.valueOf(variable));
+            BigDecimal val = new BigDecimal(String.valueOf(value));
+
+            //Perform subtraction
+            var = var.subtract(val);
+
+            //Return result
+            return var.doubleValue();
+    }
+
     public void DryerZoneReduce(double value){
-        this.DryerZone -= value;
+        setDryerZone(Reducer(this.DryerZone, value));
     }
 
     public void PrintZoneReduce(double value){
-        this.PrintZone -= value;
+        setPrintZone(Reducer(this.PrintZone, value));
     }
 
     public void RewinderReduce(double value){
-        this.Rewinder_out -= value;
+        setRewinder(Reducer(this.Rewinder_out, value));
     }
 
     public void UnwinderReduce(double value){
-        this.Unwinder_out -= value;
+        setUnwinder(Reducer(this.Unwinder_out, value));
     }
 
     public void setTargetSpeed() throws Exception{
@@ -301,19 +320,19 @@ public class Job {
     }
 
     public String setInitReason(String vname, long value){
-        return ", because " + setValue(vname, value);
+        return " because " + setValue(vname, value);
     }
 
     public String setInitReason(String vname, String value){
-        return ", because " + setValue(vname, value);
+        return " because " + setValue(vname, value);
     }
 
     public String setInitReason(String vname, boolean value){
-        return ", because " + setValue(vname, value);
+        return " because " + setValue(vname, value);
     }
 
     public String setInitReason(String vname, int upper, int lower){
-        return ", because " + vname + " is between " + Integer.toString(upper) + " and " + Integer.toString(lower);
+        return " because " + vname + " is between " + Integer.toString(upper) + " and " + Integer.toString(lower);
     }
 
     public String setSubReason(String vname, long value){
@@ -347,32 +366,32 @@ public class Job {
 	//JSON formatter
 	public String toJSON() {
 
-            int haveNext = Description.size();
-            int size = haveNext;
-            String Description_out = "";
-            for (String key: Description.keySet()){
-                Description_out += "\"" + key + "\" : \"" + Description.get(key) + "\"";
+        int haveNext = Description.size();
+        int size = haveNext;
+        String Description_out = "";
+        for (String key: Description.keySet()){
+            Description_out += "\"" + key + "\" : \"" + Description.get(key) + "\"";
 
-                haveNext -= 1;
-                if (haveNext != 0){
-                    Description_out += ", ";
-                }
+            haveNext -= 1;
+            if (haveNext != 0){
+                Description_out += ", ";
             }
-
-		return "{" +
-			"\"CoverageClass\":\"" + CoverageClass + "\"," +
-			"\"CoatingClass\":\"" + CoatingClass + "\"," +
-			"\"WeightClass\":\"" + WeightClass + "\"," +
-			"\"TargetSpeed\":" + TargetSpeed + "," +
-			"\"DryerPower\":\"" + DryerPower + "\"," +
+        }
+        return "{" +
+            "\"CoverageClass\":\"" + CoverageClass + "\"," +
+            "\"CoatingClass\":\"" + CoatingClass + "\"," +
+            "\"WeightClass\":\"" + WeightClass + "\"," +
+            "\"TargetSpeed\":" + TargetSpeed + "," +
+            "\"DryerPower\":\"" + DryerPower + "\"," +
             "\"DryerZone\":" + DryerZone + "," +
             "\"PrintZone\":" + PrintZone + "," +
             "\"Unwinder\":" + Unwinder_out + "," +
             "\"Rewinder\":" + Rewinder_out + "," +
-			"\"Primer\": " + primer + "," +
+            "\"Primer\": " + primer + "," +
             "\"BA\": " + BA + "," +
+            "\"Enhancer\": " + Enhancer + "," +
             "\"Description\": {" + Description_out + "}" +
-			"}";
+            "}";
 	}
 
 	//JSON formatter for Debugging

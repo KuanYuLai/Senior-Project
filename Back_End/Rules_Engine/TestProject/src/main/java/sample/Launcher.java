@@ -25,6 +25,13 @@ import org.json.simple.JSONArray;
 
 public class Launcher {
 
+    private static BufferedReader getFile(String url, String filename) throws Exception {
+        URL file = new URL(url + filename + ".yml");
+        URLConnection yc = file.openConnection();
+        BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
+        return in;
+    }
+
     public static String Cal(String args) throws Exception {
         System.out.println("== Starting Cal...");
       	// Read in values from provided JSON file
@@ -55,6 +62,7 @@ public class Launcher {
 
         String host_url = "http://ec2-35-163-184-27.us-west-2.compute.amazonaws.com:8080/rules/" + ruleclass + "/";
 
+        /*
         //Get rules file from server
         URL job_file = new URL(host_url + "job-rules.yml");
         URL BA_file = new URL(host_url + "BA-rule.yml");
@@ -78,7 +86,7 @@ public class Launcher {
         Rules BARule = ruleFactory.createRules(in_BA);
         Rules primerRule = ruleFactory.createRules(in_primer);
         Rules paperRule = ruleFactory.createRules(in_paper);
-
+        */
 
 
         // Create a default rules engine and fire rules on known racts
@@ -95,10 +103,12 @@ public class Launcher {
 
 
         Iterator it = ruleset.iterator();
+        /*
             while(it.hasNext()){
                 //System.out.println("== " + it.toString() + "\n");
                 switch(it.next().toString()){
                     case "BA-rule":
+                        Rules BARule = ruleFactory.createRules(getFile(host_url, "BA-rule"))
                         rulesEngine.fire(BARule, facts);
                         System.out.println("== BA-rule fired");
                         break;
@@ -118,6 +128,12 @@ public class Launcher {
                         System.out.println("== Unrecognized rule" + it.toString());
                 }
             }
+        */
+        Rules rule;
+        while(it.hasNext()){
+            rule = ruleFactory.createRules(getFile(host_url, it.next().toString()));
+            rulesEngine.fire(rule, facts);
+        }
 
         //Print out result
         System.out.println(job.toJSON());
