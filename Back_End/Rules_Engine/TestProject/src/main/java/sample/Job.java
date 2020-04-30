@@ -57,6 +57,11 @@ public class Job {
 		this.primer = null;
         this.Enhancer = null;
         this.ruleclass = ruleclass;
+
+        //Initiate Description
+        Description.put("Primer", "Not applicable for this ruleset");
+        Description.put("BA", "Not applicable for this ruleset");
+        Description.put("Enhancer", "Not applicable for this ruleset");
 	}
 
 	// Getters
