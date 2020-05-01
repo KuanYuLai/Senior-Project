@@ -31,8 +31,8 @@ export class JobResults extends Component {
 			spreadsheetWidth: 0,
 			ready: false,
 			error: false,
-			windowWidth: null,
-			windowHeight: null,
+			windowWidth: 1000,
+			windowHeight: 1000,
 		};
 	}
 
@@ -156,7 +156,7 @@ export class JobResults extends Component {
 			spreadsheetWidth,
 			exportData
 		} = this.state;
-		console.log("Window dimensions:     H: ", this.state.windowHeight, ",  W: ", this.state.windowWidth);
+
 		if (!ready)
 			return (
 				<Spin />

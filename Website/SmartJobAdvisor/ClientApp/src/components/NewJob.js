@@ -62,8 +62,8 @@ class NewJobForm extends Component {
 			fileList: [],
 			showSubmitModal: false,
 			formValues: null,
-			windowWidth: null,
-			windowHeight: null,
+			windowWidth: 1000,
+			windowHeight: 1000,
 		};
 	};
 

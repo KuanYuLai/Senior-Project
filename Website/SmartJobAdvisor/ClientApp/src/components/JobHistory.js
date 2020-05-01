@@ -215,8 +215,8 @@ class JobHistory extends Component {
 			generalCheckboxes: defaultGeneral,
 			inputCheckboxes: defaultInput,
 			outputCheckboxes: defaultOutput,
-			windowWidth: 0,
-			windowHeight: 0,
+			windowWidth: 1000,
+			windowHeight: 1000,
 			copied: false
 		};
 	}
