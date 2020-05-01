@@ -1,11 +1,11 @@
 ﻿import React, { Component } from 'react';
-import { Redirect } from 'react-router';
-import { Button, Checkbox, Form, Icon, Input, InputNumber, notification, Radio, Row, Col, Select, Slider } from 'antd';
+import { Button, Checkbox, Form, Icon, Input, InputNumber, notification, Radio, Row, Col, Select, Slider, Upload, Modal } from 'antd';
 import { instanceOf } from 'prop-types';
 import { withCookies, Cookies } from 'react-cookie';
 
 import Style from '../CSS/NewJob.module.css'
 import { ServerURL } from './Home';
+import { JobUpload } from './JobUpload.js';
 
 const { Option } = Select;
 
@@ -17,11 +17,10 @@ class BetterInputNumber extends Component {
 				<div className={Style.betterInputNumberDiv}>
 					<InputNumber
 						{...this.props}
-						className={Style.betterInputNumber}
+						style={{ verticalAlign: 'middle', borderBottomRightRadius: 0, borderTopRightRadius: 0, width: 60 }}
 						value={this.props.value}
 						onChange={(e) => this.props.onSliderChange(e, this.props.field)}
 					/>
-					{/* Can't use CSS here, since I need the className to be something else. */}
 					<div style={{ paddingTop: '2px', verticalAlign: 'middle', display: 'inline-table', lineHeight: '24px', height: '32px' }} className="ant-input-group-addon">{this.props.addonAfter}</div>
 				</div>
 			);
@@ -60,8 +59,11 @@ class NewJobForm extends Component {
 			weightgsm: null,
 			maxCoverage: maxC,
 			opticalDensity: oD,
-			jobCreated: false,
-			createdID: -1,
+			fileList: [],
+			showSubmitModal: false,
+			formValues: null,
+			windowWidth: null,
+			windowHeight: null,
 		};
 	};
 
@@ -81,6 +83,16 @@ class NewJobForm extends Component {
 				paperSubTypeRadio: this.getRadio(this.state.paperDatabase, "papersubtype"),
 				paperFinishRadio: this.getRadio(this.state.paperDatabase, "finish"),
 				prevPaperDropdown: this.getPrevPaperCookie()
+			});
+		}
+	}
+
+	/* Called when the window is resized. Gets window dimensions passed from App.js. */
+	componentDidUpdate(prevProps) {
+		if (prevProps.windowWidth !== this.props.windowWidth || prevProps.windowHeight !== this.props.windowHeight) {
+			this.setState({
+				windowWidth: this.props.windowWidth,
+				windowHeight: this.props.windowHeight
 			});
 		}
 	}
@@ -427,10 +439,10 @@ class NewJobForm extends Component {
 			for (let i = 0; i < vals.length; i++) {
 				var name =
 					vals[i].manufacturer + ' - ' +
-					vals[i].productname + ' | ' +
-					vals[i].papertype + ' | ' +
+					vals[i].productname  + ' | ' +
+					vals[i].papertype    + ' | ' +
 					vals[i].papersubtype + ' | ' +
-					vals[i].weightgsm + ' gsm | ' +
+					vals[i].weightgsm    + ' gsm | ' +
 					vals[i].finish;
 
 				dropdown.push(<Option key={i}>{name}</Option>);
@@ -447,12 +459,15 @@ class NewJobForm extends Component {
 		const { cookies } = this.props;
 
 		/* Set cookies for General Info section. */
-		cookies.set('jobName', values.jobName, { path: '/', maxAge: 31536000 });
 		cookies.set('ruleset', values.ruleset, { path: '/', maxAge: 31536000 });
 		cookies.set('qualityMode', values.qualityMode, { path: '/', maxAge: 31536000 });
 		cookies.set('pressUnwinderBrand', values.pressUnwinderBrand, { path: '/', maxAge: 31536000 });
-		cookies.set('maxCoverage', values.maxCoverage, { path: '/', maxAge: 31536000 });
 		cookies.set('opticalDensity', values.opticalDensity, { path: '/', maxAge: 31536000 });
+		/* Only set these cookies if a PDF was NOT uploaded. */
+		if (this.state.fileList.length === 0) {
+			cookies.set('jobName', values.jobName, { path: '/', maxAge: 31536000 });
+			cookies.set('maxCoverage', values.maxCoverage, { path: '/', maxAge: 31536000 });
+		}
 
 		/* Set cookie for recently-used papers in the Paper Selection section. This list will hold the
 		 * last five selected papers. When an item is chosen from the list, it is moved to the top. If
@@ -510,25 +525,32 @@ class NewJobForm extends Component {
 				/* Set cookies for next time. */
 				this.setCookies(values);
 
-				/* Call database to request paperDatabase object. */
-				await fetch(ServerURL + 'new-job/', {
-					method: 'POST',
-					mode: 'cors',
-					body: JSON.stringify(values),
-					headers: {
-						'Accept': 'application/json',
-						'Content-Type': 'application/json',
-					}
-				}).then(async (res) => {
-					await res.json().then((data) => {
-						this.setState({
-							createdID: data.id,
-							jobCreated: true
-						});
+				/* Open the modal for submitting files, only if files were added. */
+				if (this.state.fileList.length > 0) {
+					this.setState({ formValues: values }, () => {
+						this.setState({ showSubmitModal: true });
 					});
-				}).catch(() => {
-					this.fetchError("submit job");
-				});
+				} else {
+					/* Call database to post form data. */
+					await fetch(ServerURL + 'new-job/', {
+						method: 'POST',
+						mode: 'cors',
+						body: JSON.stringify(values),
+						headers: {
+							'Accept': 'application/json',
+							'Content-Type': 'application/json',
+						}
+					}).then(async (res) => {
+						await res.json().then((data) => {
+							this.setState({
+								createdID: data.id,
+								jobCreated: true
+							});
+						});
+					}).catch(() => {
+						this.fetchError("submit job");
+					});
+				}
 			}
 		});
 	};
@@ -555,15 +577,34 @@ class NewJobForm extends Component {
 		this.setState({ error: true });
 	}
 
+	/* Called when a PDF is uploaded. Updates list that will be passed to JobUpload componenet. */
+	handleFileUpload = info => {
+		let fileList = [...info.fileList];
+
+		/* Read from response and show file link. */
+		fileList = fileList.map(file => {
+			if (file.response)
+				file.url = file.response.url;
+
+			return file;
+		});
+
+		this.setState({ fileList });
+	};
+
 	render() {
+		/* Initialize cookies. */
+		const { cookies } = this.props;
 		const {
 			weightgsm,
 			maxCoverage,
 			opticalDensity,
 			paperNameMfrDisabled,
 			unknownPaper,
-			jobCreated,
-			createdID,
+			fileList,
+			showSubmitModal,
+			formValues,
+			windowWidth,
 		} = this.state;
 		const { getFieldDecorator } = this.props.form;
 
@@ -579,298 +620,339 @@ class NewJobForm extends Component {
 			},
 		}
 
-		/* Initialize cookies. */
-		const { cookies } = this.props;
+		/* Some props for the file upload: adds loading bar, forces PDF only,
+		 * allows multiple, sets function to call when file is uploaded. */
+		const uploadProps = {
+			onRemove: file => {
+				this.setState(state => {
+					const index = state.fileList.indexOf(file);
+					const newFileList = state.fileList.slice();
+					newFileList.splice(index, 1);
+					return {
+						fileList: newFileList,
+					};
+				});
+			},
+			beforeUpload: file => {
+				this.setState(state => ({
+					fileList: [...state.fileList, file],
+				}));
+				return false;
+			},
+			fileList,
+			multiple: true,
+			accept: ".pdf"
+		};
 
-		if (jobCreated) {
-			// Put a loading spinner here or something
-			console.log(createdID);
-
-			return <Redirect to={{ pathname: '/job-results', search: '?justifications=true?IDs=' + createdID }} />
-		}
-		else
-			return (
-				<div className={Style.newJobFormContainer}>
-					<h1>New Job</h1>
-					<br />
-					<Form layout="vertical" onSubmit={this.handleSubmit} className={Style.newJobForm}>
-						<div style={{ display: 'inline-block' }}>
-							<h5>
-								General Info
-								<Button className={Style.resetButton} onClick={() => this.infoReset()} type="default" >
-									<Icon style={{ position: 'relative', bottom: 3 }} type="undo" />
-									Reset
-								</Button>
-							</h5>
-						</div>
-						<Row gutter={20}>
-							<Col span={12}>
-								<Form.Item label="Job Name:" style={{ marginBottom: -5 }}>
-									{getFieldDecorator('jobName', {
-										rules: [{ required: true, message: 'Please input a job name' }],
-										initialValue: cookies.get('jobName') || "Setting Advice",
-									})(
-										<Input
-											className={Style.formItemInput}
-											prefix={<Icon type="edit" style={{ color: 'rgba(0,0,0,.25)' }} />}
-										/>,
-									)}
-								</Form.Item>
-							</Col>
-							<Col span={12}>
-								<Form.Item label="Ruleset:" style={{ marginBottom: -5 }}>
-									{getFieldDecorator('ruleset', {
-										rules: [{ required: true, message: 'Please choose a ruleset' }],
-										initialValue: cookies.get('ruleset') || "T24",
-									})(
-										<Select className={Style.formItemInput}>
-											<Option value="T24">T24</Option>
-											<Option value="T25">T25</Option>
-										</Select>
-									)}
-								</Form.Item>
-							</Col>
-						</Row>
-						<Row gutter={20}>
-							<Col span={12}>
-								<Form.Item label="Quality Mode:" style={{ marginBottom: -5 }}>
-									{getFieldDecorator('qualityMode', {
-										rules: [{ required: true }],
-										initialValue: cookies.get('qualityMode') || "Quality",
-									})(
-										<Radio.Group className={Style.formItemPaper}>
-											<Radio.Button value="Quality">Quality</Radio.Button>
-											<Radio.Button value="Performance">Performance</Radio.Button>
-										</Radio.Group>
-									)}
-								</Form.Item>
-							</Col>
-							<Col span={12}>
-								<Form.Item label="Press Unwinder Brand:" style={{ marginBottom: -5 }}>
-									{getFieldDecorator('pressUnwinderBrand', {
-										rules: [{ required: true }],
-										initialValue: cookies.get('pressUnwinderBrand') || "EMT",
-									})(
-										<Radio.Group className={Style.formItemPaper}>
-											<Radio.Button value="EMT">EMT</Radio.Button>
-											<Radio.Button value="HNK">HNK</Radio.Button>
-										</Radio.Group>
-									)}
-								</Form.Item>
-							</Col>
-						</Row>
-						<Form.Item style={{ marginBottom: -5 }} label="PDF Max Coverage:">
-							{getFieldDecorator('maxCoverage', {
-								rules: [{ required: true }],
-								initialValue: parseInt(cookies.get('maxCoverage')) || 50,
-							})(
-								<div style={{ display: 'flex', marginBottom: '-10px' }} >
-									<Slider
-										className={Style.formItemInput}
-										style={{ width: 'calc(100% - 152px)', marginRight: 15 }}
-										min={0}
-										max={100}
-										onChange={(e) => this.onSliderChange(e, "maxCoverage")}
-										value={maxCoverage}
-									/>
-									<BetterInputNumber
-										addonAfter="%"
-										value={maxCoverage}
-										field="maxCoverage"
-										onSliderChange={this.onSliderChange}
-									/>
-								</div>
-							)}
-						</Form.Item>
-						<Form.Item label="Optical Density:">
-							{getFieldDecorator('opticalDensity', {
-								rules: [{ required: true }],
-								initialValue: parseInt(cookies.get('opticalDensity')) || 100,
-							})(
-								<div style={{ display: 'flex', marginBottom: '-10px' }} >
-									<Slider
-										className={Style.formItemInput}
-										style={{ width: 'calc(100% - 152px)', marginRight: 15 }}
-										step={5}
-										min={0}
-										max={100}
-										onChange={(e) => this.onSliderChange(e, "opticalDensity")}
-										value={opticalDensity}
-									/>
-									<BetterInputNumber
-										addonAfter="%"
-										value={opticalDensity}
-										field="opticalDensity"
-										onSliderChange={this.onSliderChange}
-									/>
-								</div>
-							)}
-						</Form.Item>
-
-						<div style={{ display: 'inline-block', width: '100%' }}>
-							<h5>
-								Paper Selection
-								<Button className={Style.resetButton} onClick={() => this.paperReset()} type="default" >
-									<Icon style={{ position: 'relative', bottom: 3 }} type="undo" />
-									Reset
-								</Button>
-								<Checkbox
-									style={{ position: 'relative', bottom: 2, marginRight: 16, marginBottom: 10 }}
-									onChange={() => this.handleUnknownPaper()}
-									checked={unknownPaper}
-								>
-									Unknown Paper?
-								</Checkbox>
-								{!unknownPaper ?
-									<Select
-										className={Style.formItemPaper}
-										style={{ maxWidth: 175, postition: 'relative', bottom: 2 }}
-										onChange={(val) => this.handlePrevPaper(val)}
-										dropdownMatchSelectWidth={false}
-										placeholder="Recent papers"
-									>
-										{this.state.prevPaperDropdown}
-									</Select>
+		return (
+			<div className={Style.newJobFormContainer}>
+				<h1>New Job</h1>
+				<br />
+				<Form layout="vertical" onSubmit={this.handleSubmit} className={Style.newJobForm}>
+					<div style={{ display: 'inline-block' }}>
+						<h5>
+							General Info
+							<Button className={Style.resetButtonInfo} onClick={() => this.infoReset()} type="default" >
+								<Icon style={{ position: 'relative', bottom: 3 }} type="undo" />
+								{windowWidth >= 385 ?
+									<span>Reset</span>
 									:
 									null
 								}
-							</h5>
-						</div>
-						<Form.Item label="Mfr:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
-							{getFieldDecorator('manufacturer', {
-								rules: [{ required: !paperNameMfrDisabled, message: 'Please select a manufacturer' }],
-							})(
-								<Select
-									className={Style.formItemPaper}
-									style={{ maxWidth: 320 }}
-									disabled={paperNameMfrDisabled}
-									onChange={this.onPaperMfrChange}
-									showSearch
-									showArrow={false}
-									placeholder={ paperNameMfrDisabled === true ?
-										<span>Disabled</span>
-										:
-										<span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select manufacturer</span>
-									}
-								>
-									{this.state.paperMfrDropdown}
-								</Select>
-							)}
-						</Form.Item>
-						<Form.Item label="Name:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
-							{getFieldDecorator('productname', {
-								rules: [{ required: !paperNameMfrDisabled, message: 'Please select a paper' }],
-							})(
-								<Select
-									className={Style.formItemPaper}
-									style={{ maxWidth: 320 }}
-									disabled={paperNameMfrDisabled}
-									onChange={this.onPaperNameChange}
-									showSearch
-									showArrow={false}
-									placeholder={
-										paperNameMfrDisabled === true ? <span>Disabled</span>
-											: <span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select paper</span>
-									}
-								>
-									{this.state.paperNameDropdown}
-								</Select>
-							)}
-						</Form.Item>
-
-						<Form.Item label="Type:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
-							{getFieldDecorator('papertype', {
-								rules: [{ required: true, message: 'Please choose a paper type' }],
-							})(
-								<Radio.Group
-									className={Style.formItemPaper}
-									onChange={(e) => {
-										if (!paperNameMfrDisabled)
-											this.checkPaperMfrName(e, "papertype");
-									}}
-								>
-									{this.state.paperTypeRadio}
-								</Radio.Group>
-							)}
-						</Form.Item>
-						<Form.Item label="Sub-Type:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
-							{getFieldDecorator('papersubtype')(
-								<Radio.Group
-									className={Style.formItemPaper}
-									onChange={(e) => {
-										if (!paperNameMfrDisabled)
-											this.checkPaperMfrName(e, "papersubtype");
-									}}
-								>
-									{this.state.paperSubTypeRadio}
-								</Radio.Group>
-							)}
-						</Form.Item>
-						<Form.Item label="Weight:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
-							{getFieldDecorator('weightgsm', {
-								rules: [{ required: true, message: 'Please choose a weight in gsm' }],
-								initialValue: weightgsm || null
-							})(
-								unknownPaper ?
-									<div style={{ display: 'flex', marginBottom: '-20px' }} >
-										<Slider
-											className={Style.formItemInput}
-											style={{ width: 'calc(100% - 167px)', marginRight: 15 }}
-											min={0}
-											max={500}
-											value={weightgsm || 0}
-											onChange={(e) => this.onSliderChange(e, "weightgsm")}
-										/>
-										<BetterInputNumber
-											addonAfter="gsm"
-											value={weightgsm || null}
-											field="weightgsm"
-											onSliderChange={this.onSliderChange}
-										/>
-									</div>
-									:
-									<>
-										<Select
-											className={Style.formItemPaper}
-											style={{ maxWidth: 80 }}
-											showSearch
-											showArrow={false}
-											onChange={(e) => this.checkPaperMfrName(e, "weightgsm")}
-											placeholder={<span>Weight</span>}
-											value={weightgsm || undefined}
-										>
-											{this.state.paperWeightDropdown}
-										</Select>
-										<div className="ant-input-group-addon" style={{ position: 'relative', borderBottomLeftRadius: 2, borderTopLeftRadius: 2, bottom: 6, paddingTop: '2px', verticalAlign: 'middle', display: 'inline-table', lineHeight: '24px', height: '32px' }}>gsm</div>
-									</>
-							)}
-						</Form.Item>
-						<Form.Item label="Finish:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
-							{getFieldDecorator('finish', {
-								rules: [{ required: true, message: 'Please choose a finish' }],
-							})(
-								<Radio.Group
-									className={Style.formItemPaper}
-									onChange={(e) => {
-										if (!paperNameMfrDisabled)
-											this.checkPaperMfrName(e, "finish");
-									}}
-								>
-									{this.state.paperFinishRadio}
-								</Radio.Group>
-							)}
-						</Form.Item>
-
-						<br />
-
-						<div className={Style.formButtons}>
-							<Button type="primary" onClick={this.handleSubmit}>
-								Submit
 							</Button>
-						</div>
-					</Form>
-				</div>
-			);
+							<Upload {...uploadProps} fileList={fileList}>
+								<Button className={Style.uploadButton} style={{ marginLeft: -20 }} type="primary" ghost>
+									<Icon style={{ position: 'relative', bottom: 3 }} type="upload" />
+									{windowWidth >= 385 ?
+										<span>Upload PDFs</span>
+										:
+										<span>Upload</span>
+									}
+								</Button>
+							</Upload>
+						</h5>
+					</div>
+					<Row gutter={20}>
+						<Col span={12}>
+							<Form.Item label="Job Name:" style={{ marginBottom: -5 }}>
+								{getFieldDecorator('jobName', {
+									rules: [{ required: fileList.length === 0, message: 'Please input a job name' }],
+									initialValue: cookies.get('jobName') || "Setting Advice",
+								})(
+									<Input
+										className={Style.formItemInput}
+										prefix={<Icon type="edit" style={{ color: 'rgba(0,0,0,.25)' }} />}
+										disabled={fileList.length > 0}
+									/>,
+								)}
+							</Form.Item>
+						</Col>
+						<Col span={12}>
+							<Form.Item label="Ruleset:" style={{ marginBottom: -5 }}>
+								{getFieldDecorator('ruleset', {
+									rules: [{ required: true, message: 'Please choose a ruleset' }],
+									initialValue: cookies.get('ruleset') || "T24",
+								})(
+									<Select className={Style.formItemInput}>
+										<Option value="T24">T24</Option>
+										<Option value="T25">T25</Option>
+									</Select>
+								)}
+							</Form.Item>
+						</Col>
+					</Row>
+					<Row gutter={20}>
+						<Col span={12}>
+							<Form.Item label="Quality Mode:" style={{ marginBottom: -5 }}>
+								{getFieldDecorator('qualityMode', {
+									rules: [{ required: true }],
+									initialValue: cookies.get('qualityMode') || "Quality",
+								})(
+									<Radio.Group className={Style.formItemPaper}>
+										<Radio.Button value="Quality">Quality</Radio.Button>
+										<Radio.Button value="Performance">Performance</Radio.Button>
+									</Radio.Group>
+								)}
+							</Form.Item>
+						</Col>
+						<Col span={12}>
+							<Form.Item label="Press Unwinder Brand:" style={{ marginBottom: -5 }}>
+								{getFieldDecorator('pressUnwinderBrand', {
+									rules: [{ required: true }],
+									initialValue: cookies.get('pressUnwinderBrand') || "EMT",
+								})(
+									<Radio.Group className={Style.formItemPaper}>
+										<Radio.Button value="EMT">EMT</Radio.Button>
+										<Radio.Button value="HNK">HNK</Radio.Button>
+									</Radio.Group>
+								)}
+							</Form.Item>
+						</Col>
+					</Row>
+					<Form.Item style={{ marginBottom: -5 }} label="PDF Max Coverage:">
+						{getFieldDecorator('maxCoverage', {
+							rules: [{ required: fileList.length === 0 }],
+							initialValue: parseInt(cookies.get('maxCoverage')) || 50,
+						})(
+							<div style={{ display: 'flex', marginBottom: '-10px' }} >
+								<Slider
+									className={Style.formItemInput}
+									style={{ width: 'calc(100% - 122px)', marginRight: 15 }}
+									min={0}
+									max={100}
+									onChange={(e) => this.onSliderChange(e, "maxCoverage")}
+									value={maxCoverage}
+									disabled={fileList.length > 0}
+								/>
+								<BetterInputNumber
+									addonAfter="%"
+									value={maxCoverage}
+									field="maxCoverage"
+									onSliderChange={this.onSliderChange}
+									disabled={fileList.length > 0}
+								/>
+							</div>
+						)}
+					</Form.Item>
+					<Form.Item label="Optical Density:">
+						{getFieldDecorator('opticalDensity', {
+							rules: [{ required: true }],
+							initialValue: parseInt(cookies.get('opticalDensity')) || 100,
+						})(
+							<div style={{ display: 'flex', marginBottom: '-10px' }} >
+								<Slider
+									className={Style.formItemInput}
+									style={{ width: 'calc(100% - 122px)', marginRight: 15 }}
+									step={5}
+									min={0}
+									max={100}
+									onChange={(e) => this.onSliderChange(e, "opticalDensity")}
+									value={opticalDensity}
+								/>
+								<BetterInputNumber
+									addonAfter="%"
+									value={opticalDensity}
+									field="opticalDensity"
+									onSliderChange={this.onSliderChange}
+								/>
+							</div>
+						)}
+					</Form.Item>
+
+					<div style={{
+						display: 'inline-block', width: 'calc(100% + 1px)'}}>
+						<h5>
+							Paper Selection
+							<Button className={Style.resetButtonPaper} onClick={() => this.paperReset()} type="default" >
+								<Icon style={{ position: 'relative', bottom: 3 }} type="undo" />
+								Reset
+							</Button>
+							<Checkbox
+								style={{ position: 'relative', bottom: 2, marginRight: 16, marginBottom: 10 }}
+								onChange={() => this.handleUnknownPaper()}
+								checked={unknownPaper}
+							>
+								Unknown Paper?
+							</Checkbox>
+							{!unknownPaper ?
+								<Select
+									className={Style.formItemPaper}
+									style={{ maxWidth: 178, postition: 'relative', bottom: 2 }}
+									onChange={(val) => this.handlePrevPaper(val)}
+									dropdownMatchSelectWidth={false}
+									placeholder="Recent papers"
+								>
+									{this.state.prevPaperDropdown}
+								</Select>
+								:
+								null
+							}
+						</h5>
+					</div>
+					<Form.Item label="Mfr:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						{getFieldDecorator('manufacturer', {
+							rules: [{ required: !paperNameMfrDisabled, message: 'Please select a manufacturer' }],
+						})(
+							<Select
+								className={Style.formItemPaper}
+								style={{ maxWidth: 320 }}
+								disabled={paperNameMfrDisabled}
+								onChange={this.onPaperMfrChange}
+								showSearch
+								showArrow={false}
+								placeholder={ paperNameMfrDisabled === true ?
+									<span>Disabled</span>
+									:
+									<span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select manufacturer</span>
+								}
+							>
+								{this.state.paperMfrDropdown}
+							</Select>
+						)}
+					</Form.Item>
+					<Form.Item label="Name:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						{getFieldDecorator('productname', {
+							rules: [{ required: !paperNameMfrDisabled, message: 'Please select a paper' }],
+						})(
+							<Select
+								className={Style.formItemPaper}
+								style={{ maxWidth: 320 }}
+								disabled={paperNameMfrDisabled}
+								onChange={this.onPaperNameChange}
+								showSearch
+								showArrow={false}
+								placeholder={
+									paperNameMfrDisabled === true ? <span>Disabled</span>
+										: <span><Icon type="search" className={Style.iconAdjust} />&nbsp;Select paper</span>
+								}
+							>
+								{this.state.paperNameDropdown}
+							</Select>
+						)}
+					</Form.Item>
+
+					<Form.Item label="Type:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						{getFieldDecorator('papertype', {
+							rules: [{ required: true, message: 'Please choose a paper type' }],
+						})(
+							<Radio.Group
+								className={Style.formItemPaper}
+								onChange={(e) => {
+									if (!paperNameMfrDisabled)
+										this.checkPaperMfrName(e, "papertype");
+								}}
+							>
+								{this.state.paperTypeRadio}
+							</Radio.Group>
+						)}
+					</Form.Item>
+					<Form.Item label="Sub-Type:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						{getFieldDecorator('papersubtype')(
+							<Radio.Group
+								className={Style.formItemPaper}
+								onChange={(e) => {
+									if (!paperNameMfrDisabled)
+										this.checkPaperMfrName(e, "papersubtype");
+								}}
+							>
+								{this.state.paperSubTypeRadio}
+							</Radio.Group>
+						)}
+					</Form.Item>
+					<Form.Item label="Weight:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						{getFieldDecorator('weightgsm', {
+							rules: [{ required: true, message: 'Please choose a weight in gsm' }],
+							initialValue: weightgsm || null
+						})(
+							unknownPaper ?
+								<div style={{ display: 'flex', marginBottom: '-20px' }} >
+									<Slider
+										className={Style.formItemInput}
+										style={{ width: 'calc(100% - 167px)', marginRight: 15 }}
+										min={0}
+										max={500}
+										value={weightgsm || 0}
+										onChange={(e) => this.onSliderChange(e, "weightgsm")}
+									/>
+									<BetterInputNumber
+										addonAfter="gsm"
+										value={weightgsm || null}
+										field="weightgsm"
+										onSliderChange={this.onSliderChange}
+									/>
+								</div>
+								:
+								<>
+									<Select
+										className={Style.formItemPaper}
+										style={{ maxWidth: 80 }}
+										showSearch
+										showArrow={false}
+										onChange={(e) => this.checkPaperMfrName(e, "weightgsm")}
+										placeholder={<span>Weight</span>}
+										value={weightgsm || undefined}
+									>
+										{this.state.paperWeightDropdown}
+									</Select>
+									<div className="ant-input-group-addon" style={{ position: 'relative', borderBottomLeftRadius: 2, borderTopLeftRadius: 2, bottom: 6, paddingTop: '2px', verticalAlign: 'middle', display: 'inline-table', lineHeight: '24px', height: '32px' }}>gsm</div>
+								</>
+						)}
+					</Form.Item>
+					<Form.Item label="Finish:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						{getFieldDecorator('finish', {
+							rules: [{ required: true, message: 'Please choose a finish' }],
+						})(
+							<Radio.Group
+								className={Style.formItemPaper}
+								onChange={(e) => {
+									if (!paperNameMfrDisabled)
+										this.checkPaperMfrName(e, "finish");
+								}}
+							>
+								{this.state.paperFinishRadio}
+							</Radio.Group>
+						)}
+					</Form.Item>
+
+					<br />
+
+					<div className={Style.formButtons}>
+						<Button type="primary" onClick={this.handleSubmit}>
+							Submit
+						</Button>
+					</div>
+				</Form>
+
+				{/* Modal for show progress of PDF submission. */}
+				{showSubmitModal === true ?
+					<Modal title="Uploading Job(s)" visible={showSubmitModal} footer={null}>
+						<JobUpload fileList={fileList} formValues={formValues} />
+					</Modal>
+					:
+					null
+				}
+			</div>
+		);
 	}
 }
 

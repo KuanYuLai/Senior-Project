@@ -203,6 +203,7 @@ class JobHistory extends Component {
 		/* Set some state values so that the states exist and don't cause an error when referenced. */
 		this.state = {
 			selectedRowKeys: [],
+			selectedRowKeysHolder: [],
 			currentJobID: -1,
 			spreadsheetModalVisible: false,
 			spreadsheetModal: null,
@@ -218,8 +219,6 @@ class JobHistory extends Component {
 			windowHeight: 0,
 			copied: false
 		};
-
-		this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
 	}
 
 	/* Called immediately after the constructor. Allows page to render with empty values before data is added to avoid a crash. */
@@ -232,21 +231,6 @@ class JobHistory extends Component {
 			await this.buildTableColumns();
 			await this.buildTable();
 		}
-
-		/* Add event listener for window resize. Helps with table formatting on small screens. */
-		this.updateWindowDimensions();
-		window.addEventListener('resize', this.updateWindowDimensions);
-	}
-
-	/* Called when the component is unmounted. Removes the event listener. */
-	componentWillUnmount = () => {
-		window.removeEventListener('resize', this.updateWindowDimensions);
-	}
-
-	/* Gets window dimensions. */
-	updateWindowDimensions = () => {
-		this.setState({ windowWidth: window.innerWidth, windowHeight: window.innerHeight });
-		this.buildTableColumns();
 	}
 
 	/* Calls the database to request job history. */
@@ -437,7 +421,7 @@ class JobHistory extends Component {
 		const { selectedColumns, jobHistory, windowWidth } = this.state;
 
 		var tempCol = [];
-		var tempWidth = 800;
+		var tempWidth = 850;
 
 		/* Add base columns that cannot be removed. */
 		tempCol.push(
@@ -452,13 +436,14 @@ class JobHistory extends Component {
 			{
 				title: 'Date',
 				dataIndex: 'jobTime',
-				width: 225,
+				width: 275,
 				sorter: (a, b) => moment(a.jobTime).unix() - moment(b.jobTime).unix(),
 				defaultSortOrder: 'descend',
 			},
 			{
 				title: 'Job Name',
 				dataIndex: 'jobName',
+				ellipsis: true,
 				sorter: (a, b) => { return a.jobName.localeCompare(b.jobName) },
 			},
 		);
@@ -507,7 +492,17 @@ class JobHistory extends Component {
 		tempCol.push(
 			{
 				title: 'View',
-				render: (text, row) => <Button className={windowWidth < 350 ? null : Style.resultsColumn} onClick={() => { setTimeout(() => { this.compareJobs([row.jobID]) }, 100) }}><Icon className={Style.buttonIcon} type="search" /></Button>,
+				render: (text, row) =>
+					<Button
+						className={windowWidth < 350 ? null : Style.resultsColumn}
+						onClick={() => {
+							setTimeout(() => {
+								this.setState({ selectedRowKeys: [] });
+								this.compareJobs([row.jobID]);
+							}, 100);
+						}}
+					>
+					<Icon className={Style.buttonIcon} type="search" /></Button>,
 				width: 65,
 				fixed: 'right'
 			},
@@ -642,6 +637,7 @@ class JobHistory extends Component {
 			</>;
 
 		this.setState({
+			selectedRowKeysHolder: keys,
 			spreadsheetWidth: spreadExportData[2],
 			spreadsheetModal: modalInnards,
 			currentJobID: keys.length === 1 ? keys[0] : null
@@ -657,7 +653,7 @@ class JobHistory extends Component {
 
 		await this.setState({ justifications: !this.state.justifications });
 
-		setTimeout(() => { this.compareJobs(this.state.selectedRowKeys); this.forceUpdate(); }, 300);
+		setTimeout(() => { this.compareJobs(this.state.selectedRowKeysHolder); this.forceUpdate(); }, 300);
 	}
 
 	render() {

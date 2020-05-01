@@ -32,6 +32,20 @@ export default class App extends Component {
 		} else {
 			this.setState({ currentPage: 'home' });
 		}
+
+		/* Add event listener for window resize. Helps with table formatting on small screens. */
+		this.updateWindowDimensions();
+		window.addEventListener('resize', this.updateWindowDimensions);
+	}
+
+	/* Called when the component is unmounted. Removes the event listener. */
+	componentWillUnmount = () => {
+		window.removeEventListener('resize', this.updateWindowDimensions);
+	}
+
+	/* Gets window dimensions. */
+	updateWindowDimensions = () => {
+		this.setState({ windowWidth: window.innerWidth, windowHeight: window.innerHeight });
 	}
 
 	handleMenuClick = (page) => {
@@ -77,10 +91,10 @@ export default class App extends Component {
 					<Content style={{ height: 'calc(100vh - 48px)' }}>
 						<div className={Style.mainContent}>
 							<Switch>
-								<Route exact path='/' render={(props) => <Home {...props} callback={this.handleMenuClick} />} />
-								<Route exact path='/new-job' render={(props) => <NewJob {...props} />} />
-								<Route exact path='/job-history' render={(props) => <JobHistory {...props} />} />
-								<Route path='/job-results' component={JobResults} />
+								<Route exact path='/' render={(props) => <Home {...props} callback={this.handleMenuClick} windowWidth={this.state.windowWidth} windowHeight={this.state.windowHeight} />} />
+								<Route exact path='/new-job' render={(props) => <NewJob {...props} windowWidth={this.state.windowWidth} windowHeight={this.state.windowHeight} />} />
+								<Route exact path='/job-history' render={(props) => <JobHistory {...props} windowWidth={this.state.windowWidth} windowHeight={this.state.windowHeight} />} />
+								<Route path='/job-results' component={JobResults} windowWidth={this.state.windowWidth} windowHeight={this.state.windowHeight} />
 							</Switch>
 						</div>
 					</Content>

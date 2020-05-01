@@ -30,7 +30,9 @@ export class JobResults extends Component {
 			justifications: justifications,
 			spreadsheetWidth: 0,
 			ready: false,
-			error: false
+			error: false,
+			windowWidth: null,
+			windowHeight: null,
 		};
 	}
 
@@ -42,6 +44,16 @@ export class JobResults extends Component {
 			await this.fetchJob(jobIDs[i]);
 
 		this.generateData();
+	}
+
+	/* Called when the window is resized. Gets window dimensions passed from App.js. */
+	componentDidUpdate(prevProps) {
+		if (prevProps.windowWidth !== this.props.windowWidth || prevProps.windowHeight !== this.props.windowHeight) {
+			this.setState({
+				windowWidth: this.props.windowWidth,
+				windowHeight: this.props.windowHeight
+			});
+		}
 	}
 
 	/* Calls the database to request job history. */
@@ -144,7 +156,7 @@ export class JobResults extends Component {
 			spreadsheetWidth,
 			exportData
 		} = this.state;
-
+		console.log("Window dimensions:     H: ", this.state.windowHeight, ",  W: ", this.state.windowWidth);
 		if (!ready)
 			return (
 				<Spin />
@@ -166,7 +178,7 @@ export class JobResults extends Component {
 						</Button>
 					</CSVLink>
 					<CopyToClipboard text={copyURL}>
-						<Tooltip placement="top" trigger="focus" title="Copied!">
+						<Tooltip placement="top" trigger="click" title="Copied!">
 							<Button
 								type="default"
 								style={{ marginBottom: 10, paddingLeft: 10, paddingRight: 10 }}

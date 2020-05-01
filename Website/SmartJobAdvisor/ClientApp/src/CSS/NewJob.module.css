@@ -6,15 +6,14 @@
 
 @media only screen and (max-width: 575px) {
 	.newJobFormContainer {
-		max-width: 98%;
+		max-width: 99%;
 	}
 }
 
-.betterInputNumber {
-	vertical-align: middle;
-	border-bottom-right-radius: 0;
-	border-top-right-radius: 0;
-	width: 60px;
+@media only screen and (max-width: 350px) {
+	.newJobFormContainer {
+		max-width: 98%;
+	}
 }
 
 .betterInputNumberLabel {
@@ -59,12 +58,38 @@
 	bottom: 3px;
 }
 
-.resetButton {
+.resetButtonInfo {
 	position: relative;
 	left: 20px;
 	bottom: 2px;
 	margin-bottom: 5px;
 	margin-right: 40px;
+}
+
+.resetButtonPaper {
+	position: relative;
+	left: 20px;
+	bottom: 2px;
+	margin-bottom: 5px;
+	margin-right: 40px;
+}
+
+.uploadButton {
+	position: relative;
+	left: 20px;
+	bottom: 2px;
+	margin-bottom: 5px;
+	margin-left: 0px;
+}
+
+@media only screen and (max-width: 405px) {
+	.resetButtonInfo {
+		margin-left: -10px;
+		margin-right: 0px;
+	}
+	.uploadButton {
+		left: 50px;
+	}
 }
 
 .formButtons {
