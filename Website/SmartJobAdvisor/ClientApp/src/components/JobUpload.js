@@ -77,12 +77,11 @@ export class JobUpload extends Component {
 		const { fileList, fileStatus, fileCoverage } = this.state;
 
 		const formData = new FormData();
-		formData.append('file', fileList[index]);
+		formData.append('pdf', fileList[index]);
 
 		await fetch(ServerURL + 'upload/', {
 			method: 'POST',
 			mode: 'cors',
-			name: 'pdf',
 			body: formData,
 		}).then(async (res) => {
 			await res.json().then((data) => {
