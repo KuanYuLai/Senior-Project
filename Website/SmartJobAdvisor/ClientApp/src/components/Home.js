@@ -30,6 +30,7 @@ export class Home extends Component {
 						alt="Smart Job Advisor"
 					/>
 				)} />
+				<h1>Smart Job Advisor</h1>
 				<br />
 				<h3>What would you like to do?</h3>
 
