@@ -783,6 +783,7 @@ class NewJobForm extends Component {
 										value={opticalDensity}
 									/>
 									<BetterInputNumber
+										step={5}
 										addonAfter="%"
 										value={opticalDensity}
 										field="opticalDensity"
