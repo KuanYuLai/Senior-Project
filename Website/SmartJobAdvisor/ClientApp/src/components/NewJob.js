@@ -290,9 +290,16 @@ class NewJobForm extends Component {
 	onSliderChange = (val, field) => {
 		const { setFieldsValue } = this.props.form;
 
-		/* Set a minimum value, but only for opticalDensity slider. */
-		if (val < 50 && field === "opticalDensity")
+		/* Check to ensure it's a number, not a string. Thanks for catching this one Trey. */
+		if (typeof val !== 'number')
 			val = 50;
+		else {
+			/* Set a minimum value, but only for opticalDensity slider. */
+			if (val < 50 && field === "opticalDensity")
+				val = 50;
+			else if (val < 1 && field === "maxCoverage")
+				val = 1;
+		}
 
 		/* Apply the value to both the form and state. */
 		setFieldsValue({ [field]: val });
