@@ -1,0 +1,24 @@
+name: "BA-rule-true"
+description: "Determines whether or not to apply the bonding agent."
+priority: 5
+condition: "!(job.getpaperType().contains('Uncoated') && job.getCoatingClass() == 'Inkjet Treated Surface') || (job.getpaperType().contains('Coated') && (job.getCoatingClass() == 'Closed Surface' || job.getCoatingClass() == 'Inkjet Treated Surface'))"
+actions:
+  - "job.setBA(true);"
+  - "job.setDescription('BA', job.setValue('BA', true) + job.setInitReason('paper type', job.getpaperType()) + job.setSubReason('Coating Class', job.getCoatingClass()));"
+---
+name: "BA-rule-false-1"
+description: "Determines whether or not to apply the bonding agent."
+priority: 5
+condition: "job.getpaperType().contains('Uncoated') && job.getCoatingClass() != 'Inkjet Treated Surface'"
+actions:
+  - "job.setBA(false);"
+  - "job.setDescription('BA', job.setValue('BA', false) + job.setInitReason('paper type', job.getpaperType()) + job.setEndReason('Coating Class', job.getCoatingClass()));"
+---
+name: "BA-rule-false-2"
+description: "Determines whether or not to apply the bonding agent."
+priority: 5
+condition: "!(job.getpaperType().contains('Coated') && (job.getCoatingClass() != 'Closed Surface' || job.getCoatingClass() != 'Inkjet Treated Surface'))"
+actions:
+  - "job.setBA(false);"
+  - "job.setDescription('BA', job.setValue('BA', false) + job.setInitReason('paper type', job.getpaperType()) + job.setEndReason('Coating Class', job.getCoatingClass()));"
+
