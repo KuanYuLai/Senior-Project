@@ -1,5 +1,5 @@
 ﻿import React, { Component, Fragment } from 'react';
-import { Button, Checkbox, Icon, Modal, notification, Table, Tooltip, Row, Col } from 'antd';
+import { Button, Checkbox, Icon, Modal, notification, Popconfirm, Table, Tooltip, Row, Col } from 'antd';
 import { instanceOf } from 'prop-types';
 import { withCookies, Cookies } from 'react-cookie';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -58,7 +58,6 @@ export const BuildSpreadsheet = function (keys, jobHistory, justifications) {
 
 	/* Runs through the list of all keys (except jobID), making a row for each. */
 	for (let j = 0; j < keyList.length; j++) {
-
 		if (keyList[j] !== 'input' && keyList[j] !== 'output') {
 			spreadsheetTemp.push({ value: keyList[j], width: 150, readOnly: true });
 			exportTemp.push(keyList[j]);
@@ -236,7 +235,7 @@ class JobHistory extends Component {
 	/* Calls the database to request job history. */
 	fetchHistory = async () => {
 		await fetch(ServerURL + "job-history", {
-			method: "GET",
+			method: 'GET',
 			mode: 'cors',
 			headers: {
 				'Accept': 'application/json',
@@ -247,6 +246,25 @@ class JobHistory extends Component {
 			});
 		}).catch(err => {
 			this.fetchError("fetch job history");
+		});
+	}
+
+	/* Deletes currently selected jobs from the Job History file. */
+	deleteHistory = async (keys) => {
+		await fetch(ServerURL + "job-history/remove/" + keys, {
+			method: 'POST',
+			mode: 'cors',
+			headers: {
+				'Accept': 'application/json',
+			}
+		}).then(async (res) => {
+			await res.jons().then((data) => {
+				console.log(res);
+				this.setState({ selectedRowKeys: [] })
+				//this.forceUpdate();
+			});
+		}).catch(err => {
+			this.fetchError("delete from job history");
 		});
 	}
 
@@ -755,12 +773,20 @@ class JobHistory extends Component {
 							<Button
 								className={Style.tableButton}
 								onClick={() => this.setState({ selectedRowKeys: [] })}
-								type="danger"
-								ghost
+								type="default"
 							>
 								<Icon className={Style.buttonIcon} type="undo" />
-								Clear
+								Deselect
 							</Button>
+							<Popconfirm
+								title="Are you sure you want to delete the job(s)?"
+								onConfirm={() => this.deleteHistory(selectedRowKeys)}
+							>
+								<Button className={Style.tableButton} type="danger" >
+									<Icon className={Style.buttonIcon} type="delete" />
+									Delete
+								</Button>
+							</Popconfirm>
 							<span>{selectedRowKeys.length} selected</span>
 						</>
 						:

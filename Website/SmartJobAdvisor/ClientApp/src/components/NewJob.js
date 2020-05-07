@@ -1,12 +1,28 @@
 ﻿import React, { Component } from 'react';
 import { Redirect } from 'react-router';
-import { Button, Checkbox, Form, Icon, Input, InputNumber, notification, Radio, Row, Col, Select, Slider, Upload, Modal } from 'antd';
+import { Button, Checkbox, Form, Icon, Input, InputNumber, notification, Popover, Radio, Row, Col, Select, Slider, Upload, Modal } from 'antd';
 import { instanceOf } from 'prop-types';
 import { withCookies, Cookies } from 'react-cookie';
 
 import Style from '../CSS/NewJob.module.css'
 import { ServerURL } from './Home';
-import { JobUpload } from './JobUpload.js';
+import { JobUpload } from './JobUpload';
+
+/* Import all text for info buttons. */
+import {
+	jobNameInfo,
+	rulesetInfo,
+	qualityModeInfo,
+	pressUnwinderBrandInfo,
+	maxCoverageInfo,
+	opticalDensityInfo,
+	paperMfrInfo,
+	paperNameInfo,
+	paperTypeInfo,
+	paperSubTypeInfo,
+	paperWeightInfo,
+	paperFinishInfo
+} from './NewJobInfo';
 
 const { Option } = Select;
 
@@ -622,11 +638,11 @@ class NewJobForm extends Component {
 		const paperFormItemLayout = {
 			labelCol: {
 				xs: { span: 24 },
-				sm: { span: 4 },
+				sm: { span: 5 },
 			},
 			wrapperCol: {
 				xs: { span: 24 },
-				sm: { span: 20 },
+				sm: { span: 19 },
 			},
 		}
 
@@ -687,7 +703,17 @@ class NewJobForm extends Component {
 						</div>
 						<Row gutter={20}>
 							<Col span={12}>
-								<Form.Item label="Job Name:" style={{ marginBottom: -5 }}>
+								<Form.Item
+									style={{ marginBottom: -5 }}
+									label={
+										<>
+											<span>Job Name:</span>
+											<Popover content={jobNameInfo} title="Job Name" placement="bottom">
+												<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 8, bottom: -2 }} type="info-circle" />
+											</Popover>
+										</>
+									}
+								>
 									{getFieldDecorator('jobName', {
 										rules: [{ required: fileList.length === 0, message: 'Please input a job name' }],
 										initialValue: cookies.get('jobName') || "Setting Advice",
@@ -701,7 +727,17 @@ class NewJobForm extends Component {
 								</Form.Item>
 							</Col>
 							<Col span={12}>
-								<Form.Item label="Ruleset:" style={{ marginBottom: -5 }}>
+								<Form.Item
+									style={{ marginBottom: -5 }}
+									label={
+										<>
+											<span>Ruleset:</span>
+											<Popover content={rulesetInfo} title="Ruleset" placement="bottom">
+												<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 8, bottom: -2 }} type="info-circle" />
+											</Popover>
+										</>
+									}
+								>
 									{getFieldDecorator('ruleset', {
 										rules: [{ required: true, message: 'Please choose a ruleset' }],
 										initialValue: cookies.get('ruleset') || "T24",
@@ -716,7 +752,17 @@ class NewJobForm extends Component {
 						</Row>
 						<Row gutter={20}>
 							<Col span={12}>
-								<Form.Item label="Quality Mode:" style={{ marginBottom: -5 }}>
+								<Form.Item
+									style={{ marginBottom: -5 }}
+									label={
+										<>
+											<span>Quality Mode:</span>
+											<Popover content={qualityModeInfo} title="Quality Mode" placement="bottom">
+												<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 8, bottom: -2 }} type="info-circle" />
+											</Popover>
+										</>
+									}
+								>
 									{getFieldDecorator('qualityMode', {
 										rules: [{ required: true }],
 										initialValue: cookies.get('qualityMode') || "Quality",
@@ -729,7 +775,17 @@ class NewJobForm extends Component {
 								</Form.Item>
 							</Col>
 							<Col span={12}>
-								<Form.Item label="Press Unwinder Brand:" style={{ marginBottom: -5 }}>
+								<Form.Item
+									style={{ marginBottom: -5 }}
+									label={
+										<>
+											<span>Press Unwinder Brand:</span>
+											<Popover content={pressUnwinderBrandInfo} title="Press Unwinder Brand" placement="bottom">
+												<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 8, bottom: -2 }} type="info-circle" />
+											</Popover>
+										</>
+									}
+								>
 									{getFieldDecorator('pressUnwinderBrand', {
 										rules: [{ required: true }],
 										initialValue: cookies.get('pressUnwinderBrand') || "EMT",
@@ -742,7 +798,17 @@ class NewJobForm extends Component {
 								</Form.Item>
 							</Col>
 						</Row>
-						<Form.Item style={{ marginBottom: -5 }} label="PDF Max Coverage:">
+						<Form.Item
+							style={{ marginBottom: -5 }}
+							label={
+								<>
+									<span>PDF Max Coverage:</span>
+									<Popover content={maxCoverageInfo} title="PDF Max Coverage" placement="bottom">
+										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 8, bottom: -2 }} type="info-circle" />
+									</Popover>
+								</>
+							}
+						>
 							{getFieldDecorator('maxCoverage', {
 								rules: [{ required: fileList.length === 0 }],
 								initialValue: parseInt(cookies.get('maxCoverage')) || 50,
@@ -767,7 +833,16 @@ class NewJobForm extends Component {
 								</div>
 							)}
 						</Form.Item>
-						<Form.Item label="Optical Density:">
+						<Form.Item
+							label={
+								<>
+									<span>Optical Density:</span>
+									<Popover content={opticalDensityInfo} title="Optical Density" placement="bottom">
+										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 8, bottom: -2 }} type="info-circle" />
+									</Popover>
+								</>
+							}
+						>
 							{getFieldDecorator('opticalDensity', {
 								rules: [{ required: true }],
 								initialValue: parseInt(cookies.get('opticalDensity')) || 100,
@@ -823,7 +898,18 @@ class NewJobForm extends Component {
 								}
 							</h5>
 						</div>
-						<Form.Item label="Mfr:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						<Form.Item
+							{...paperFormItemLayout}
+							style={{ marginBottom: 0 }}
+							label={
+								<>
+									<span>Mfr:</span>
+									<Popover content={paperMfrInfo} title="Manufacturer" placement="bottom">
+										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 37, bottom: -2 }} type="info-circle" />
+									</Popover>
+								</>
+							}
+						>
 							{getFieldDecorator('manufacturer', {
 								rules: [{ required: !paperNameMfrDisabled, message: 'Please select a manufacturer' }],
 							})(
@@ -844,7 +930,18 @@ class NewJobForm extends Component {
 								</Select>
 							)}
 						</Form.Item>
-						<Form.Item label="Name:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						<Form.Item
+							{...paperFormItemLayout}
+							style={{ marginBottom: 0 }}
+							label={
+								<>
+									<span>Name:</span>
+									<Popover content={paperNameInfo} title="Product Name" placement="bottom">
+										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 22, bottom: -2 }} type="info-circle" />
+									</Popover>
+								</>
+							}
+						>
 							{getFieldDecorator('productname', {
 								rules: [{ required: !paperNameMfrDisabled, message: 'Please select a paper' }],
 							})(
@@ -865,7 +962,18 @@ class NewJobForm extends Component {
 							)}
 						</Form.Item>
 
-						<Form.Item label="Type:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						<Form.Item
+							{...paperFormItemLayout}
+							style={{ marginBottom: 0 }}
+							label={
+								<>
+									<span>Type:</span>
+									<Popover content={paperTypeInfo} title="Paper Type" placement="bottom">
+										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 30, bottom: -2 }} type="info-circle" />
+									</Popover>
+								</>
+							}
+						>
 							{getFieldDecorator('papertype', {
 								rules: [{ required: true, message: 'Please choose a paper type' }],
 							})(
@@ -880,7 +988,18 @@ class NewJobForm extends Component {
 								</Radio.Group>
 							)}
 						</Form.Item>
-						<Form.Item label="Sub-Type:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						<Form.Item
+							{...paperFormItemLayout}
+							style={{ marginBottom: 0 }}
+							label={
+								<>
+									<span>Sub-Type:</span>
+									<Popover content={paperSubTypeInfo} title="Paper Sub-Type" placement="bottom">
+										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 12, bottom: -2 }} type="info-circle" />
+									</Popover>
+								</>
+							}
+						>
 							{getFieldDecorator('papersubtype')(
 								<Radio.Group
 									className={Style.formItemPaper}
@@ -893,7 +1012,18 @@ class NewJobForm extends Component {
 								</Radio.Group>
 							)}
 						</Form.Item>
-						<Form.Item label="Weight:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						<Form.Item
+							{...paperFormItemLayout}
+							style={{ marginBottom: 0 }}
+							label={
+								<>
+									<span>Weight:</span>
+									<Popover content={paperWeightInfo} title="Paper Weight" placement="bottom">
+										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 15, bottom: -2 }} type="info-circle" />
+									</Popover>
+								</>
+							}
+						>
 							{getFieldDecorator('weightgsm', {
 								rules: [{ required: true, message: 'Please choose a weight in gsm' }],
 								initialValue: weightgsm || null
@@ -932,7 +1062,18 @@ class NewJobForm extends Component {
 									</>
 							)}
 						</Form.Item>
-						<Form.Item label="Finish:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						<Form.Item
+							{...paperFormItemLayout}
+							style={{ marginBottom: 0 }}
+							label={
+								<>
+									<span>Finish:</span>
+									<Popover content={paperFinishInfo} title="Paper Finish" placement="bottom">
+										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 24, bottom: -2 }} type="info-circle" />
+									</Popover>
+								</>
+							}
+						>
 							{getFieldDecorator('finish', {
 								rules: [{ required: true, message: 'Please choose a finish' }],
 							})(

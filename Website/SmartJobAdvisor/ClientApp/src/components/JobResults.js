@@ -29,6 +29,7 @@ export class JobResults extends Component {
 			jobResults: [],
 			justifications: justifications,
 			spreadsheetWidth: 0,
+			showSpreadsheet: false,
 			ready: false,
 			error: false,
 			windowWidth: 1000,
@@ -131,6 +132,7 @@ export class JobResults extends Component {
 				spreadsheetData: data[0],
 				exportData: data[1],
 				spreadsheetWidth: data[2],
+				showSpreadsheet: true,
 				copyURL: copyURL,
 				ready: true,
 				fileName: fileName
@@ -140,9 +142,12 @@ export class JobResults extends Component {
 
 	/* Triggered when checkbox is clicked. Toggles justification column. */
 	handleJustifications = async () => {
-		await this.setState({ justifications: !this.state.justifications });
+		await this.setState({
+			showSpreadsheet: false,
+			justifications: !this.state.justifications
+		});
 
-		setTimeout(() => { this.generateData(); this.forceUpdate(); }, 50);
+		await this.generateData();
 	}
 
 	render() {
@@ -153,6 +158,7 @@ export class JobResults extends Component {
 			copyURL,
 			fileName,
 			spreadsheetData,
+			showSpreadsheet,
 			spreadsheetWidth,
 			exportData
 		} = this.state;
@@ -195,15 +201,20 @@ export class JobResults extends Component {
 					>
 						Justifications?
 					</Checkbox>
-					<div style={{ width: spreadsheetWidth, maxWidth: '100%', overflowX: 'scroll' }}>
-						<div style={{ width: spreadsheetWidth }}>
-							<ReactDataSheet
-								data={spreadsheetData}
-								valueRenderer={(cell) => <div style={{ textAlign: 'center' }}>{cell.value}</div>}
-								onChange={() => { }}
-							/>
+					{showSpreadsheet ? 
+						<div style={{ width: spreadsheetWidth, maxWidth: '100%', overflowX: 'scroll' }}>
+							<div style={{ width: spreadsheetWidth }}>
+								<ReactDataSheet
+									data={spreadsheetData}
+									valueRenderer={(cell) => <div style={{ textAlign: 'center' }}>{cell.value}</div>}
+									onChange={() => { }}
+								/>
+							</div>
 						</div>
-					</div>
+						:
+						null
+					}
+					
 				</Fragment>
 			);
 	}
