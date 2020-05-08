@@ -222,6 +222,10 @@ class JobHistory extends Component {
 
 	/* Called immediately after the constructor. Allows page to render with empty values before data is added to avoid a crash. */
 	componentDidMount = async () => {
+		this.refreshTable();
+	}
+
+	refreshTable = async () => {
 		/* Fetch the job history from the server. Wait unfil fetch is complete to continue. */
 		await this.fetchHistory();
 
@@ -252,16 +256,16 @@ class JobHistory extends Component {
 	/* Deletes currently selected jobs from the Job History file. */
 	deleteHistory = async (keys) => {
 		await fetch(ServerURL + "job-history/remove/" + keys, {
-			method: 'POST',
+			method: 'DELETE',
 			mode: 'cors',
 			headers: {
 				'Accept': 'application/json',
 			}
 		}).then(async (res) => {
-			await res.jons().then((data) => {
-				console.log(res);
+			await res.json().then((data) => {
+				console.log(data);
 				this.setState({ selectedRowKeys: [] })
-				//this.forceUpdate();
+				this.refreshTable();
 			});
 		}).catch(err => {
 			this.fetchError("delete from job history");
