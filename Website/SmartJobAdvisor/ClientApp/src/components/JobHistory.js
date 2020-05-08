@@ -517,7 +517,7 @@ class JobHistory extends Component {
 						className={windowWidth < 350 ? null : Style.resultsColumn}
 						onClick={() => {
 							setTimeout(() => {
-								this.setState({ selectedRowKeys: [] });
+								this.setState({ selectedRowKeys: [], justifications: true });
 								this.compareJobs([row.jobID]);
 							}, 100);
 						}}
@@ -727,7 +727,8 @@ class JobHistory extends Component {
 						this.toggleModal("spreadsheet");
 						this.setState({
 							selectedRowKeys: [],
-							currentJobID: -1
+							currentJobID: -1,
+							justifications: false,
 						});
 					}}
 					destroyOnClose={true}
@@ -759,7 +760,7 @@ class JobHistory extends Component {
 						<Button
 							className={Style.tableButton}
 							onClick={() => {
-								this.setState({ justifications: !this.state.justifications }, () => this.compareJobs(selectedRowKeys));
+								this.setState({ justifications: false }, () => this.compareJobs(selectedRowKeys));
 							}}
 							type="primary"
 						>
