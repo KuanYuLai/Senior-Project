@@ -451,7 +451,6 @@ class JobHistory extends Component {
 				title: 'Job ID',
 				dataIndex: 'jobID',
 				width: 100,
-				sortOrder: 'descend',
 				sorter: (a, b) => a.jobID - b.jobID,
 				fixed: windowWidth < 350 ? false : 'left'
 			},
@@ -460,7 +459,6 @@ class JobHistory extends Component {
 				dataIndex: 'jobTime',
 				width: 275,
 				sorter: (a, b) => moment(a.jobTime).unix() - moment(b.jobTime).unix(),
-				defaultSortOrder: 'descend',
 			},
 			{
 				title: 'Job Name',
@@ -544,7 +542,7 @@ class JobHistory extends Component {
 		var rowObject = {};
 
 		/* Create an entry in the table for each object in jobHistory. */
-		for (let i = 0; i < jobHistory.length; i++) {
+		for (let i = jobHistory.length - 1; i >= 0; i--) {
 			/* Add data from correct spot. Column data may be surface level, or child of 'input'/'output' */
 			for (let j = 0; j < selectedColumns.length; j++) {
 				if (typeof jobHistory[i][selectedColumns[j]] !== 'undefined')
