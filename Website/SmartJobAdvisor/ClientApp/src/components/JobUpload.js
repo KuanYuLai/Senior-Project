@@ -15,6 +15,7 @@ export class JobUpload extends Component {
 		let fileCoverage = Array.from(Array(this.props.fileList.length), (_, i) => 0);
 		let jobIDs = Array.from(Array(this.props.fileList.length), (_, i) => 0);
 
+		/* Trigger that must be active in addition to the uploadReady flag. Used for debouncing. */
 		this.trigger = true;
 
 		this.state = {
@@ -28,19 +29,21 @@ export class JobUpload extends Component {
 		};
 	}
 
+	/* Called after the constructor, after the component mounts. */
 	componentDidMount = async () => {
 		/* Generate the content for the modal */
 		await this.buildModalContent();
 
-		/* Start uploading PDFs to get coverage values. */
+		/* Send the PDFs to the /analyze-pdf endpoint to get coverage values. */
 		for (let i = 0; i < this.state.fileList.length; i++)
-			await this.uploadPDF(i);
+			await this.analyzePDF(i);
 
+		/* Set flag for upload to be ready to fire. */
 		this.setState({ uploadReady: true });
 	}
 
 	/* Updates the text next to the file name to display the file's current status in processing.
-	 * Statuses are:  analyzing for maxCoverage;  POSTing to new-job;  Done. */
+	 * Statuses are:  Analyzing for maxCoverage;  Uploading to new-job;  Done. */
 	getFileStatusString = (index) => {
 		switch (this.state.fileStatus[index]) {
 			case 0:
@@ -54,9 +57,12 @@ export class JobUpload extends Component {
 		}
 	}
 
+	/* Fist function called in componentDidMount().
+	 * Generates a grid layout for the statuses and file names in the modal. */
 	buildModalContent = () => {
 		let { fileList } = this.state;
 
+		/* Generate a row with two columns for each job. */
 		let modalContent = fileList.map((item, index) => {
 			return (
 				<Row key={fileList[index].name} gutter={10}>
@@ -73,24 +79,32 @@ export class JobUpload extends Component {
 		this.setState({ modalContent: modalContent });
 	}
 
-	uploadPDF = async (index) => {
+	/* Second function called in componentDidMount().
+	 * Generates form data and appends file. POSTs the formdata to the /analyze-pdf endpoint.
+	 * Saves returned maxCoverage value and sets status flag for job to indicate completion of analysis. */
+	analyzePDF = async (index) => {
 		const { fileList, fileStatus, fileCoverage } = this.state;
 
+		/* Generate a form data and apply the file with 'pdf' tag. */
 		const formData = new FormData();
 		formData.append('pdf', fileList[index]);
 
-		await fetch(ServerURL + 'upload/', {
+		/* POST the file to the /analyze-pdf endpoint, capture returned value. */
+		await fetch(ServerURL + 'analyze-pdf/', {
 			method: 'POST',
 			mode: 'cors',
 			body: formData,
 		}).then(async (res) => {
 			await res.json().then((data) => {
+				/* Make copies of current state arrays. */
 				let tempCoverage = [...fileCoverage];
 				let tempStatus = [...fileStatus];
 
+				/* Capture coverage value and set status tag in copied arrays. */
 				tempCoverage[index] = parseInt(data.Coverage);
 				tempStatus[index] = 1;
 
+				/* Save the changes to the actual state arrays. */
 				this.setState({
 					fileCoverage: tempCoverage,
 					fileStatus: tempStatus,
@@ -100,47 +114,21 @@ export class JobUpload extends Component {
 			console.log("ERROR: ", err)
 		});
 
-
-
-		/* Dummy endpoint that just returns a random number for use as maxCoverage value.
-		 * Placeholder while York fixes the actual upload endpoint. * /
-		await fetch(ServerURL + 'dummy/upload/', {
-			method: 'POST',
-			mode: 'cors',
-			body: formData,
-			headers: {
-				'Accept': 'multipart/form-data',
-				'Content-Type': 'multipart/form-data',
-			}
-		}).then(async (res) => {
-			await res.json().then((data) => {
-				let tempCoverage = [...fileCoverage];
-				let tempStatus = [...fileStatus];
-
-				tempCoverage[index] = parseInt(data.Coverage);
-				tempStatus[index] = 1;
-
-				this.setState({
-					fileCoverage: tempCoverage,
-					fileStatus: tempStatus,
-				});
-			});
-		}).catch((err) => {
-			console.log("ERROR: ", err)
-		});
-		*/
-
+		/* Rebuild modal content to refresh view and update status. */
 		this.buildModalContent();
 	}
 
+	/* Sends the job to the SJA engine. */
 	submitJob = async (index) => {
 		var { fileList, fileStatus, fileCoverage, jobIDs } = this.state;
 
 		var tempValues = { ...this.props.formValues };
 
-		tempValues.jobName = fileList[index].name.split(".pdf")[0];
+		/* Remove file extension, case insensitive. Apply maxCoverage value. */
+		tempValues.jobName = fileList[index].name.split(/(.pdf)/i)[0];
 		tempValues.maxCoverage = fileCoverage[index];
 
+		/* POST the job to the SJA engine. */
 		await fetch(ServerURL + 'new-job/', {
 			method: 'POST',
 			mode: 'cors',
@@ -155,12 +143,15 @@ export class JobUpload extends Component {
 
 			throw new Error(response.text());
 		}).then((data) => {
+		/* Make copies of current state arrays. */
 			let tempStatus = [...fileStatus];
 			let tempJobIDs = [...jobIDs];
 
-			tempStatus[index] = 2;
+			/* Capture jobID and set status tag in copied arrays. */
 			tempJobIDs[index] = data.id;
+			tempStatus[index] = 2;
 
+		/* Save the changes to the actual state arrays. */
 			this.setState({
 				fileStatus: tempStatus,
 				jobIDs: tempJobIDs,
@@ -169,16 +160,22 @@ export class JobUpload extends Component {
 			console.log("Error in POST call: ", err);
 		});
 
+		/* Rebuild modal content to refresh view and update status. */
 		this.buildModalContent();
 	}
 
+	/* Handles queueing jobs, applying submitJob() to each job in sequence.
+	 * Waits for job to complete before moving to the next. */
 	submitJobHandler = async () => {
+		/* Submits the jobs, waiting to finish before moving to next job. */
 		for (let i = 0; i < this.state.fileStatus.length; i++)
 			await this.submitJob(i);
 
+		/* Grabs all of the jobIDs in the state array, joins them into a comma-separated string. */
 		var idString = [...this.state.jobIDs];
 		idString = idString.join();
 
+		/* Saves the idString to state, used for redirecting to Job Results page. */
 		this.setState({ idString: idString })
 
 		/* Wait a bit to set complete so that users can see that jobs are done. */
@@ -195,6 +192,7 @@ export class JobUpload extends Component {
 		if (uploadReady && this.trigger) {
 			this.trigger = false;
 
+			/* Invoke the jobHandler to upload each job one-by-one. */
 			this.submitJobHandler();
 		}
 
