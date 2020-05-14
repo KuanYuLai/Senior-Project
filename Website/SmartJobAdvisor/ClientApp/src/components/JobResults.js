@@ -173,7 +173,7 @@ export class JobResults extends Component {
 				spreadsheetWidth: data[2],
 				showSpreadsheet: true,
 				copyURL: copyURL,
-				fileName: fileName
+				fileName: fileName,
 				ready: true,
 			});
 		}
