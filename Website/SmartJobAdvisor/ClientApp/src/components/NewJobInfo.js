@@ -1,7 +1,7 @@
-﻿import React, { Component } from 'react';
+﻿import React from 'react';
 
 /* This file contains the information held in the info button popups in the NewJob form.
- * Having them all here makes them easier to edit, and saves a lot of space in NewJob.js. */
+ * Having them all here makes them easier to edit, and saves some space in NewJob.js. */
 
 const jobNameInfo =
 	<span>
