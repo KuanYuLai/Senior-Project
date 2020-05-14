@@ -208,7 +208,7 @@ export class JobResults extends Component {
 		/* If content has not yet loaded, show a spinner in the middle of the screen. */
 		if (!ready)
 			return (
-				<div style={{ textAlign: 'center', width: '100%', height: '90%', border: '1px solid red' }}>
+				<div style={{ textAlign: 'center', width: '100%', height: '90%' }}>
 					<div style={{ position: 'relative', top: '50%' }} >
 						<Spin size="large" style={{ position: 'relative' }} />
 					</div>

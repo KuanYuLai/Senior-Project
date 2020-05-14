@@ -18,14 +18,25 @@ export class JobUpload extends Component {
 		/* Trigger that must be active in addition to the uploadReady flag. Used for debouncing. */
 		this.trigger = true;
 
+		/* Initialize state variables:
+		 *   - 'jobIDs'       :  a list that holds all of the IDs of the jobs created.
+		 *   - 'modalContent' :  an object that holds the contents of the modal popup.
+		 *   - 'fileList'     :  a list of all files that the user has uploaded.
+		 *   - 'fileStatus'   :  a list of integer flags, determines the status of the file (analyzing/uploading/done).
+		 *   - 'fileCoverage' :  a list containing the calculated coverage values for all PDF files.
+		 *   - 'uploadReady'  :  flag for indicating if a file is ready to be uploaded. Used with fileStatus for debouncing.
+		 *   - 'complete'     :  flag for indicating if the component is ready to redirect to JobResults.
+		 *   - 'idString'     :  string that holds the jobIDs, comma separated.
+		 */
 		this.state = {
+			jobIDs: jobIDs,
+			modalContent: null,
 			fileList: this.props.fileList,
 			fileStatus: fileStatus,
 			fileCoverage: fileCoverage,
 			uploadReady: false,
-			jobIDs: jobIDs,
 			complete: false,
-			modalContent: null,
+			idString: "",
 		};
 	}
 
@@ -181,7 +192,7 @@ export class JobUpload extends Component {
 		/* Wait a bit to set complete so that users can see that jobs are done. */
 		setTimeout(() => {
 			this.setState({ complete: true,  });
-		}, 1000);
+		}, 2000);
 	}
 
 	render() {
@@ -196,6 +207,8 @@ export class JobUpload extends Component {
 			this.submitJobHandler();
 		}
 
+		/* When all files are done being uploaded and have jobIDs associated with them,
+		 * redirect the user to the Job Results page for said jobs. */
 		if (complete)
 			return <Redirect to={{ pathname: '/job-results', search: '?justifications=true?IDs=' + idString }} />;
 		else
@@ -206,7 +219,14 @@ export class JobUpload extends Component {
 
 					{this.state.modalContent}
 
-					{complete}
+					<br />
+
+					{/* Tell user that they are being redirected once the jobs are finished uploading. */}
+					{idString !== "" ?
+						<span><b>Jobs uploaded. Redirecting...</b></span>
+						:
+						<span>&nbsp;</span>
+					}
 				</Fragment>
 			);
 	}
