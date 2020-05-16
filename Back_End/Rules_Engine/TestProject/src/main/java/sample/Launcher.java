@@ -25,10 +25,12 @@ import org.json.simple.JSONArray;
 
 public class Launcher {
 
+    // Function for read in rule file
     private static BufferedReader getFile(String url, String filename) throws Exception {
         URL file = new URL(url + filename + ".yml");
         URLConnection yc = file.openConnection();
         BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
+        // Return the rule buffer
         return in;
     }
 
@@ -37,6 +39,7 @@ public class Launcher {
       	// Read in values from provided JSON file
         Object obj = new JSONParser().parse(args);
       	JSONObject jo = (JSONObject) obj;
+
         // Create a new Job instance
         String jobName = (String) jo.get("jobName");
         String qualityMode = (String) jo.get("qualityMode");
@@ -44,22 +47,20 @@ public class Launcher {
         long opticalDensity= (long) jo.get("opticalDensity");
         String paperType = (String) jo.get("paperType");
         String papersubType = (String) jo.get("papersubType");
-	    long weightgsm = (long) jo.get("weightgsm");
+	      long weightgsm = (long) jo.get("weightgsm");
         String finish = (String) jo.get("finish");
         String Unwinder = (String) jo.get("pressUnwinderBrand");
         String ruleclass = (String) jo.get("ruleclass");
         JSONArray ruleset = (JSONArray) jo.get("ruleset");
 
-
+        //Initiate job values
         Job job = new Job(jobName, qualityMode, CoverageSize, opticalDensity, paperType, papersubType, weightgsm, finish, Unwinder, ruleclass);
       	Facts facts = new Facts();
       	facts.put("job", job);
 
         System.out.println("== Finish creating job...");
 
-      	// Create rules for job size and coverage
-        MVELRuleFactory ruleFactory = new MVELRuleFactory(new YamlRuleDefinitionReader());
-
+        // URL for rules folder
         String host_url = "http://ec2-35-163-184-27.us-west-2.compute.amazonaws.com:8080/rules/" + ruleclass + "/";
 
         // Create a default rules engine and fire rules on known racts
@@ -71,13 +72,13 @@ public class Launcher {
 
         RulesEngine rulesEngine = new DefaultRulesEngine(parameters);
 
-        //Firing given rules
         System.out.println("\nStarting...\n");
 
-
+        MVELRuleFactory ruleFactory = new MVELRuleFactory(new YamlRuleDefinitionReader());
         Iterator it = ruleset.iterator();
-
         Rules rule;
+
+        //Fire all given rules
         while(it.hasNext()){
             rule = ruleFactory.createRules(getFile(host_url, it.next().toString()));
             rulesEngine.fire(rule, facts);
