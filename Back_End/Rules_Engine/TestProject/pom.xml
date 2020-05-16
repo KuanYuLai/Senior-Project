@@ -10,7 +10,7 @@
     <artifactId>TestProject</artifactId>
     <packaging>war</packaging>
 
-    <name>Easy Rules tutorials</name>
+    <name>Rules Engine</name>
 
     <properties>
         <maven-exec-plugin.version>1.6.0</maven-exec-plugin.version>
@@ -22,30 +22,25 @@
     </properties>
 
     <scm>
-        <url>git@github.com:j-easy/easy-rules.git</url>
-        <connection>scm:git:git@github.com:j-easy/easy-rules.git</connection>
-        <developerConnection>scm:git:git@github.com:j-easy/easy-rules.git</developerConnection>
+        <url>https://github.com/KuanYuLai/Senior-Project.git</url>
+        <connection>scm:git:git@github.com:KuanYuLai/Senior-Project.git</connection>
+        <developerConnection>scm:git:git@github.com:KuanYuLai/Senior-Project.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/j-easy/easy-rules/issues</url>
+        <url>https://github.com/KuanYuLai/Senior-Project/issues</url>
     </issueManagement>
-
-    <ciManagement>
-        <system>Travis CI</system>
-        <url>https://travis-ci.org/j-easy/easy-rules</url>
-    </ciManagement>
 
     <developers>
         <developer>
-            <id>benas</id>
-            <name>Mahmoud Ben Hassine</name>
-            <url>http://benas.github.io</url>
-            <email>mahmoud.benhassine@icloud.com</email>
+            <id>KL</id>
+            <name>Kuan-Yu Lai</name>
+            <url>https://github.com/KuanYuLai</url>
+            <email>yorklai0523@gmail.com</email>
             <roles>
-                <role>Lead developer</role>
+                <role>Back-end developer</role>
             </roles>
         </developer>
     </developers>
@@ -73,6 +68,10 @@
             <artifactId>easy-rules-support</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
