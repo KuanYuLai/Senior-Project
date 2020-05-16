@@ -26,8 +26,12 @@ const logger = require('./lib/logger');
 const job_history = require('./job_history');
 
 //Variable 
+try{
 var job_id = job_history[job_history.length-1].jobID; 
-
+}
+catch(err){
+var job_id = 0;
+}
 app.use(bodyParser.json());
 app.use(logger);
 app.use(cors());
