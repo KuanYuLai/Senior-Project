@@ -51,6 +51,12 @@ Run:
 npm install
 ```
 
+## Add Execute Permission
+Add execute permission to [eval.sh](eval.sh) file by running the command
+```
+chmod +x eval.sh
+```
+
 ## Run Locally
 
 To deploy the server locally, simply run the command:
