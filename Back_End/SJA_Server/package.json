@@ -1,5 +1,5 @@
 {
-  "name": "server-setup",
+  "name": "SJA-server",
   "version": "1.0.0",
   "description": "Serving with Express and Node.js",
   "main": "server.js",
@@ -10,9 +10,11 @@
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "express-fileupload": "^1.1.7-alpha.3",
     "figlet": "^1.2.1",
-    "logger": "0.0.1",
-    "moment": "^2.24.0"
+    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.28",
+    "multer": "^1.4.2"
   },
   "devDependencies": {
     "nodemon": "^1.18.11"
@@ -25,6 +27,6 @@
     "Node",
     "express"
   ],
-  "author": "Hess <hessro@oregonstate.edu>",
+  "author": "Kuan-Yu Lai <laik@oregonstate.edu>",
   "license": "MIT"
 }
