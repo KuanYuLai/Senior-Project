@@ -28,9 +28,11 @@ to install all of the require packages.
 
 ## Set up file serving folder
 
-The Rules Engine server requires additional files to operate. In order to do that you have to set up a static file serving folder. You can find the instruction [here](https://www.moreofless.co.uk/static-content-web-pages-images-tomcat-outside-war/).
+The Rules Engine server requires additional files  contain in the ***rules*** folder to operate. Therefore, you have to server the ***rules*** folder. To do that you can follow the instruction [here](https://www.moreofless.co.uk/static-content-web-pages-images-tomcat-outside-war/). The setting command should be 
+```
 
-After that move all the Json and YML file to that folder to serve it to the server.
+<Context docBase="/Senior-Project/Back_End/rules" path="/rules" />
+```
 
 ## Change server URL
 
@@ -64,7 +66,7 @@ localhost:8080
 
 ## Deploy Remotely
 
-If you want to deploy the server on your cloud server, first you have to install tomcat 7 in your cloud server. You can find the instruction [here](https://tecadmin.net/steps-to-install-tomcat-server-on-centos-rhel/).
+If you want to deploy the server on your cloud server, first you have to install tomcat 7 in your cloud server. You can find the instruction [here](https://tecadmin.net/steps-to-install-tomcat-server-on-centos-rhel/).  
 Next, run
 
 ```
