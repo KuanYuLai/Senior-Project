@@ -210,6 +210,9 @@ class NewJobForm extends Component {
 		paperFinishes = [...new Set(paperFinishes)];
 		paperWeights = [...new Set(paperWeights)];
 
+		/* Sort paperWeights. */
+		paperWeights = paperWeights.sort((a, b) => a - b);
+
 		/* If there's only one choice for a radio, just fill it out. */
 		if (paperTypes.length === 1)
 			setFieldsValue({ papertype: paperTypes[0] });

@@ -189,8 +189,8 @@ class JobHistory extends Component {
 		/* Get column checkbox values from cookies (if they exist, otherwise use defaults). */
 		const { cookies } = props;
 
-		var defaultCols = ["jobID", "jobTime", "jobName", "result"];
-		var defaultGeneral = ["jobID", "jobTime", "jobName", "result"];
+		var defaultCols = ["jobID", "jobTime", "jobName"];
+		var defaultGeneral = ["jobID", "jobTime", "jobName"];
 		var defaultInput = [];
 		var defaultResult = [];
 
@@ -351,24 +351,23 @@ class JobHistory extends Component {
 			{ label: "Job ID", value: "jobID", disabled: true },
 			{ label: "Date", value: "jobTime", disabled: true },
 			{ label: "Job Name", value: "jobName", disabled: true },
-			{ label: "Results", value: "results", disabled: true },
 		];
 		var colList2 = [];
 		var colList3 = [];
 
 		/* Build the list of input values. */
-		for (let i = 0; i < Object.keys(this.state.jobHistory[0].input).length; i++) {
+		for (let i = 0; i < Object.keys(this.state.jobHistory[this.state.jobHistory.length - 1].input).length; i++) {
 			/* Get the label for the column, clean it up a bit. */
-			var tempTitle = [...this.state.jobHistory][0];
+			var tempTitle = [...this.state.jobHistory][this.state.jobHistory.length - 1];
 			tempTitle = Object.keys(tempTitle.input)[i].replace(/([a-z])([A-Z])/g, '$1 $2');
 			tempTitle = tempTitle.charAt(0).toUpperCase() + tempTitle.slice(1);
 
 			/* If the key is not 'jobName', add it to the list of column labels. */
-			if (Object.keys(this.state.jobHistory[0].input)[i] !== 'jobName')
+			if (Object.keys(this.state.jobHistory[this.state.jobHistory.length - 1].input)[i] !== 'jobName')
 				colList2.push(
 					{
 						label: tempTitle,
-						value: Object.keys(this.state.jobHistory[0].input)[i]
+						value: Object.keys(this.state.jobHistory[this.state.jobHistory.length - 1].input)[i]
 					},
 				);
 		}
@@ -376,31 +375,30 @@ class JobHistory extends Component {
 		/* Build the list of result values. */
 		for (let j = 0; j < Object.keys(this.state.jobHistory[this.state.jobHistory.length - 1].result).length; j++) {
 			/* Get the label for the column, clean it up a bit. */
-			var tempTitle2 = [...this.state.jobHistory][0];
+			var tempTitle2 = [...this.state.jobHistory][this.state.jobHistory.length - 1];
 			tempTitle2 = Object.keys(tempTitle2.result)[j].replace(/([a-z])([A-Z])/g, '$1 $2');
 			tempTitle2 = tempTitle2.charAt(0).toUpperCase() + tempTitle2.slice(1);
 
 			/* If the key is not 'jobName', add it to the list of column labels. */
-			if (Object.keys(this.state.jobHistory[0].result)[j] !== 'jobName')
+			if (Object.keys(this.state.jobHistory[this.state.jobHistory.length - 1].result)[j] !== 'jobName'
+				&& Object.keys(this.state.jobHistory[this.state.jobHistory.length - 1].result)[j] !== 'Description'
+			)
 				colList3.push(
 					{
 						label: tempTitle2,
-						value: Object.keys(this.state.jobHistory[0].result)[j]
+						value: Object.keys(this.state.jobHistory[this.state.jobHistory.length - 1].result)[j]
 					},
 				);
 		}
 
 		/* If window width is small, do 2 per row instead of 3 (helps with formatting). */
-		var activeColSpan = 6;
 		var colSpan = 8;
 
-		if (this.state.windowWidth <= 500) {
-			activeColSpan = 12;
+		if (this.state.windowWidth <= 500)
 			colSpan = 12;
-		}
 
 		/* Build checkbox lists for each section. Helps with formatting. */
-		var alwaysActiveCols = this.buildCheckboxes(colList1, 'general', activeColSpan, true);
+		var alwaysActiveCols = this.buildCheckboxes(colList1, 'general', colSpan, true);
 		var jobInputCols = this.buildCheckboxes(colList2, 'input', colSpan);
 		var jobResultCols = this.buildCheckboxes(colList3, 'result', colSpan);
 
@@ -468,11 +466,10 @@ class JobHistory extends Component {
 
 		var temp = [];
 
-		/* Collect all checkbox values (except "results"), concat into one array, then append "results" to the end. */
-		temp = temp.concat(generalCheckboxes.slice(0, -1));
+		/* Collect all checkbox values, concat into one array. */
+		temp = temp.concat(generalCheckboxes);
 		temp = temp.concat(inputCheckboxes);
 		temp = temp.concat(resultCheckboxes);
-		temp = temp.concat("results");
 
 		/* Initialize cookies and set them to remember checkbox selection */
 		const { cookies } = this.props;
