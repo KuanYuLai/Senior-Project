@@ -48,7 +48,9 @@ const maxCoverageInfo =
 const opticalDensityInfo =
 	<span>
 		The optical density value for the Job <br />
-		(the average opacity of ink).
+		(the average opacity of ink).         <br /><br />
+		Cannot be lower than 50%, must be     <br />
+		in 5% increments.
 	</span>;
 
 const paperMfrInfo =
