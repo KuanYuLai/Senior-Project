@@ -87,7 +87,7 @@ Your_Domain:8080/preferred_path_name/new
 
 ## Sample Testing
 
-You can test the server by using [postman](https://www.postman.com/)
+You can test the server by using [Postman](https://www.postman.com/)
 
 First, fire a POST request to the endpoint **/new**
 With Input:
@@ -142,3 +142,16 @@ You should get a output like this:
     }
 }
 ```
+### Postman Image
+Sample1:
+    - Input
+    ![Sample Input 1](https://github.com/KuanYuLai/Senior-Project/blob/master/Classwork/Img/RE_IN_1.PNG)
+    - Output
+    ![Sample Output 1](https://github.com/KuanYuLai/Senior-Project/blob/master/Classwork/Img/RE_OUT_1.PNG)
+
+Sample2:
+    - Input
+    ![Sample Input 2](https://github.com/KuanYuLai/Senior-Project/blob/master/Classwork/Img/RE_IN_2.PNG)
+    - Output
+    ![Sample Output 2](https://github.com/KuanYuLai/Senior-Project/blob/master/Classwork/Img/RE_OUT_2.PNG)
+
