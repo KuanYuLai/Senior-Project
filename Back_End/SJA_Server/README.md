@@ -185,3 +185,11 @@ You should get a output like this:
     }
 }
 ```
+### Postman Sample Test
+Sample:
+   Create new job:  
+   ![Create_new_job](https://github.com/KuanYuLai/Senior-Project/blob/master/Classwork/Img/SJA_IN_1.PNG)  
+   Get the associate job ID:  
+   ![Get_job_ID](https://github.com/KuanYuLai/Senior-Project/blob/master/Classwork/Img/SJA_OUT_1.PNG)  
+   View detail information with the given job ID:  
+   ![View_job](https://github.com/KuanYuLai/Senior-Project/blob/master/Classwork/Img/SJA_GET_1.PNG)  
