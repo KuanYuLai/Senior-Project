@@ -5,9 +5,10 @@
 
 const jobNameInfo =
 	<span>
-		The name to give the Job.                  <br /><br />
-		Disabled when a PDF is uploaded, as the    <br />
-		name of the PDF file will be used instead.
+		The name to give the Job.        <br /><br />
+		Disabled when a PDF is uploaded, <br />
+		as the name of the PDF file will <br />
+		be used instead.
 	</span>;
 
 const rulesetInfo =
@@ -48,7 +49,9 @@ const maxCoverageInfo =
 const opticalDensityInfo =
 	<span>
 		The optical density value for the Job <br />
-		(the average opacity of ink).
+		(the average opacity of ink).         <br /><br />
+		Cannot be lower than 50%, must be     <br />
+		in 5% increments.
 	</span>;
 
 const paperMfrInfo =

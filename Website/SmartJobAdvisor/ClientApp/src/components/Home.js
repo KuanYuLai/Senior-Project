@@ -20,7 +20,7 @@ export class Home extends Component {
 
 	render() {
 		let { redirect, redirectTarget } = this.state;
-        let { callback } = this.props;
+		let { callback } = this.props;
 
 		/* If redirect is true, redirect the user to the page specified by redirectTarget. */
 		if (redirect === true) {

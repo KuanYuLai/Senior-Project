@@ -22,7 +22,7 @@ export const BuildSpreadsheet = function (keys, jobHistory, justifications) {
 	var exportTemp = [];
 
 	/* Get list of all keys in an entry, except for jobID. */
-	var keyList = Object.keys(jobHistory[0]).filter((val) => {
+	var keyList = Object.keys(jobHistory[jobHistory.length - 1]).filter((val) => {
 		return val !== "jobID";
 	});
 
@@ -42,12 +42,12 @@ export const BuildSpreadsheet = function (keys, jobHistory, justifications) {
 		/* Column for each job being compared. If justifications are on, additional
 		 * column to the right and the header column (Job #) spans two columns. */
 		if (justifications) {
-			spreadsheetTemp.push({ value: 'Job ' + currentData.jobID, colSpan: 2, readOnly: true });
-			exportTemp.push('Job ' + currentData.jobID);
+			spreadsheetTemp.push({ value: 'Job ' + currentData.jobID + ", " + currentData.input.jobName, colSpan: 2, readOnly: true });
+			exportTemp.push('Job ' + currentData.jobID + ", " + currentData.input.jobName);
 			exportTemp.push('Job ' + currentData.jobID + ' Justifications');
 		} else {
-			spreadsheetTemp.push({ value: 'Job ' + currentData.jobID, width: 175, readOnly: true });
-			exportTemp.push('Job ' + currentData.jobID);
+			spreadsheetTemp.push({ value: 'Job ' + currentData.jobID + ", " + currentData.input.jobName, width: 175, readOnly: true });
+			exportTemp.push('Job ' + currentData.jobID + ", " + currentData.input.jobName);
 		}
 	}
 
@@ -59,8 +59,8 @@ export const BuildSpreadsheet = function (keys, jobHistory, justifications) {
 
 	/* Runs through the list of all keys (except jobID), making a row for each. */
 	for (let j = 0; j < keyList.length; j++) {
-		/* If the key is 'input' or 'output', its row stays empty. */
-		if (keyList[j] !== 'input' && keyList[j] !== 'output') {
+		/* If the key is 'input' or 'result', its row stays empty. */
+		if (keyList[j] !== 'input' && keyList[j] !== 'result') {
 			/* Make a row label for that key in keyList. */
 			spreadsheetTemp.push({ value: keyList[j], width: 150, readOnly: true });
 			exportTemp.push(keyList[j]);
@@ -97,7 +97,7 @@ export const BuildSpreadsheet = function (keys, jobHistory, justifications) {
 			/* Empty space for that row. */
 			for (let k = 0; k < keys.length; k++) {
 				if (justifications) {
-					/* Justifications for output. */
+					/* Justifications for result. */
 					spreadsheetTemp.push({ value: "", colSpan: 2 });
 					exportTemp.push("");
 					exportTemp.push("");
@@ -149,8 +149,8 @@ export const BuildSpreadsheet = function (keys, jobHistory, justifications) {
 						} else {
 							spreadsheetTemp.push({ value: tempVal, width: 175 });
 							exportTemp.push(tempVal);
-							spreadsheetTemp.push({ value: currentData.output.Description[subKeyList[n]], width: 250 });
-							exportTemp.push(currentData.output.Description[subKeyList[n]]);
+							spreadsheetTemp.push({ value: currentData.result.Description[subKeyList[n]], width: 250 });
+							exportTemp.push(currentData.result.Description[subKeyList[n]]);
 						}
 					} else {
 						spreadsheetTemp.push({ value: tempVal, width: 175 });
@@ -189,10 +189,10 @@ class JobHistory extends Component {
 		/* Get column checkbox values from cookies (if they exist, otherwise use defaults). */
 		const { cookies } = props;
 
-		var defaultCols = ["jobID", "jobTime", "jobName", "results"];
-		var defaultGeneral = ["jobID", "jobTime", "jobName", "results"];
+		var defaultCols = ["jobID", "jobTime", "jobName"];
+		var defaultGeneral = ["jobID", "jobTime", "jobName"];
 		var defaultInput = [];
-		var defaultOutput = [];
+		var defaultResult = [];
 
 		if (typeof cookies.get('defaultCols') !== 'undefined')
 			defaultCols = cookies.get('defaultCols');
@@ -200,8 +200,8 @@ class JobHistory extends Component {
 			defaultGeneral = cookies.get('defaultGeneral');
 		if (typeof cookies.get('defaultInput') !== 'undefined')
 			defaultInput = cookies.get('defaultInput');
-		if (typeof cookies.get('defaultOutput') !== 'undefined')
-			defaultOutput = cookies.get('defaultOutput');
+		if (typeof cookies.get('defaultResult') !== 'undefined')
+			defaultResult = cookies.get('defaultResult');
 
 		/* Initialize state variables:
 		 *   - 'jobHistory'              :  a list containing the entirety of the job history database. Empty before fetch.
@@ -218,7 +218,7 @@ class JobHistory extends Component {
 		 *   - 'selectedColumns'         :  a list containing the columns that are currently active. Default to defaultCols list.
 		 *   - 'generalCheckboxes'       :  a list containing the general columns that are active. GENERAL COLUMNS SHOULD ALWAYS BE ACTIVE.
 		 *   - 'inputCheckboxes'         :  a list containing the checkboxes for the 'input' section of the table data.
-		 *   - 'outputCheckboxes'        :  a list containing the checkboxes for the 'output' section of the table data.
+		 *   - 'resultCheckboxes'        :  a list containing the checkboxes for the 'result' section of the table data.
 		 *   - 'error'                   :  flag to determine if there has been a general error. If true, prevents page from rendering.
 		 *   - 'windowWidth'             :  window width obtained from window listener. Inherited from App.js.
 		 *   - 'windowHeight'            :  window height obtained from window listener. Inherited from App.js.
@@ -238,7 +238,7 @@ class JobHistory extends Component {
 			selectedColumns: defaultCols,
 			generalCheckboxes: defaultGeneral,
 			inputCheckboxes: defaultInput,
-			outputCheckboxes: defaultOutput,
+			resultCheckboxes: defaultResult,
 			error: null,
 			windowWidth: 1000,
 			windowHeight: 1000,
@@ -351,58 +351,56 @@ class JobHistory extends Component {
 			{ label: "Job ID", value: "jobID", disabled: true },
 			{ label: "Date", value: "jobTime", disabled: true },
 			{ label: "Job Name", value: "jobName", disabled: true },
-			{ label: "Results", value: "results", disabled: true },
 		];
 		var colList2 = [];
 		var colList3 = [];
 
 		/* Build the list of input values. */
-		for (let i = 0; i < Object.keys(this.state.jobHistory[0].input).length; i++) {
+		for (let i = 0; i < Object.keys(this.state.jobHistory[this.state.jobHistory.length - 1].input).length; i++) {
 			/* Get the label for the column, clean it up a bit. */
-			var tempTitle = [...this.state.jobHistory][0];
+			var tempTitle = [...this.state.jobHistory][this.state.jobHistory.length - 1];
 			tempTitle = Object.keys(tempTitle.input)[i].replace(/([a-z])([A-Z])/g, '$1 $2');
 			tempTitle = tempTitle.charAt(0).toUpperCase() + tempTitle.slice(1);
 
 			/* If the key is not 'jobName', add it to the list of column labels. */
-			if (Object.keys(this.state.jobHistory[0].input)[i] !== 'jobName')
+			if (Object.keys(this.state.jobHistory[this.state.jobHistory.length - 1].input)[i] !== 'jobName')
 				colList2.push(
 					{
 						label: tempTitle,
-						value: Object.keys(this.state.jobHistory[0].input)[i]
+						value: Object.keys(this.state.jobHistory[this.state.jobHistory.length - 1].input)[i]
 					},
 				);
 		}
 
-		/* Build the list of output values. */
-		for (let j = 0; j < Object.keys(this.state.jobHistory[0].output).length; j++) {
+		/* Build the list of result values. */
+		for (let j = 0; j < Object.keys(this.state.jobHistory[this.state.jobHistory.length - 1].result).length; j++) {
 			/* Get the label for the column, clean it up a bit. */
-			var tempTitle2 = [...this.state.jobHistory][0];
-			tempTitle2 = Object.keys(tempTitle2.output)[j].replace(/([a-z])([A-Z])/g, '$1 $2');
+			var tempTitle2 = [...this.state.jobHistory][this.state.jobHistory.length - 1];
+			tempTitle2 = Object.keys(tempTitle2.result)[j].replace(/([a-z])([A-Z])/g, '$1 $2');
 			tempTitle2 = tempTitle2.charAt(0).toUpperCase() + tempTitle2.slice(1);
 
 			/* If the key is not 'jobName', add it to the list of column labels. */
-			if (Object.keys(this.state.jobHistory[0].output)[j] !== 'jobName')
+			if (Object.keys(this.state.jobHistory[this.state.jobHistory.length - 1].result)[j] !== 'jobName'
+				&& Object.keys(this.state.jobHistory[this.state.jobHistory.length - 1].result)[j] !== 'Description'
+			)
 				colList3.push(
 					{
 						label: tempTitle2,
-						value: Object.keys(this.state.jobHistory[0].output)[j]
+						value: Object.keys(this.state.jobHistory[this.state.jobHistory.length - 1].result)[j]
 					},
 				);
 		}
 
 		/* If window width is small, do 2 per row instead of 3 (helps with formatting). */
-		var activeColSpan = 6;
 		var colSpan = 8;
 
-		if (this.state.windowWidth <= 500) {
-			activeColSpan = 12;
+		if (this.state.windowWidth <= 500)
 			colSpan = 12;
-		}
 
 		/* Build checkbox lists for each section. Helps with formatting. */
-		var alwaysActiveCols = this.buildCheckboxes(colList1, 'general', activeColSpan, true);
+		var alwaysActiveCols = this.buildCheckboxes(colList1, 'general', colSpan, true);
 		var jobInputCols = this.buildCheckboxes(colList2, 'input', colSpan);
-		var jobOutputCols = this.buildCheckboxes(colList3, 'output', colSpan);
+		var jobResultCols = this.buildCheckboxes(colList3, 'result', colSpan);
 
 		/* Build the content within the modal using the objects that were just created. */
 		var modalInnards =
@@ -415,8 +413,8 @@ class JobHistory extends Component {
 				{jobInputCols}
 				<br /><br />
 
-				<b>Job Output Columns</b>
-				{jobOutputCols}
+				<b>Job Result Columns</b>
+				{jobResultCols}
 			</>;
 
 		/* Set the columnModal state object equal to the modal content that was just created. */
@@ -452,7 +450,7 @@ class JobHistory extends Component {
 				this.setState({ inputCheckboxes: checkedValues });
 				break;
 			default:
-				this.setState({ outputCheckboxes: checkedValues });
+				this.setState({ resultCheckboxes: checkedValues });
 				break;
 		}
 	}
@@ -463,16 +461,15 @@ class JobHistory extends Component {
 		const {
 			generalCheckboxes,
 			inputCheckboxes,
-			outputCheckboxes
+			resultCheckboxes
 		} = this.state;
 
 		var temp = [];
 
-		/* Collect all checkbox values (except "results"), concat into one array, then append "results" to the end. */
-		temp = temp.concat(generalCheckboxes.slice(0, -1));
+		/* Collect all checkbox values, concat into one array. */
+		temp = temp.concat(generalCheckboxes);
 		temp = temp.concat(inputCheckboxes);
-		temp = temp.concat(outputCheckboxes);
-		temp = temp.concat("results");
+		temp = temp.concat(resultCheckboxes);
 
 		/* Initialize cookies and set them to remember checkbox selection */
 		const { cookies } = this.props;
@@ -480,7 +477,7 @@ class JobHistory extends Component {
 		cookies.set('defaultCols', temp, { path: '/', maxAge: 31536000 });
 		cookies.set('defaultGeneral', generalCheckboxes, { path: '/', maxAge: 31536000 });
 		cookies.set('defaultInput', inputCheckboxes, { path: '/', maxAge: 31536000 });
-		cookies.set('defaultOutput', outputCheckboxes, { path: '/', maxAge: 31536000 });
+		cookies.set('defaultResult', resultCheckboxes, { path: '/', maxAge: 31536000 });
 
 		/* Set selected columns, rebuild table. */
 		this.setState({
@@ -524,12 +521,12 @@ class JobHistory extends Component {
 
 		/* Add the rest of the selected columns. */
 		for (let i = 0; i < selectedColumns.length; i++) {
-			if (selectedColumns[i] !== 'jobID' && selectedColumns[i] !== 'jobTime' && selectedColumns[i] !== 'jobName' && selectedColumns[i] !== 'results') {
+			if (selectedColumns[i] !== 'jobID' && selectedColumns[i] !== 'jobTime' && selectedColumns[i] !== 'jobName' && selectedColumns[i] !== 'result') {
 				var tempTitle = selectedColumns[i].replace(/([a-z])([A-Z])/g, '$1 $2');
 				tempTitle = tempTitle.charAt(0).toUpperCase() + tempTitle.slice(1);
 
 				/* Check if value is number, boolean, or string. If number sort rows by number, if string sort rows by localecompare. */
-				if ((typeof jobHistory[0].input[selectedColumns[i]] === 'number') || (typeof jobHistory[0].output[selectedColumns[i]] === 'number'))
+				if ((typeof jobHistory[jobHistory.length - 1].input[selectedColumns[i]] === 'number') || (typeof jobHistory[jobHistory.length - 1].result[selectedColumns[i]] === 'number'))
 					tempCol.push(
 						{
 							title: tempTitle,
@@ -538,7 +535,7 @@ class JobHistory extends Component {
 							sorter: (a, b) => a[selectedColumns[i]] - b[selectedColumns[i]],
 						},
 					);
-				else if ((typeof jobHistory[0].input[selectedColumns[i]] === 'boolean') || (typeof jobHistory[0].output[selectedColumns[i]] === 'boolean'))
+				else if ((typeof jobHistory[jobHistory.length - 1].input[selectedColumns[i]] === 'boolean') || (typeof jobHistory[jobHistory.length - 1].result[selectedColumns[i]] === 'boolean'))
 					tempCol.push(
 						{
 							title: tempTitle,
@@ -598,14 +595,14 @@ class JobHistory extends Component {
 
 		/* Create an entry in the table for each object in jobHistory. */
 		for (let i = jobHistory.length - 1; i >= 0; i--) {
-			/* Add data from correct spot. Column data may be surface level, or child of 'input'/'output' */
+			/* Add data from correct spot. Column data may be surface level, or child of 'input'/'result' */
 			for (let j = 0; j < selectedColumns.length; j++) {
 				if (typeof jobHistory[i][selectedColumns[j]] !== 'undefined')
 					rowObject[selectedColumns[j]] = jobHistory[i][selectedColumns[j]];
 				else if (typeof jobHistory[i].input[selectedColumns[j]] !== 'undefined')
 					rowObject[selectedColumns[j]] = jobHistory[i].input[selectedColumns[j]];
-				else if (typeof jobHistory[i].output[selectedColumns[j]] !== 'undefined')
-					rowObject[selectedColumns[j]] = jobHistory[i].output[selectedColumns[j]];
+				else if (typeof jobHistory[i].result[selectedColumns[j]] !== 'undefined')
+					rowObject[selectedColumns[j]] = jobHistory[i].result[selectedColumns[j]];
 			}
 
 			/* Add the row to the table data array, clear the row object for next run. */
@@ -856,7 +853,7 @@ class JobHistory extends Component {
 					}
 				</div>
 
-                <Table
+				<Table
 					rowKey="jobID"
 					rowSelection={rowSelection}
 					dataSource={tableData}

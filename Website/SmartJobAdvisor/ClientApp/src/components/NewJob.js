@@ -126,10 +126,6 @@ class NewJobForm extends Component {
 		}).then(async (res) => {
 			await res.json().then((data) => {
 				this.setState({ paperDatabase: data.paperdb });
-
-				// Testing with actual data
-				//var realData = require('../PaperData/HP-paper-db-CONFIDENTIAL-2020-02-09.json');
-				//this.setState({ paperDatabase: realData.paperdb })
 			});
 		}).catch(err => {
 			this.fetchError("fetch paper database");
@@ -209,6 +205,9 @@ class NewJobForm extends Component {
 		paperSubTypes = [...new Set(paperSubTypes)];
 		paperFinishes = [...new Set(paperFinishes)];
 		paperWeights = [...new Set(paperWeights)];
+
+		/* Sort paperWeights. */
+		paperWeights = paperWeights.sort((a, b) => a - b);
 
 		/* If there's only one choice for a radio, just fill it out. */
 		if (paperTypes.length === 1)
@@ -487,6 +486,7 @@ class NewJobForm extends Component {
 		cookies.set('qualityMode', values.qualityMode, { path: '/', maxAge: 31536000 });
 		cookies.set('pressUnwinderBrand', values.pressUnwinderBrand, { path: '/', maxAge: 31536000 });
 		cookies.set('opticalDensity', values.opticalDensity, { path: '/', maxAge: 31536000 });
+
 		/* Only set these cookies if a PDF was NOT uploaded. */
 		if (this.state.fileList.length === 0) {
 			cookies.set('jobName', values.jobName, { path: '/', maxAge: 31536000 });
@@ -525,11 +525,11 @@ class NewJobForm extends Component {
 			}
 
 			/* If the newly-created usedPaper object was not found in the list:
-			 *     If < 5 items, just add usedPaper to the list
-			 *     If = 5 items, remove oldest, then push usedPaper */
+			 *    If < 5 items, just add usedPaper to the list
+			 *    If = 5 items, remove oldest, then push usedPaper */
 			if (!exists) {
-				if (paperList.length === 5)
-					paperList.splice(4, 1);
+				if (paperList.length === 10)
+					paperList.splice(9, 1);
 
 				paperList.unshift(usedPaper);
 			}
@@ -904,7 +904,7 @@ class NewJobForm extends Component {
 							label={
 								<>
 									<span>Mfr:</span>
-									<Popover content={paperMfrInfo} title="Manufacturer" placement="bottom">
+									<Popover content={paperMfrInfo} title="Manufacturer" placement={windowWidth <= 500 ? "bottom" : "bottomLeft"}>
 										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 37, bottom: -2 }} type="info-circle" />
 									</Popover>
 								</>
@@ -936,7 +936,7 @@ class NewJobForm extends Component {
 							label={
 								<>
 									<span>Name:</span>
-									<Popover content={paperNameInfo} title="Product Name" placement="bottom">
+									<Popover content={paperNameInfo} title="Product Name" placement={windowWidth <= 500 ? "bottom" : "bottomLeft"}>
 										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 22, bottom: -2 }} type="info-circle" />
 									</Popover>
 								</>
@@ -968,7 +968,7 @@ class NewJobForm extends Component {
 							label={
 								<>
 									<span>Type:</span>
-									<Popover content={paperTypeInfo} title="Paper Type" placement="bottom">
+									<Popover content={paperTypeInfo} title="Paper Type" placement={windowWidth <= 500 ? "bottom" : "bottomLeft"}>
 										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 30, bottom: -2 }} type="info-circle" />
 									</Popover>
 								</>
@@ -994,7 +994,7 @@ class NewJobForm extends Component {
 							label={
 								<>
 									<span>Sub-Type:</span>
-									<Popover content={paperSubTypeInfo} title="Paper Sub-Type" placement="bottom">
+									<Popover content={paperSubTypeInfo} title="Paper Sub-Type" placement={windowWidth <= 500 ? "bottom" : "bottomLeft"}>
 										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 12, bottom: -2 }} type="info-circle" />
 									</Popover>
 								</>
@@ -1018,7 +1018,7 @@ class NewJobForm extends Component {
 							label={
 								<>
 									<span>Weight:</span>
-									<Popover content={paperWeightInfo} title="Paper Weight" placement="bottom">
+									<Popover content={paperWeightInfo} title="Paper Weight" placement={windowWidth <= 500 ? "bottom" : "bottomLeft"}>
 										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 15, bottom: -2 }} type="info-circle" />
 									</Popover>
 								</>
@@ -1068,7 +1068,7 @@ class NewJobForm extends Component {
 							label={
 								<>
 									<span>Finish:</span>
-									<Popover content={paperFinishInfo} title="Paper Finish" placement="bottom">
+									<Popover content={paperFinishInfo} title="Paper Finish" placement={windowWidth <= 500 ? "bottom" : "bottomLeft"}>
 										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 24, bottom: -2 }} type="info-circle" />
 									</Popover>
 								</>
