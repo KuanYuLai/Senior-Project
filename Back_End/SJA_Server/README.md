@@ -137,7 +137,7 @@ With Input:
    "papersubtype":"Text",
    "finish":"Matte",
    "weightgsm":90,
-   "ruleset":"Default"
+   "ruleset":"T24"
 }
 ```
 
@@ -153,7 +153,7 @@ You should get a output like this:
     "jobTime": "April 24 2020, 1:23:16 pm",
     "input": {
         "jobName": "TT0",
-        "ruleset": "Default",
+        "ruleset": "T24",
         "qualityMode": "Quality",
         "pressUnwinderBrand": "EMT",
         "maxCoverage": 50,
