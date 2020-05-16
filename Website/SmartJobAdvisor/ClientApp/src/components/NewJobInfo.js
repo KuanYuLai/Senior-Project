@@ -5,9 +5,10 @@
 
 const jobNameInfo =
 	<span>
-		The name to give the Job.                  <br /><br />
-		Disabled when a PDF is uploaded, as the    <br />
-		name of the PDF file will be used instead.
+		The name to give the Job.        <br /><br />
+		Disabled when a PDF is uploaded, <br />
+		as the name of the PDF file will <br />
+		be used instead.
 	</span>;
 
 const rulesetInfo =

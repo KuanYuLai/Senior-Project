@@ -904,7 +904,7 @@ class NewJobForm extends Component {
 							label={
 								<>
 									<span>Mfr:</span>
-									<Popover content={paperMfrInfo} title="Manufacturer" placement="bottom">
+									<Popover content={paperMfrInfo} title="Manufacturer" placement={windowWidth <= 500 ? "bottom" : "bottomLeft"}>
 										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 37, bottom: -2 }} type="info-circle" />
 									</Popover>
 								</>
@@ -936,7 +936,7 @@ class NewJobForm extends Component {
 							label={
 								<>
 									<span>Name:</span>
-									<Popover content={paperNameInfo} title="Product Name" placement="bottom">
+									<Popover content={paperNameInfo} title="Product Name" placement={windowWidth <= 500 ? "bottom" : "bottomLeft"}>
 										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 22, bottom: -2 }} type="info-circle" />
 									</Popover>
 								</>
@@ -968,7 +968,7 @@ class NewJobForm extends Component {
 							label={
 								<>
 									<span>Type:</span>
-									<Popover content={paperTypeInfo} title="Paper Type" placement="bottom">
+									<Popover content={paperTypeInfo} title="Paper Type" placement={windowWidth <= 500 ? "bottom" : "bottomLeft"}>
 										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 30, bottom: -2 }} type="info-circle" />
 									</Popover>
 								</>
@@ -994,7 +994,7 @@ class NewJobForm extends Component {
 							label={
 								<>
 									<span>Sub-Type:</span>
-									<Popover content={paperSubTypeInfo} title="Paper Sub-Type" placement="bottom">
+									<Popover content={paperSubTypeInfo} title="Paper Sub-Type" placement={windowWidth <= 500 ? "bottom" : "bottomLeft"}>
 										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 12, bottom: -2 }} type="info-circle" />
 									</Popover>
 								</>
@@ -1018,7 +1018,7 @@ class NewJobForm extends Component {
 							label={
 								<>
 									<span>Weight:</span>
-									<Popover content={paperWeightInfo} title="Paper Weight" placement="bottom">
+									<Popover content={paperWeightInfo} title="Paper Weight" placement={windowWidth <= 500 ? "bottom" : "bottomLeft"}>
 										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 15, bottom: -2 }} type="info-circle" />
 									</Popover>
 								</>
@@ -1068,7 +1068,7 @@ class NewJobForm extends Component {
 							label={
 								<>
 									<span>Finish:</span>
-									<Popover content={paperFinishInfo} title="Paper Finish" placement="bottom">
+									<Popover content={paperFinishInfo} title="Paper Finish" placement={windowWidth <= 500 ? "bottom" : "bottomLeft"}>
 										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 24, bottom: -2 }} type="info-circle" />
 									</Popover>
 								</>
