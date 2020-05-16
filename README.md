@@ -11,7 +11,8 @@ There are two server in this project, the Smart Job Advisor(SJA) server is respo
 
 The Website is the user-facing front end, and is used for uploading jobs to SmartJobAdvisor/Rules engines for processing.
 
-Feedback from the code review, along with the changes that we made because of feedback, are located in `~/Classwork/Code Review`
+Feedback from the code review, along with the changes that we made because of feedback, are located in
+`~/Classwork/Code Review`
 
 
 # License
