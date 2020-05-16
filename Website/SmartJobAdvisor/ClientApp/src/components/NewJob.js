@@ -126,10 +126,6 @@ class NewJobForm extends Component {
 		}).then(async (res) => {
 			await res.json().then((data) => {
 				this.setState({ paperDatabase: data.paperdb });
-
-				// Testing with actual data
-				//var realData = require('../PaperData/HP-paper-db-CONFIDENTIAL-2020-02-09.json');
-				//this.setState({ paperDatabase: realData.paperdb })
 			});
 		}).catch(err => {
 			this.fetchError("fetch paper database");
@@ -490,6 +486,7 @@ class NewJobForm extends Component {
 		cookies.set('qualityMode', values.qualityMode, { path: '/', maxAge: 31536000 });
 		cookies.set('pressUnwinderBrand', values.pressUnwinderBrand, { path: '/', maxAge: 31536000 });
 		cookies.set('opticalDensity', values.opticalDensity, { path: '/', maxAge: 31536000 });
+
 		/* Only set these cookies if a PDF was NOT uploaded. */
 		if (this.state.fileList.length === 0) {
 			cookies.set('jobName', values.jobName, { path: '/', maxAge: 31536000 });
@@ -528,11 +525,11 @@ class NewJobForm extends Component {
 			}
 
 			/* If the newly-created usedPaper object was not found in the list:
-			 *     If < 5 items, just add usedPaper to the list
-			 *     If = 5 items, remove oldest, then push usedPaper */
+			 *    If < 5 items, just add usedPaper to the list
+			 *    If = 5 items, remove oldest, then push usedPaper */
 			if (!exists) {
-				if (paperList.length === 5)
-					paperList.splice(4, 1);
+				if (paperList.length === 10)
+					paperList.splice(9, 1);
 
 				paperList.unshift(usedPaper);
 			}

@@ -853,7 +853,7 @@ class JobHistory extends Component {
 					}
 				</div>
 
-                <Table
+				<Table
 					rowKey="jobID"
 					rowSelection={rowSelection}
 					dataSource={tableData}
