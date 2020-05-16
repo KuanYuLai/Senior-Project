@@ -54,7 +54,9 @@ The `Add New Job` button takes you to the New Job page, which contains a form fo
   - **Sub-Type:**  the type of the paper (bond/cover/news/text)
   - **Weight:**  the weight of the paper in GSM (grams per square meter)
   - **Finish:**  the finish for the selected paper (gloss/matte/silk/etc.)
-  
+
+The New Job form also has info popups next to each form item to explain its meaning.
+
 Both sections have a reset button, which resets the form values only in that section.
 
 When finished filling out the form, press the 'Submit' button to pass the input to the SmartJobAdvisor Engine. When the button is pressed, the form values are displayed in the console (Ctrl + Shift + i) along with the ID that was passed back from the SmartJobAdvisor Engine. You will be brought to a new screen, Job Results.
