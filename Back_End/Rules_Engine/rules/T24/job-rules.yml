@@ -55,13 +55,13 @@ actions:
   - "job.setCoverageClass('Heavy');"
   - "job.setDescription('CoverageClass', job.setValue('Coverage class', 'Heavy') + job.setInitReason('coverage class', 'greater than 60'));"
 ---
-name: "Coating-Coated-Exposed-Fiber"
-description: "Set Coating Class to 'Exposed Fiber'"
+name: "Coating-Coated-Exposed-Fiber-Surface"
+description: "Set Coating Class to 'Exposed Fiber Surface'"
 priority: 2
 condition: "job.getpaperType() == 'Coated' && (job.getfinish() == 'High Bulk' || job.getfinish() == 'Matte' || job.getfinish() == 'Silk' || job.getfinish() == 'Vellum')"
 actions:
-  - "job.setCoatingClass('Exposed Fiber');"
-  - "job.setDescription('CoatingClass', job.setValue('Coating class', job.getpaperType() + ' - Exposed Fiber') + job.setInitReason('paper type', job.getpaperType()) + job.setSubReason('finish', job.getfinish()));"
+  - "job.setCoatingClass('Exposed Fiber Surface');"
+  - "job.setDescription('CoatingClass', job.setValue('Coating class', job.getpaperType() + ' - Exposed Fiber Surface') + job.setInitReason('paper type', job.getpaperType()) + job.setSubReason('finish', job.getfinish()));"
 ---
 name: "Coating-Coated-Closed-Surface"
 description: "Set Coating Class to 'Closed Surface'"

@@ -383,9 +383,6 @@ public class Job {
             }
         }
         return "{" +
-            "\"CoverageClass\":\"" + CoverageClass + "\"," +
-            "\"CoatingClass\":\"" + CoatingClass + "\"," +
-            "\"WeightClass\":\"" + WeightClass + "\"," +
             "\"TargetSpeed\":" + TargetSpeed + "," +
             "\"DryerPower\":\"" + DryerPower + "\"," +
             "\"DryerZone\":" + DryerZone + "," +
@@ -395,6 +392,9 @@ public class Job {
             "\"Primer\": " + primer + "," +
             "\"BA\": " + BA + "," +
             "\"Enhancer\": " + Enhancer + "," +
+            "\"CoverageClass\":\"" + CoverageClass + "\"," +
+            "\"CoatingClass\":\"" + CoatingClass + "\"," +
+            "\"WeightClass\":\"" + WeightClass + "\"," +
             "\"Description\": {" + Description_out + "}" +
             "}";
 	}

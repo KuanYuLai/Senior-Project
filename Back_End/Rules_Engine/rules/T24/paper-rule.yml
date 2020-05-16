@@ -1,10 +1,10 @@
 ---
-name: "Coating-Class-Exposed-Fiber"
+name: "Coating-Class-Exposed-Fiber-Surface"
 description: "Set Coating Class to 'Exposed Fiber'"
 priority: 2
 condition: "job.getpaperType() == 'Coated' && job.getfinish() == 'Glossy'"
 actions:
-  - "job.setCoatingClass('Exposed Fiber');"
+  - "job.setCoatingClass('Exposed Fiber Surface');"
 ---
 name: "Coating-Class-Closed-Surface"
 description: "Set Coating Class to 'Closed Surfce'"

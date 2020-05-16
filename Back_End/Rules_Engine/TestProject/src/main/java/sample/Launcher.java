@@ -62,33 +62,6 @@ public class Launcher {
 
         String host_url = "http://ec2-35-163-184-27.us-west-2.compute.amazonaws.com:8080/rules/" + ruleclass + "/";
 
-        /*
-        //Get rules file from server
-        URL job_file = new URL(host_url + "job-rules.yml");
-        URL BA_file = new URL(host_url + "BA-rule.yml");
-        URL primer_file = new URL(host_url + "primer-rule.yml");
-        URL paper_file = new URL(host_url + "paper-rule.yml");
-        //Open connection
-        URLConnection yc_job = job_file.openConnection();
-        URLConnection yc_BA = BA_file.openConnection();
-        URLConnection yc_primer = primer_file.openConnection();
-        URLConnection yc_paper = paper_file.openConnection();
-        //Read buffer
-        BufferedReader in_job = new BufferedReader(new InputStreamReader(yc_job.getInputStream()));
-        BufferedReader in_BA = new BufferedReader(new InputStreamReader(yc_BA.getInputStream()));
-        BufferedReader in_primer = new BufferedReader(new InputStreamReader(yc_primer.getInputStream()));
-        BufferedReader in_paper = new BufferedReader(new InputStreamReader(yc_paper.getInputStream()));
-
-
-
-      	// Create composite rule for determining if primer/BA is used
-        Rules jobRule= ruleFactory.createRules(in_job);
-        Rules BARule = ruleFactory.createRules(in_BA);
-        Rules primerRule = ruleFactory.createRules(in_primer);
-        Rules paperRule = ruleFactory.createRules(in_paper);
-        */
-
-
         // Create a default rules engine and fire rules on known racts
         RulesEngineParameters parameters = new RulesEngineParameters()
             .priorityThreshold(10)
@@ -103,32 +76,7 @@ public class Launcher {
 
 
         Iterator it = ruleset.iterator();
-        /*
-            while(it.hasNext()){
-                //System.out.println("== " + it.toString() + "\n");
-                switch(it.next().toString()){
-                    case "BA-rule":
-                        Rules BARule = ruleFactory.createRules(getFile(host_url, "BA-rule"))
-                        rulesEngine.fire(BARule, facts);
-                        System.out.println("== BA-rule fired");
-                        break;
-                    case "primer-rule":
-                        rulesEngine.fire(primerRule, facts);
-                        System.out.println("== primer-rule fired");
-                        break;
-                    case "paper-rule":
-                        rulesEngine.fire(paperRule, facts);
-                        System.out.println("== paper-rule fired");
-                        break;
-                    case "job-rule":
-                        rulesEngine.fire(jobRule, facts);
-                        System.out.println("== job-rule fired");
-                        break;
-                    default:
-                        System.out.println("== Unrecognized rule" + it.toString());
-                }
-            }
-        */
+
         Rules rule;
         while(it.hasNext()){
             rule = ruleFactory.createRules(getFile(host_url, it.next().toString()));
