@@ -198,6 +198,7 @@ public class Job {
     
     public void setTargetSpeed() throws Exception{
         //Host URL for the JSON file
+        // URL "YourDomain:8000/Your_endpoint_for_rules_folder"
         String host_url = "http://ec2-35-163-184-27.us-west-2.compute.amazonaws.com:8080/rules/" + ruleclass + "/";
         //Getting JSON files
         URL TargetSpeed_JSON = new URL(host_url + "TargetSpeed.json");
@@ -238,6 +239,7 @@ public class Job {
 
     public void setDryerPower() throws Exception{
         //Host URL for the JSON file
+        // URL "YourDomain:8000/Your_endpoint_for_rules_folder"
         String host_url = "http://ec2-35-163-184-27.us-west-2.compute.amazonaws.com:8080/rules/" + ruleclass + "/";
         //Getting JSON files
         URL dryerpower_JSON= new URL(host_url + "DryerPower.json");

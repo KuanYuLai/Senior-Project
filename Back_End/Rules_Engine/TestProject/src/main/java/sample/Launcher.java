@@ -61,6 +61,7 @@ public class Launcher {
         System.out.println("== Finish creating job...");
 
         // URL for rules folder
+        // URL "YourDomain:8000/Your_endpoint_for_rules_folder"
         String host_url = "http://ec2-35-163-184-27.us-west-2.compute.amazonaws.com:8080/rules/" + ruleclass + "/";
 
         // Create a default rules engine and fire rules on known racts
