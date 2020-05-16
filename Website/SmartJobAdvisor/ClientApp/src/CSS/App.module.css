@@ -12,7 +12,7 @@
 }
 
 /* Change the padding of the main content when the screen is very small. */
-@media only screen and (max-width: 350px) {
+@media only screen and (max-width: 375px) {
 	.mainContent {
 		width: calc(100vw - 10px);
 		height: calc(100vh - 60px);
@@ -24,7 +24,7 @@
 	}
 }
 
-@media only screen and (min-width: 350px) {
+@media only screen and (min-width: 376px) {
 	.mainContent {
 		width: calc(100vw - 20px);
 		height: calc(100vh - 70px);

@@ -1,5 +1,5 @@
 ﻿import React, { Component, Fragment } from 'react';
-import { Button, Checkbox, Icon, Modal, notification, Table, Tooltip, Row, Col } from 'antd';
+import { Button, Checkbox, Icon, Modal, notification, Popconfirm, Table, Tooltip, Row, Col } from 'antd';
 import { instanceOf } from 'prop-types';
 import { withCookies, Cookies } from 'react-cookie';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -9,8 +9,8 @@ import 'react-datasheet/lib/react-datasheet.css';
 import moment from 'moment';
 
 import Style from '../CSS/JobHistory.module.css'
+import '../CSS/GlobalStyles.css';
 import { ServerURL } from './Home';
-
 
 /* Constructs the spreadsheet containing the job results. Can also compare multiple jobs.
  * The function will be exported so that the jobResults page can use it as well. */
@@ -33,13 +33,14 @@ export const BuildSpreadsheet = function (keys, jobHistory, justifications) {
 	spreadsheetTemp.push({ value: '', width: 150, readOnly: true });
 	exportTemp.push("");
 
+	/* For each jobID passed, get that job from the jobHistory object. */
 	for (let i = 0; i < keys.length; i++) {
 		currentData = jobHistory.filter(obj => {
 			return obj.jobID === keys[i];
 		})[0];
 
-		/* Column for each job being compared. If justifications are on,
-		 * additionalcolumn to the right and the header column (Job #) spans two columns. */
+		/* Column for each job being compared. If justifications are on, additional
+		 * column to the right and the header column (Job #) spans two columns. */
 		if (justifications) {
 			spreadsheetTemp.push({ value: 'Job ' + currentData.jobID, colSpan: 2, readOnly: true });
 			exportTemp.push('Job ' + currentData.jobID);
@@ -58,8 +59,9 @@ export const BuildSpreadsheet = function (keys, jobHistory, justifications) {
 
 	/* Runs through the list of all keys (except jobID), making a row for each. */
 	for (let j = 0; j < keyList.length; j++) {
-
+		/* If the key is 'input' or 'output', its row stays empty. */
 		if (keyList[j] !== 'input' && keyList[j] !== 'output') {
+			/* Make a row label for that key in keyList. */
 			spreadsheetTemp.push({ value: keyList[j], width: 150, readOnly: true });
 			exportTemp.push(keyList[j]);
 
@@ -69,7 +71,7 @@ export const BuildSpreadsheet = function (keys, jobHistory, justifications) {
 					return obj.jobID === keys[k];
 				})[0];
 
-				/* If justifications are enabled, make 'input' span 2 columns.
+				/* If justifications are enabled, make 'input' data span 2 columns.
 				 * Otherwise, make it only one column of width 175px. */
 				if (justifications) {
 					spreadsheetTemp.push({ value: currentData[keyList[j]], colSpan: 2 });
@@ -174,7 +176,8 @@ export const BuildSpreadsheet = function (keys, jobHistory, justifications) {
 	return [spreadsheetData, exportData, spreadsheetWidth];
 }
 
-/* The job history page displays a table of all previously completed jobs, sorted chronologically. */
+/* The job history page displays a table of all previously completed jobs, sorted chronologically.
+ * Allows the user to look at the results of/delete one or more jobs. */
 class JobHistory extends Component {
 	static propTypes = {
 		cookies: instanceOf(Cookies).isRequired
@@ -200,13 +203,35 @@ class JobHistory extends Component {
 		if (typeof cookies.get('defaultOutput') !== 'undefined')
 			defaultOutput = cookies.get('defaultOutput');
 
-		/* Set some state values so that the states exist and don't cause an error when referenced. */
+		/* Initialize state variables:
+		 *   - 'jobHistory'              :  a list containing the entirety of the job history database. Empty before fetch.
+		 *   - 'tableData'               :  a list containing the data shown in the table. Empty by default.
+		 *   - 'selectedRowKeys'         :  a list containing all the rowIDs of all of the currently selected rows in the table. Empty by default.
+		 *   - 'selectedRowKeysHolder'   :  a list for holding the currently-selected rowKeys. Fixes empty-datasheet glitch. Empty by default.
+		 *   - 'currentJobID'            :  the ID of the currently-selected job. Used for setting modal title with job ID, only on a single job.
+		 *   - 'justifications'          :  flag to toggle visibility of justifications in the spreadsheet modal. True by default.
+		 *   - 'spreadsheetModalVisible' :  flag to toggle visibility of the modal containing the datasheet. False by default.
+		 *   - 'spreadsheetModal'        :  object that holds the content of the spreadsheet modal. Null be default.
+		 *   - 'columnModalVisible'      :  flag to toggle visibility of the modal containing the column picker. False by default.
+		 *   - 'columnModal'             :  object that holds the content of the column picker modal. null be default
+		 *   - 'tableColumns'            :  a list containing the column definitions for the table. Empty be default.
+		 *   - 'selectedColumns'         :  a list containing the columns that are currently active. Default to defaultCols list.
+		 *   - 'generalCheckboxes'       :  a list containing the general columns that are active. GENERAL COLUMNS SHOULD ALWAYS BE ACTIVE.
+		 *   - 'inputCheckboxes'         :  a list containing the checkboxes for the 'input' section of the table data.
+		 *   - 'outputCheckboxes'        :  a list containing the checkboxes for the 'output' section of the table data.
+		 *   - 'error'                   :  flag to determine if there has been a general error. If true, prevents page from rendering.
+		 *   - 'windowWidth'             :  window width obtained from window listener. Inherited from App.js.
+		 *   - 'windowHeight'            :  window height obtained from window listener. Inherited from App.js.
+		 */
 		this.state = {
+			jobHistory: [],
+			tableData: [],
 			selectedRowKeys: [],
+			selectedRowKeysHolder: [],
 			currentJobID: -1,
+			justifications: true,
 			spreadsheetModalVisible: false,
 			spreadsheetModal: null,
-			justifications: true,
 			columnModalVisible: false,
 			columnModal: null,
 			tableColumns: [],
@@ -214,55 +239,84 @@ class JobHistory extends Component {
 			generalCheckboxes: defaultGeneral,
 			inputCheckboxes: defaultInput,
 			outputCheckboxes: defaultOutput,
-			windowWidth: 0,
-			windowHeight: 0,
-			copied: false
+			error: null,
+			windowWidth: 1000,
+			windowHeight: 1000,
 		};
-
-		this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
 	}
 
 	/* Called immediately after the constructor. Allows page to render with empty values before data is added to avoid a crash. */
 	componentDidMount = async () => {
+		this.refreshTable();
+	}
+
+	/* Called when the window is resized. Gets window dimensions passed from App.js. */
+	componentDidUpdate(prevProps) {
+		/* If the window height/width passed from App.js is different than
+		 * the value stored in the state, update the state with the new value. */
+		if (prevProps.windowWidth !== this.props.windowWidth || prevProps.windowHeight !== this.props.windowHeight) {
+			this.setState({
+				windowWidth: this.props.windowWidth,
+				windowHeight: this.props.windowHeight
+			});
+
+			this.refreshTable();
+		}
+	}
+
+	/* Grabs the job history from the endpoint and rebuilds the table. */
+	refreshTable = async () => {
 		/* Fetch the job history from the server. Wait unfil fetch is complete to continue. */
 		await this.fetchHistory();
 
 		/* If there was an error fetching the paper database, don't attempt to populate dropdowns/radios. */
-		if (typeof this.state.error === 'undefined' && this.state.error !== true) {
+		if (this.state.error !== true && this.state.error !== null) {
 			await this.buildTableColumns();
 			await this.buildTable();
 		}
-
-		/* Add event listener for window resize. Helps with table formatting on small screens. */
-		this.updateWindowDimensions();
-		window.addEventListener('resize', this.updateWindowDimensions);
-	}
-
-	/* Called when the component is unmounted. Removes the event listener. */
-	componentWillUnmount = () => {
-		window.removeEventListener('resize', this.updateWindowDimensions);
-	}
-
-	/* Gets window dimensions. */
-	updateWindowDimensions = () => {
-		this.setState({ windowWidth: window.innerWidth, windowHeight: window.innerHeight });
-		this.buildTableColumns();
 	}
 
 	/* Calls the database to request job history. */
 	fetchHistory = async () => {
 		await fetch(ServerURL + "job-history", {
-			method: "GET",
+			method: 'GET',
 			mode: 'cors',
 			headers: {
 				'Accept': 'application/json',
 			}
 		}).then(async (res) => {
 			await res.json().then((data) => {
-				this.setState({ jobHistory: data });
+				/* Save the fetched data to the jobHistory state list,
+				 * set error flag to false to indicate successful fetch. */
+				this.setState({
+					jobHistory: data,
+					error: false
+				});
 			});
 		}).catch(err => {
+			/* If there was an error in the fetch, call fetchError() to alert the user. */
 			this.fetchError("fetch job history");
+		});
+	}
+
+	/* Deletes currently selected jobs from the Job History file. */
+	deleteHistory = async (keys) => {
+		await fetch(ServerURL + "job-history/remove/" + keys, {
+			method: 'DELETE',
+			mode: 'cors',
+			headers: {
+				'Accept': 'application/json',
+			}
+		}).then(async (res) => {
+			await res.json().then((data) => {
+				/* Print message from server, deselect all selected rows, rebuild the table. */
+				console.log(data);
+				this.setState({ selectedRowKeys: [] })
+				this.refreshTable();
+			});
+		}).catch(err => {
+			/* If there was an error in the fetch, call fetchError() to alert the user. */
+			this.fetchError("delete from job history");
 		});
 	}
 
@@ -280,11 +334,13 @@ class JobHistory extends Component {
 				duration: null
 			});
 
+			/* Debouncing... */
 			setTimeout(() => {
 				this.alertPresent = false;
 			}, 1000);
 		}
 
+		/* Toggle the error state flag. */
 		this.setState({ error: true });
 	}
 
@@ -302,11 +358,12 @@ class JobHistory extends Component {
 
 		/* Build the list of input values. */
 		for (let i = 0; i < Object.keys(this.state.jobHistory[0].input).length; i++) {
+			/* Get the label for the column, clean it up a bit. */
 			var tempTitle = [...this.state.jobHistory][0];
-
 			tempTitle = Object.keys(tempTitle.input)[i].replace(/([a-z])([A-Z])/g, '$1 $2');
 			tempTitle = tempTitle.charAt(0).toUpperCase() + tempTitle.slice(1);
 
+			/* If the key is not 'jobName', add it to the list of column labels. */
 			if (Object.keys(this.state.jobHistory[0].input)[i] !== 'jobName')
 				colList2.push(
 					{
@@ -318,11 +375,12 @@ class JobHistory extends Component {
 
 		/* Build the list of output values. */
 		for (let j = 0; j < Object.keys(this.state.jobHistory[0].output).length; j++) {
+			/* Get the label for the column, clean it up a bit. */
 			var tempTitle2 = [...this.state.jobHistory][0];
-
 			tempTitle2 = Object.keys(tempTitle2.output)[j].replace(/([a-z])([A-Z])/g, '$1 $2');
 			tempTitle2 = tempTitle2.charAt(0).toUpperCase() + tempTitle2.slice(1);
 
+			/* If the key is not 'jobName', add it to the list of column labels. */
 			if (Object.keys(this.state.jobHistory[0].output)[j] !== 'jobName')
 				colList3.push(
 					{
@@ -336,7 +394,7 @@ class JobHistory extends Component {
 		var activeColSpan = 6;
 		var colSpan = 8;
 
-		if (this.state.windowWidth < 500) {
+		if (this.state.windowWidth <= 500) {
 			activeColSpan = 12;
 			colSpan = 12;
 		}
@@ -346,6 +404,7 @@ class JobHistory extends Component {
 		var jobInputCols = this.buildCheckboxes(colList2, 'input', colSpan);
 		var jobOutputCols = this.buildCheckboxes(colList3, 'output', colSpan);
 
+		/* Build the content within the modal using the objects that were just created. */
 		var modalInnards =
 			<>
 				<b>Always-Active Columns</b><br />
@@ -360,6 +419,7 @@ class JobHistory extends Component {
 				{jobOutputCols}
 			</>;
 
+		/* Set the columnModal state object equal to the modal content that was just created. */
 		this.setState({
 			columnModal: modalInnards
 		});
@@ -437,7 +497,7 @@ class JobHistory extends Component {
 		const { selectedColumns, jobHistory, windowWidth } = this.state;
 
 		var tempCol = [];
-		var tempWidth = 800;
+		var tempWidth = 850;
 
 		/* Add base columns that cannot be removed. */
 		tempCol.push(
@@ -445,20 +505,19 @@ class JobHistory extends Component {
 				title: 'Job ID',
 				dataIndex: 'jobID',
 				width: 100,
-				sortOrder: 'descend',
 				sorter: (a, b) => a.jobID - b.jobID,
-				fixed: windowWidth < 350 ? false : 'left'
+				fixed: windowWidth <= 500 ? false : 'left'
 			},
 			{
 				title: 'Date',
 				dataIndex: 'jobTime',
-				width: 225,
+				width: 275,
 				sorter: (a, b) => moment(a.jobTime).unix() - moment(b.jobTime).unix(),
-				defaultSortOrder: 'descend',
 			},
 			{
 				title: 'Job Name',
 				dataIndex: 'jobName',
+				ellipsis: true,
 				sorter: (a, b) => { return a.jobName.localeCompare(b.jobName) },
 			},
 		);
@@ -507,12 +566,23 @@ class JobHistory extends Component {
 		tempCol.push(
 			{
 				title: 'View',
-				render: (text, row) => <Button className={windowWidth < 350 ? null : Style.resultsColumn} onClick={() => { setTimeout(() => { this.compareJobs([row.jobID]) }, 100) }}><Icon className={Style.buttonIcon} type="search" /></Button>,
+				render: (text, row) =>
+					<Button
+						className={windowWidth <= 500 ? null : Style.resultsColumn}
+						onClick={() => {
+							setTimeout(() => {
+								this.setState({ selectedRowKeys: [row.jobID], justifications: true });
+								this.compareJobs([row.jobID]);
+							}, 100);
+						}}
+					>
+					<Icon className={Style.buttonIcon} type="search" /></Button>,
 				width: 65,
 				fixed: 'right'
 			},
 		);
 
+		/* Save generated columns/width to state objects. */
 		this.setState({
 			tableColumns: tempCol,
 			tableWidth: tempWidth
@@ -527,7 +597,7 @@ class JobHistory extends Component {
 		var rowObject = {};
 
 		/* Create an entry in the table for each object in jobHistory. */
-		for (let i = 0; i < jobHistory.length; i++) {
+		for (let i = jobHistory.length - 1; i >= 0; i--) {
 			/* Add data from correct spot. Column data may be surface level, or child of 'input'/'output' */
 			for (let j = 0; j < selectedColumns.length; j++) {
 				if (typeof jobHistory[i][selectedColumns[j]] !== 'undefined')
@@ -642,6 +712,7 @@ class JobHistory extends Component {
 			</>;
 
 		this.setState({
+			selectedRowKeysHolder: keys,
 			spreadsheetWidth: spreadExportData[2],
 			spreadsheetModal: modalInnards,
 			currentJobID: keys.length === 1 ? keys[0] : null
@@ -653,11 +724,14 @@ class JobHistory extends Component {
 
 	/* Triggered when checkbox is clicked. Toggles justification column. */
 	handleJustifications = async () => {
+		/* Close the spreadsheet modal. */
 		this.toggleModal("spreadsheet");
 
+		/* Toggle justifications. Wait for this to finish. */
 		await this.setState({ justifications: !this.state.justifications });
 
-		setTimeout(() => { this.compareJobs(this.state.selectedRowKeys); this.forceUpdate(); }, 300);
+		/* After a 300ms delay, rebuild and reopen the spreadsheet modal. */
+		setTimeout(() => { this.compareJobs(this.state.selectedRowKeysHolder); this.forceUpdate(); }, 300);
 	}
 
 	render() {
@@ -674,10 +748,11 @@ class JobHistory extends Component {
 			windowWidth
 		} = this.state;
 
-		const rowSelection = {
+		/* Some options for the rowselection column in the table. */
+		let rowSelection = {
 			selectedRowKeys,
 			onChange: this.onSelectChange,
-			fixed: windowWidth < 350 ? null : 'left',
+			fixed: 'left',
 		};
 
 		return (
@@ -711,7 +786,8 @@ class JobHistory extends Component {
 						this.toggleModal("spreadsheet");
 						this.setState({
 							selectedRowKeys: [],
-							currentJobID: -1
+							currentJobID: -1,
+							justifications: false,
 						});
 					}}
 					destroyOnClose={true}
@@ -743,7 +819,7 @@ class JobHistory extends Component {
 						<Button
 							className={Style.tableButton}
 							onClick={() => {
-								this.setState({ justifications: !this.state.justifications }, () => this.compareJobs(selectedRowKeys));
+								this.setState({ justifications: false }, () => this.compareJobs(selectedRowKeys));
 							}}
 							type="primary"
 						>
@@ -759,12 +835,20 @@ class JobHistory extends Component {
 							<Button
 								className={Style.tableButton}
 								onClick={() => this.setState({ selectedRowKeys: [] })}
-								type="danger"
-								ghost
+								type="default"
 							>
 								<Icon className={Style.buttonIcon} type="undo" />
-								Clear
+								Deselect
 							</Button>
+							<Popconfirm
+								title="Are you sure you want to delete the job(s)?"
+								onConfirm={() => this.deleteHistory(selectedRowKeys)}
+							>
+								<Button className={Style.tableButton} type="danger" >
+									<Icon className={Style.buttonIcon} type="delete" />
+									Delete
+								</Button>
+							</Popconfirm>
 							<span>{selectedRowKeys.length} selected</span>
 						</>
 						:
@@ -780,9 +864,11 @@ class JobHistory extends Component {
 					style={{ width: tableWidth, maxWidth: '100%' }}
 					scroll={{ y: '60vh', x: tableWidth - 100 }}
 					pagination={{ defaultPageSize: 10, showQuickJumper: true, showSizeChanger: true, pageSizeOptions: ['10', '20', '30'] }}
-					size={windowWidth < 350 ? "small" : "large"}
+					size={windowWidth <= 500 ? "small" : "large"}
 					bordered
 					onRow={(record, rowIndex) => {
+						/* Allows rows to be selected by clicking on them,
+						 * instead of having to click the rowselection checkbox. */
 						return {
 							onClick: () => {
 								var tempRowKeys = [...this.state.selectedRowKeys];

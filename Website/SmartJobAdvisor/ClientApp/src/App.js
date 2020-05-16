@@ -12,6 +12,8 @@ import Style from './CSS/App.module.css'
 
 const { Content } = Layout;
 
+/* The main page of the site, essentially a container. All other pages are rendered within.
+ * Allows the navigation bar to be visible on every page, handles window dimensions with an eventlistener. */
 export default class App extends Component {
 	state = {
 		currentPage: 'home',
@@ -22,7 +24,8 @@ export default class App extends Component {
 		// Get the current page for the menu
 		var URL = window.location.href;
 
-		/* This is a really messy way of doing this, but it doesn't really matter. */
+		/* Sets the current page that the user is on. Used for highlighting the correct tab in the navigation bar.
+		 * This is a kind of messy way of doing this, but it doesn't really matter. */
 		if (URL.includes('new-job')) {
 			this.setState({ currentPage: 'new-job' });
 		} else if (URL.includes('job-history')) {
@@ -32,8 +35,23 @@ export default class App extends Component {
 		} else {
 			this.setState({ currentPage: 'home' });
 		}
+
+		/* Add event listener for window resize. Helps with table formatting on small screens. */
+		this.updateWindowDimensions();
+		window.addEventListener('resize', this.updateWindowDimensions);
 	}
 
+	/* Called when the component is unmounted. Removes the event listener. */
+	componentWillUnmount = () => {
+		window.removeEventListener('resize', this.updateWindowDimensions);
+	}
+
+	/* Gets window dimensions. */
+	updateWindowDimensions = () => {
+		this.setState({ windowWidth: window.innerWidth, windowHeight: window.innerHeight });
+	}
+
+	/* When a menu item is clicked, set the correct page. */
 	handleMenuClick = (page) => {
 		if (page === "navImage")
 			this.setState({ currentPage: 'home' });
@@ -45,6 +63,7 @@ export default class App extends Component {
 		return (
 			<Router>
 				<Layout>
+					{/* The navigation bar. Each entry links to its respective page. */}
 					<Menu onClick={(e) => {this.handleMenuClick(e.key)}} selectedKeys={[this.state.currentPage]} mode="horizontal">
 						<Menu.Item key="navImage">
 							<img
@@ -74,13 +93,14 @@ export default class App extends Component {
 						</Menu.Item>
 					</Menu>
 
+					{/* Used to define what component is rendered when Link is called. */}
 					<Content style={{ height: 'calc(100vh - 48px)' }}>
 						<div className={Style.mainContent}>
 							<Switch>
-								<Route exact path='/' render={(props) => <Home {...props} callback={this.handleMenuClick} />} />
-								<Route exact path='/new-job' render={(props) => <NewJob {...props} />} />
-								<Route exact path='/job-history' render={(props) => <JobHistory {...props} />} />
-								<Route path='/job-results' component={JobResults} />
+								<Route exact path='/' render={(props) => <Home {...props} callback={this.handleMenuClick} windowWidth={this.state.windowWidth} windowHeight={this.state.windowHeight} />} />
+								<Route exact path='/new-job' render={(props) => <NewJob {...props} windowWidth={this.state.windowWidth} windowHeight={this.state.windowHeight} />} />
+								<Route exact path='/job-history' render={(props) => <JobHistory {...props} windowWidth={this.state.windowWidth} windowHeight={this.state.windowHeight} />} />
+								<Route path='/job-results' component={JobResults} windowWidth={this.state.windowWidth} windowHeight={this.state.windowHeight} />
 							</Switch>
 						</div>
 					</Content>

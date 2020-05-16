@@ -10,6 +10,11 @@ import Style from '../CSS/JobHistory.module.css'
 
 import { ServerURL } from './Home';
 
+/* This class handles displaying the results of job(s) to the user.
+ * In the URL, there are two options:
+ *   - '?justifications=[true|false]' : toggles justifications, on by default
+ *   - '?IDs=[IDs]'                   : list of jobs to display
+ */
 export class JobResults extends Component {
 	constructor(props) {
 		super(props);
@@ -24,24 +29,60 @@ export class JobResults extends Component {
 		var justifications = window.location.href.split('?justifications=')[1].split('?IDs=')[0];
 		justifications = (justifications === 'true');
 
+		/* Initialize state variables:
+		 *   - 'jobIDs'           :  a list containing all of the Job IDs passed through the URL.
+		 *   - 'jobResults'       :  a list containing the job data fetched from the server.
+		 *   - 'justifications'   :  flag to determine whether or not to show justifications in the spreadsheet. On by default.
+		 *   - 'spreadsheetData'  :  object that holds generated spreadsheet data. Null initially.
+		 *   - 'exportData'       :  object that holds generated export data. Null initially.
+		 *   - 'spreadsheetWidth' :  the width of the spreadsheet, calculated base on the number of jobs and if justifications are toggled.
+		 *   - 'showSpreadsheet'  :  flag to determine whether or not to render the spreadsheet. When false, spreadsheet is destroyed so it can be rebuilt.
+		 *   - 'copyURL'          :  the URL copied when the 'Copy Link to Clipboard' button is pressed.
+		 *   - 'fileName'         :  the name of the file created when the 'Export to CSV' button is pressed.
+		 *   - 'ready'            :  flag that indicates data is ready to be displayed. When true, spinner will be replaced with rendered page.
+		 *   - 'error'            :  flag that indicates an error has been hit. When true, page will not load/operate on nonexisting data.
+		 *   - 'windowWidth'      :  window width obtained from window listener. Inherited from App.js.
+		 *   - 'windowHeight'     :  window height obtained from window listener. Inherited from App.js.
+		 */
 		this.state = {
 			jobIDs: IDs,
 			jobResults: [],
 			justifications: justifications,
+			spreadsheetData: null,
+			exportData: null,
 			spreadsheetWidth: 0,
+			showSpreadsheet: false,
+			copyURL: "",
+			fileName: "",
 			ready: false,
-			error: false
+			error: false,
+			windowWidth: 1000,
+			windowHeight: 1000,
 		};
 	}
 
-	/* Calls after the component mounts, fetches data and generates spreadsheet/export. */
+	/* Calls after the component mounts. Fetches data and generates spreadsheet/export. */
 	componentDidMount = async () => {
 		const { jobIDs } = this.state;
 
+		/* Fetch each job in a row, saving the fetched data to the jobResults state list. */
 		for (let i = 0; i < jobIDs.length; i++)
 			await this.fetchJob(jobIDs[i]);
 
-		this.generateData();
+		/* After all data has been fetched, generate the spreadsheet. */
+		this.generateSpreadsheet();
+	}
+
+	/* Called when the window is resized. Gets window dimensions passed from App.js. */
+	componentDidUpdate(prevProps) {
+		/* If the window height/width passed from App.js is different than
+		 * the value stored in the state, update the state with the new value. */
+		if (prevProps.windowWidth !== this.props.windowWidth || prevProps.windowHeight !== this.props.windowHeight) {
+			this.setState({
+				windowWidth: this.props.windowWidth,
+				windowHeight: this.props.windowHeight
+			});
+		}
 	}
 
 	/* Calls the database to request job history. */
@@ -54,14 +95,17 @@ export class JobResults extends Component {
 			}
 		}).then(async (res) => {
 			await res.json().then((data) => {
+				/* Make a copy of the jobResults state list, append newly-fetched data. */
 				var temp = [...this.state.jobResults];
 				temp.push(data);
 
+				/* Save jobResults copy back to the state. */
 				this.setState({
 					jobResults: temp
 				});
 			});
 		}).catch(err => {
+			/* If there was an error in the fetch, call fetchError() to alert the user. */
 			this.fetchError("fetch job history");
 		});
 	}
@@ -80,27 +124,33 @@ export class JobResults extends Component {
 				duration: null
 			});
 
+			/* Debouncing... */
 			setTimeout(() => {
 				this.alertPresent = false;
 			}, 1000);
 		}
 
+		/* Toggle the error state flag. */
 		this.setState({ error: true });
 	}
 
 	/* Generate the data for the spreadsheet/export. */
-	generateData = () => {
+	generateSpreadsheet = () => {
 		const { jobIDs, jobResults, justifications } = this.state;
 
+		/* Only continue if there hasn't been an error of some kind. */
 		if (!this.state.error) {
+			/* Generate URL copied when 'Copy Link to Clipboard' button is pressed. */
 			var copyURL = window.location.href.split('job-results')[0];
 			if (justifications)
 				copyURL += 'job-results?justifications=true?IDs='
 			else
 				copyURL += 'job-results?justifications=false?IDs='
 
+			/* Append job IDs to the copy URL. */
 			copyURL += window.location.href.split('?IDs=')[1];
 
+			/* Call the function from JobHistory that builds the spreadsheet and export data. */
 			var data = BuildSpreadsheet(jobIDs, jobResults, justifications);
 
 			/* Name of the file generated when the "Export to CSV" button is clicked. */
@@ -115,22 +165,31 @@ export class JobResults extends Component {
 
 			fileName += ".csv";
 
+			/* Save the spreadsheet/export data to the state, along with the generated spreadsheet width.
+			 * Also save copyURL and fileName, then toggle the showSpreadsheet and ready flags. */
 			this.setState({
 				spreadsheetData: data[0],
 				exportData: data[1],
 				spreadsheetWidth: data[2],
+				showSpreadsheet: true,
 				copyURL: copyURL,
+				fileName: fileName,
 				ready: true,
-				fileName: fileName
 			});
 		}
 	}
 
 	/* Triggered when checkbox is clicked. Toggles justification column. */
 	handleJustifications = async () => {
-		await this.setState({ justifications: !this.state.justifications });
+		/* Set showSpreadsheet flag to false, derendering the spreadsheet
+		 * and destroying its contents so that justifications can be toggled. */
+		await this.setState({
+			showSpreadsheet: false,
+			justifications: !this.state.justifications
+		});
 
-		setTimeout(() => { this.generateData(); this.forceUpdate(); }, 50);
+		/* Once the justifications have been toggled, rebuild the spreadsheet/export data. */
+		await this.generateSpreadsheet();
 	}
 
 	render() {
@@ -141,13 +200,19 @@ export class JobResults extends Component {
 			copyURL,
 			fileName,
 			spreadsheetData,
+			showSpreadsheet,
 			spreadsheetWidth,
 			exportData
 		} = this.state;
 
+		/* If content has not yet loaded, show a spinner in the middle of the screen. */
 		if (!ready)
 			return (
-				<Spin />
+				<div style={{ textAlign: 'center', width: '100%', height: '90%' }}>
+					<div style={{ position: 'relative', top: '50%' }} >
+						<Spin size="large" style={{ position: 'relative' }} />
+					</div>
+				</div>
 			);
 		else
 			return (
@@ -159,6 +224,8 @@ export class JobResults extends Component {
 					}
 					<br /><br />
 
+					{/* Buttons for exporting to CSV, copying link to clipboard,
+					  * checkbox for toggling justifications in the spreadsheet/export. */}
 					<CSVLink data={exportData} filename={fileName}>
 						<Button type="primary" style={{ marginBottom: 10, marginRight: 10, paddingLeft: 10, paddingRight: 10 }}>
 							<Icon className={Style.buttonIcon} type="file-excel" />
@@ -166,7 +233,7 @@ export class JobResults extends Component {
 						</Button>
 					</CSVLink>
 					<CopyToClipboard text={copyURL}>
-						<Tooltip placement="top" trigger="focus" title="Copied!">
+						<Tooltip placement="top" trigger="click" title="Copied!">
 							<Button
 								type="default"
 								style={{ marginBottom: 10, paddingLeft: 10, paddingRight: 10 }}
@@ -183,15 +250,23 @@ export class JobResults extends Component {
 					>
 						Justifications?
 					</Checkbox>
-					<div style={{ width: spreadsheetWidth, maxWidth: '100%', overflowX: 'scroll' }}>
-						<div style={{ width: spreadsheetWidth }}>
-							<ReactDataSheet
-								data={spreadsheetData}
-								valueRenderer={(cell) => <div style={{ textAlign: 'center' }}>{cell.value}</div>}
-								onChange={() => { }}
-							/>
+
+					{/* Conditional rendering of the spreadsheet.
+					  * If showSpreadsheet is true, then the ReactDataSheet component is rendered.
+					  * If showSpreadsheet is false, null is rendered (ReactDataSheet is destroyed). */}
+					{showSpreadsheet ?
+						<div style={{ width: spreadsheetWidth, maxWidth: '100%', overflowX: 'scroll' }}>
+							<div style={{ width: spreadsheetWidth }}>
+								<ReactDataSheet
+									data={spreadsheetData}
+									valueRenderer={(cell) => <div style={{ textAlign: 'center' }}>{cell.value}</div>}
+									onChange={() => { }}
+								/>
+							</div>
 						</div>
-					</div>
+						:
+						null
+					}
 				</Fragment>
 			);
 	}

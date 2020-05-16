@@ -1,11 +1,28 @@
 ﻿import React, { Component } from 'react';
 import { Redirect } from 'react-router';
-import { Button, Checkbox, Form, Icon, Input, InputNumber, notification, Radio, Row, Col, Select, Slider } from 'antd';
+import { Button, Checkbox, Form, Icon, Input, InputNumber, notification, Popover, Radio, Row, Col, Select, Slider, Upload, Modal } from 'antd';
 import { instanceOf } from 'prop-types';
 import { withCookies, Cookies } from 'react-cookie';
 
 import Style from '../CSS/NewJob.module.css'
 import { ServerURL } from './Home';
+import { JobUpload } from './JobUpload';
+
+/* Import all text for info buttons. */
+import {
+	jobNameInfo,
+	rulesetInfo,
+	qualityModeInfo,
+	pressUnwinderBrandInfo,
+	maxCoverageInfo,
+	opticalDensityInfo,
+	paperMfrInfo,
+	paperNameInfo,
+	paperTypeInfo,
+	paperSubTypeInfo,
+	paperWeightInfo,
+	paperFinishInfo
+} from './NewJobInfo';
 
 const { Option } = Select;
 
@@ -17,11 +34,10 @@ class BetterInputNumber extends Component {
 				<div className={Style.betterInputNumberDiv}>
 					<InputNumber
 						{...this.props}
-						className={Style.betterInputNumber}
+						style={{ verticalAlign: 'middle', borderBottomRightRadius: 0, borderTopRightRadius: 0, width: 60 }}
 						value={this.props.value}
 						onChange={(e) => this.props.onSliderChange(e, this.props.field)}
 					/>
-					{/* Can't use CSS here, since I need the className to be something else. */}
 					<div style={{ paddingTop: '2px', verticalAlign: 'middle', display: 'inline-table', lineHeight: '24px', height: '32px' }} className="ant-input-group-addon">{this.props.addonAfter}</div>
 				</div>
 			);
@@ -60,8 +76,11 @@ class NewJobForm extends Component {
 			weightgsm: null,
 			maxCoverage: maxC,
 			opticalDensity: oD,
-			jobCreated: false,
-			createdID: -1,
+			fileList: [],
+			showSubmitModal: false,
+			formValues: null,
+			windowWidth: 1000,
+			windowHeight: 1000,
 		};
 	};
 
@@ -81,6 +100,16 @@ class NewJobForm extends Component {
 				paperSubTypeRadio: this.getRadio(this.state.paperDatabase, "papersubtype"),
 				paperFinishRadio: this.getRadio(this.state.paperDatabase, "finish"),
 				prevPaperDropdown: this.getPrevPaperCookie()
+			});
+		}
+	}
+
+	/* Called when the window is resized. Gets window dimensions passed from App.js. */
+	componentDidUpdate(prevProps) {
+		if (prevProps.windowWidth !== this.props.windowWidth || prevProps.windowHeight !== this.props.windowHeight) {
+			this.setState({
+				windowWidth: this.props.windowWidth,
+				windowHeight: this.props.windowHeight
 			});
 		}
 	}
@@ -277,9 +306,16 @@ class NewJobForm extends Component {
 	onSliderChange = (val, field) => {
 		const { setFieldsValue } = this.props.form;
 
-		/* Set a minimum value, but only for opticalDensity slider. */
-		if (val < 50 && field === "opticalDensity")
+		/* Check to ensure it's a number, not a string. Thanks for catching this one Trey. */
+		if (typeof val !== 'number')
 			val = 50;
+		else {
+			/* Set a minimum value, but only for opticalDensity slider. */
+			if (val < 50 && field === "opticalDensity")
+				val = 50;
+			else if (val < 1 && field === "maxCoverage")
+				val = 1;
+		}
 
 		/* Apply the value to both the form and state. */
 		setFieldsValue({ [field]: val });
@@ -427,10 +463,10 @@ class NewJobForm extends Component {
 			for (let i = 0; i < vals.length; i++) {
 				var name =
 					vals[i].manufacturer + ' - ' +
-					vals[i].productname + ' | ' +
-					vals[i].papertype + ' | ' +
+					vals[i].productname  + ' | ' +
+					vals[i].papertype    + ' | ' +
 					vals[i].papersubtype + ' | ' +
-					vals[i].weightgsm + ' gsm | ' +
+					vals[i].weightgsm    + ' gsm | ' +
 					vals[i].finish;
 
 				dropdown.push(<Option key={i}>{name}</Option>);
@@ -447,12 +483,15 @@ class NewJobForm extends Component {
 		const { cookies } = this.props;
 
 		/* Set cookies for General Info section. */
-		cookies.set('jobName', values.jobName, { path: '/', maxAge: 31536000 });
 		cookies.set('ruleset', values.ruleset, { path: '/', maxAge: 31536000 });
 		cookies.set('qualityMode', values.qualityMode, { path: '/', maxAge: 31536000 });
 		cookies.set('pressUnwinderBrand', values.pressUnwinderBrand, { path: '/', maxAge: 31536000 });
-		cookies.set('maxCoverage', values.maxCoverage, { path: '/', maxAge: 31536000 });
 		cookies.set('opticalDensity', values.opticalDensity, { path: '/', maxAge: 31536000 });
+		/* Only set these cookies if a PDF was NOT uploaded. */
+		if (this.state.fileList.length === 0) {
+			cookies.set('jobName', values.jobName, { path: '/', maxAge: 31536000 });
+			cookies.set('maxCoverage', values.maxCoverage, { path: '/', maxAge: 31536000 });
+		}
 
 		/* Set cookie for recently-used papers in the Paper Selection section. This list will hold the
 		 * last five selected papers. When an item is chosen from the list, it is moved to the top. If
@@ -510,25 +549,32 @@ class NewJobForm extends Component {
 				/* Set cookies for next time. */
 				this.setCookies(values);
 
-				/* Call database to request paperDatabase object. */
-				await fetch(ServerURL + 'new-job/', {
-					method: 'POST',
-					mode: 'cors',
-					body: JSON.stringify(values),
-					headers: {
-						'Accept': 'application/json',
-						'Content-Type': 'application/json',
-					}
-				}).then(async (res) => {
-					await res.json().then((data) => {
-						this.setState({
-							createdID: data.id,
-							jobCreated: true
-						});
+				/* Open the modal for submitting files, only if files were added. */
+				if (this.state.fileList.length > 0) {
+					this.setState({ formValues: values }, () => {
+						this.setState({ showSubmitModal: true });
 					});
-				}).catch(() => {
-					this.fetchError("submit job");
-				});
+				} else {
+					/* Call database to post form data. */
+					await fetch(ServerURL + 'new-job/', {
+						method: 'POST',
+						mode: 'cors',
+						body: JSON.stringify(values),
+						headers: {
+							'Accept': 'application/json',
+							'Content-Type': 'application/json',
+						}
+					}).then(async (res) => {
+						await res.json().then((data) => {
+							this.setState({
+								createdID: data.id,
+								jobCreated: true
+							});
+						});
+					}).catch(() => {
+						this.fetchError("submit job");
+					});
+				}
 			}
 		});
 	};
@@ -555,15 +601,36 @@ class NewJobForm extends Component {
 		this.setState({ error: true });
 	}
 
+	/* Called when a PDF is uploaded. Updates list that will be passed to JobUpload componenet. */
+	handleFileUpload = info => {
+		let fileList = [...info.fileList];
+
+		/* Read from response and show file link. */
+		fileList = fileList.map(file => {
+			if (file.response)
+				file.url = file.response.url;
+
+			return file;
+		});
+
+		this.setState({ fileList });
+	};
+
 	render() {
+		/* Initialize cookies. */
+		const { cookies } = this.props;
 		const {
 			weightgsm,
 			maxCoverage,
 			opticalDensity,
 			paperNameMfrDisabled,
 			unknownPaper,
+			fileList,
 			jobCreated,
 			createdID,
+			showSubmitModal,
+			formValues,
+			windowWidth,
 		} = this.state;
 		const { getFieldDecorator } = this.props.form;
 
@@ -571,23 +638,40 @@ class NewJobForm extends Component {
 		const paperFormItemLayout = {
 			labelCol: {
 				xs: { span: 24 },
-				sm: { span: 4 },
+				sm: { span: 5 },
 			},
 			wrapperCol: {
 				xs: { span: 24 },
-				sm: { span: 20 },
+				sm: { span: 19 },
 			},
 		}
 
-		/* Initialize cookies. */
-		const { cookies } = this.props;
+		/* Some props for the file upload: adds loading bar, forces PDF only,
+		 * allows multiple, sets function to call when file is uploaded. */
+		const uploadProps = {
+			onRemove: file => {
+				this.setState(state => {
+					const index = state.fileList.indexOf(file);
+					const newFileList = state.fileList.slice();
+					newFileList.splice(index, 1);
+					return {
+						fileList: newFileList,
+					};
+				});
+			},
+			beforeUpload: file => {
+				this.setState(state => ({
+					fileList: [...state.fileList, file],
+				}));
+				return false;
+			},
+			fileList,
+			multiple: true,
+			accept: ".pdf"
+		};
 
-		if (jobCreated) {
-			// Put a loading spinner here or something
-			console.log(createdID);
-
-			return <Redirect to={{ pathname: '/job-results', search: '?justifications=true?IDs=' + createdID }} />
-		}
+		if (jobCreated)
+			return <Redirect to={{ pathname: '/job-results', search: '?justifications=true?IDs=' + createdID }} />;
 		else
 			return (
 				<div className={Style.newJobFormContainer}>
@@ -597,28 +681,63 @@ class NewJobForm extends Component {
 						<div style={{ display: 'inline-block' }}>
 							<h5>
 								General Info
-								<Button className={Style.resetButton} onClick={() => this.infoReset()} type="default" >
+								<Button className={Style.resetButtonInfo} onClick={() => this.infoReset()} type="default" >
 									<Icon style={{ position: 'relative', bottom: 3 }} type="undo" />
-									Reset
+									{windowWidth >= 385 ?
+										<span>Reset</span>
+										:
+										null
+									}
 								</Button>
+								<Upload {...uploadProps} fileList={fileList}>
+									<Button className={Style.uploadButton} style={{ marginLeft: -20 }} type="primary" ghost>
+										<Icon style={{ position: 'relative', bottom: 3 }} type="upload" />
+										{windowWidth >= 385 ?
+											<span>Upload PDFs</span>
+											:
+											<span>Upload</span>
+										}
+									</Button>
+								</Upload>
 							</h5>
 						</div>
 						<Row gutter={20}>
 							<Col span={12}>
-								<Form.Item label="Job Name:" style={{ marginBottom: -5 }}>
+								<Form.Item
+									style={{ marginBottom: -5 }}
+									label={
+										<>
+											<span>Job Name:</span>
+											<Popover content={jobNameInfo} title="Job Name" placement="bottom">
+												<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 8, bottom: -2 }} type="info-circle" />
+											</Popover>
+										</>
+									}
+								>
 									{getFieldDecorator('jobName', {
-										rules: [{ required: true, message: 'Please input a job name' }],
+										rules: [{ required: fileList.length === 0, message: 'Please input a job name' }],
 										initialValue: cookies.get('jobName') || "Setting Advice",
 									})(
 										<Input
 											className={Style.formItemInput}
 											prefix={<Icon type="edit" style={{ color: 'rgba(0,0,0,.25)' }} />}
+											disabled={fileList.length > 0}
 										/>,
 									)}
 								</Form.Item>
 							</Col>
 							<Col span={12}>
-								<Form.Item label="Ruleset:" style={{ marginBottom: -5 }}>
+								<Form.Item
+									style={{ marginBottom: -5 }}
+									label={
+										<>
+											<span>Ruleset:</span>
+											<Popover content={rulesetInfo} title="Ruleset" placement="bottom">
+												<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 8, bottom: -2 }} type="info-circle" />
+											</Popover>
+										</>
+									}
+								>
 									{getFieldDecorator('ruleset', {
 										rules: [{ required: true, message: 'Please choose a ruleset' }],
 										initialValue: cookies.get('ruleset') || "T24",
@@ -633,7 +752,17 @@ class NewJobForm extends Component {
 						</Row>
 						<Row gutter={20}>
 							<Col span={12}>
-								<Form.Item label="Quality Mode:" style={{ marginBottom: -5 }}>
+								<Form.Item
+									style={{ marginBottom: -5 }}
+									label={
+										<>
+											<span>Quality Mode:</span>
+											<Popover content={qualityModeInfo} title="Quality Mode" placement="bottom">
+												<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 8, bottom: -2 }} type="info-circle" />
+											</Popover>
+										</>
+									}
+								>
 									{getFieldDecorator('qualityMode', {
 										rules: [{ required: true }],
 										initialValue: cookies.get('qualityMode') || "Quality",
@@ -646,7 +775,17 @@ class NewJobForm extends Component {
 								</Form.Item>
 							</Col>
 							<Col span={12}>
-								<Form.Item label="Press Unwinder Brand:" style={{ marginBottom: -5 }}>
+								<Form.Item
+									style={{ marginBottom: -5 }}
+									label={
+										<>
+											<span>Press Unwinder Brand:</span>
+											<Popover content={pressUnwinderBrandInfo} title="Press Unwinder Brand" placement="bottom">
+												<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 8, bottom: -2 }} type="info-circle" />
+											</Popover>
+										</>
+									}
+								>
 									{getFieldDecorator('pressUnwinderBrand', {
 										rules: [{ required: true }],
 										initialValue: cookies.get('pressUnwinderBrand') || "EMT",
@@ -659,30 +798,51 @@ class NewJobForm extends Component {
 								</Form.Item>
 							</Col>
 						</Row>
-						<Form.Item style={{ marginBottom: -5 }} label="PDF Max Coverage:">
+						<Form.Item
+							style={{ marginBottom: -5 }}
+							label={
+								<>
+									<span>PDF Max Coverage:</span>
+									<Popover content={maxCoverageInfo} title="PDF Max Coverage" placement="bottom">
+										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 8, bottom: -2 }} type="info-circle" />
+									</Popover>
+								</>
+							}
+						>
 							{getFieldDecorator('maxCoverage', {
-								rules: [{ required: true }],
+								rules: [{ required: fileList.length === 0 }],
 								initialValue: parseInt(cookies.get('maxCoverage')) || 50,
 							})(
 								<div style={{ display: 'flex', marginBottom: '-10px' }} >
 									<Slider
 										className={Style.formItemInput}
-										style={{ width: 'calc(100% - 152px)', marginRight: 15 }}
+										style={{ width: 'calc(100% - 122px)', marginRight: 15 }}
 										min={0}
 										max={100}
 										onChange={(e) => this.onSliderChange(e, "maxCoverage")}
 										value={maxCoverage}
+										disabled={fileList.length > 0}
 									/>
 									<BetterInputNumber
 										addonAfter="%"
 										value={maxCoverage}
 										field="maxCoverage"
 										onSliderChange={this.onSliderChange}
+										disabled={fileList.length > 0}
 									/>
 								</div>
 							)}
 						</Form.Item>
-						<Form.Item label="Optical Density:">
+						<Form.Item
+							label={
+								<>
+									<span>Optical Density:</span>
+									<Popover content={opticalDensityInfo} title="Optical Density" placement="bottom">
+										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 8, bottom: -2 }} type="info-circle" />
+									</Popover>
+								</>
+							}
+						>
 							{getFieldDecorator('opticalDensity', {
 								rules: [{ required: true }],
 								initialValue: parseInt(cookies.get('opticalDensity')) || 100,
@@ -690,7 +850,7 @@ class NewJobForm extends Component {
 								<div style={{ display: 'flex', marginBottom: '-10px' }} >
 									<Slider
 										className={Style.formItemInput}
-										style={{ width: 'calc(100% - 152px)', marginRight: 15 }}
+										style={{ width: 'calc(100% - 122px)', marginRight: 15 }}
 										step={5}
 										min={0}
 										max={100}
@@ -698,6 +858,7 @@ class NewJobForm extends Component {
 										value={opticalDensity}
 									/>
 									<BetterInputNumber
+										step={5}
 										addonAfter="%"
 										value={opticalDensity}
 										field="opticalDensity"
@@ -707,10 +868,11 @@ class NewJobForm extends Component {
 							)}
 						</Form.Item>
 
-						<div style={{ display: 'inline-block', width: '100%' }}>
+						<div style={{
+							display: 'inline-block', width: 'calc(100% + 1px)'}}>
 							<h5>
 								Paper Selection
-								<Button className={Style.resetButton} onClick={() => this.paperReset()} type="default" >
+								<Button className={Style.resetButtonPaper} onClick={() => this.paperReset()} type="default" >
 									<Icon style={{ position: 'relative', bottom: 3 }} type="undo" />
 									Reset
 								</Button>
@@ -724,7 +886,7 @@ class NewJobForm extends Component {
 								{!unknownPaper ?
 									<Select
 										className={Style.formItemPaper}
-										style={{ maxWidth: 175, postition: 'relative', bottom: 2 }}
+										style={{ maxWidth: 178, postition: 'relative', bottom: 2 }}
 										onChange={(val) => this.handlePrevPaper(val)}
 										dropdownMatchSelectWidth={false}
 										placeholder="Recent papers"
@@ -736,7 +898,18 @@ class NewJobForm extends Component {
 								}
 							</h5>
 						</div>
-						<Form.Item label="Mfr:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						<Form.Item
+							{...paperFormItemLayout}
+							style={{ marginBottom: 0 }}
+							label={
+								<>
+									<span>Mfr:</span>
+									<Popover content={paperMfrInfo} title="Manufacturer" placement="bottom">
+										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 37, bottom: -2 }} type="info-circle" />
+									</Popover>
+								</>
+							}
+						>
 							{getFieldDecorator('manufacturer', {
 								rules: [{ required: !paperNameMfrDisabled, message: 'Please select a manufacturer' }],
 							})(
@@ -757,7 +930,18 @@ class NewJobForm extends Component {
 								</Select>
 							)}
 						</Form.Item>
-						<Form.Item label="Name:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						<Form.Item
+							{...paperFormItemLayout}
+							style={{ marginBottom: 0 }}
+							label={
+								<>
+									<span>Name:</span>
+									<Popover content={paperNameInfo} title="Product Name" placement="bottom">
+										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 22, bottom: -2 }} type="info-circle" />
+									</Popover>
+								</>
+							}
+						>
 							{getFieldDecorator('productname', {
 								rules: [{ required: !paperNameMfrDisabled, message: 'Please select a paper' }],
 							})(
@@ -778,7 +962,18 @@ class NewJobForm extends Component {
 							)}
 						</Form.Item>
 
-						<Form.Item label="Type:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						<Form.Item
+							{...paperFormItemLayout}
+							style={{ marginBottom: 0 }}
+							label={
+								<>
+									<span>Type:</span>
+									<Popover content={paperTypeInfo} title="Paper Type" placement="bottom">
+										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 30, bottom: -2 }} type="info-circle" />
+									</Popover>
+								</>
+							}
+						>
 							{getFieldDecorator('papertype', {
 								rules: [{ required: true, message: 'Please choose a paper type' }],
 							})(
@@ -793,7 +988,18 @@ class NewJobForm extends Component {
 								</Radio.Group>
 							)}
 						</Form.Item>
-						<Form.Item label="Sub-Type:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						<Form.Item
+							{...paperFormItemLayout}
+							style={{ marginBottom: 0 }}
+							label={
+								<>
+									<span>Sub-Type:</span>
+									<Popover content={paperSubTypeInfo} title="Paper Sub-Type" placement="bottom">
+										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 12, bottom: -2 }} type="info-circle" />
+									</Popover>
+								</>
+							}
+						>
 							{getFieldDecorator('papersubtype')(
 								<Radio.Group
 									className={Style.formItemPaper}
@@ -806,7 +1012,18 @@ class NewJobForm extends Component {
 								</Radio.Group>
 							)}
 						</Form.Item>
-						<Form.Item label="Weight:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						<Form.Item
+							{...paperFormItemLayout}
+							style={{ marginBottom: 0 }}
+							label={
+								<>
+									<span>Weight:</span>
+									<Popover content={paperWeightInfo} title="Paper Weight" placement="bottom">
+										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 15, bottom: -2 }} type="info-circle" />
+									</Popover>
+								</>
+							}
+						>
 							{getFieldDecorator('weightgsm', {
 								rules: [{ required: true, message: 'Please choose a weight in gsm' }],
 								initialValue: weightgsm || null
@@ -845,7 +1062,18 @@ class NewJobForm extends Component {
 									</>
 							)}
 						</Form.Item>
-						<Form.Item label="Finish:" {...paperFormItemLayout} style={{ marginBottom: 0 }}>
+						<Form.Item
+							{...paperFormItemLayout}
+							style={{ marginBottom: 0 }}
+							label={
+								<>
+									<span>Finish:</span>
+									<Popover content={paperFinishInfo} title="Paper Finish" placement="bottom">
+										<Icon style={{ fontSize: 18, color: 'dodgerblue', position: 'relative', left: 24, bottom: -2 }} type="info-circle" />
+									</Popover>
+								</>
+							}
+						>
 							{getFieldDecorator('finish', {
 								rules: [{ required: true, message: 'Please choose a finish' }],
 							})(
@@ -869,6 +1097,15 @@ class NewJobForm extends Component {
 							</Button>
 						</div>
 					</Form>
+
+					{/* Modal for show progress of PDF submission. */}
+					{showSubmitModal === true ?
+						<Modal title="Uploading Job(s)" visible={showSubmitModal} footer={null}>
+							<JobUpload fileList={fileList} formValues={formValues} />
+						</Modal>
+						:
+						null
+					}
 				</div>
 			);
 	}
