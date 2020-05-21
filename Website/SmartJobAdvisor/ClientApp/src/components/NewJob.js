@@ -672,7 +672,7 @@ class NewJobForm extends Component {
 		};
 
 		if (jobCreated && error != true)
-			if (createdID.match(/undefined/i))
+			if (createdID.toLowerCase().indexOf("undefined") !== -1)
 				return <Redirect to={{ pathname: '/job-results', search: '?justifications=true?IDs=' + createdID }} />;
 			else
 				this.fetchError("generate job(s)", "The SJA Engine probably does not yet recognize the selected paper.")
