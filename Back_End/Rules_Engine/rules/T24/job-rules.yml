@@ -175,8 +175,8 @@ actions:
   - "job.setRewinder(1 * 0.7);"
   - "job.setDescription('DryerZone', job.setValue('Dryer Zone', 1) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
   - "job.setDescription('PrintZone', job.setValue('Print Zone', 1) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
-  - "job.setDescription('Unwinder', job.setValue('Unwinder', 0.5) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
-  - "job.setDescription('Rewinder', job.setValue('Rewinder', 0.5) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Unwinder', job.setValue('Unwinder', 0.7) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Rewinder', job.setValue('Rewinder', 0.7) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
 ---
 name: "HNK-Medium"
 description: "Set tension value when Unwinder is HNK and Weight Class is Medium"
@@ -189,8 +189,8 @@ actions:
   - "job.setRewinder(1.25 * 0.8);"
   - "job.setDescription('DryerZone', job.setValue('Dryer Zone', 1.25) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
   - "job.setDescription('PrintZone', job.setValue('Print Zone', 1.25) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
-  - "job.setDescription('Unwinder', job.setValue('Unwinder', 0.625) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
-  - "job.setDescription('Rewinder', job.setValue('Rewinder', 0.625) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Unwinder', job.setValue('Unwinder', 1) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Rewinder', job.setValue('Rewinder', 1) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
 ---
 name: "HNK-High"
 description: "Set tension value when Unwinder is HNK and Weight Class is High"
@@ -203,8 +203,8 @@ actions:
   - "job.setRewinder(1.5 * 1);"
   - "job.setDescription('DryerZone', job.setValue('Dryer Zone', 1.5) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
   - "job.setDescription('PrintZone', job.setValue('Print Zone', 1.5) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
-  - "job.setDescription('Unwinder', job.setValue('Unwinder', 0.75) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
-  - "job.setDescription('Rewinder', job.setValue('Rewinder', 0.75) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Unwinder', job.setValue('Unwinder', 1.5) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
+  - "job.setDescription('Rewinder', job.setValue('Rewinder', 1.5) + job.setInitReason('unwinder', job.getUnwinder()) + job.setSubReason('weight class', job.getWeightClass()));"
 ---
 name: "Set-Dryer-Power"
 description: "Set Dryer Power value"
