@@ -180,7 +180,6 @@ public class Job {
         this.Enhancer = choice;
     }
 
-
 	// Function for checking if paper type requires bonding agent
 	public boolean checkValidPaperType() {
 		if (this.paperType.equals("PaperThatNeedsBA")) {
@@ -196,39 +195,10 @@ public class Job {
 		else
 			this.CoverageClass = "Light";
 	}
-
-
-    //Value Reducer
-    private double Reducer(double variable, double value){
-            //Change double type to BigDecimal type
-            BigDecimal var = new BigDecimal(String.valueOf(variable));
-            BigDecimal val = new BigDecimal(String.valueOf(value));
-
-            //Perform subtraction
-            var = var.subtract(val);
-
-            //Return result
-            return var.doubleValue();
-    }
-
-    public void DryerZoneReduce(double value){
-        setDryerZone(Reducer(this.DryerZone, value));
-    }
-
-    public void PrintZoneReduce(double value){
-        setPrintZone(Reducer(this.PrintZone, value));
-    }
-
-    public void RewinderReduce(double value){
-        setRewinder(Reducer(this.Rewinder_out, value));
-    }
-
-    public void UnwinderReduce(double value){
-        setUnwinder(Reducer(this.Unwinder_out, value));
-    }
-
+    
     public void setTargetSpeed() throws Exception{
         //Host URL for the JSON file
+        // URL "YourDomain:8000/Your_endpoint_for_rules_folder"
         String host_url = "http://ec2-35-163-184-27.us-west-2.compute.amazonaws.com:8080/rules/" + ruleclass + "/";
         //Getting JSON files
         URL TargetSpeed_JSON = new URL(host_url + "TargetSpeed.json");
@@ -269,6 +239,7 @@ public class Job {
 
     public void setDryerPower() throws Exception{
         //Host URL for the JSON file
+        // URL "YourDomain:8000/Your_endpoint_for_rules_folder"
         String host_url = "http://ec2-35-163-184-27.us-west-2.compute.amazonaws.com:8080/rules/" + ruleclass + "/";
         //Getting JSON files
         URL dryerpower_JSON= new URL(host_url + "DryerPower.json");
@@ -305,6 +276,35 @@ public class Job {
             //setDryerPower(getCoverageClass() + getWeightClass() + coat_compare+getqualityMode());
         }
     setDescription("DryerPower", setValue("Dryer power", DryerPower) + setInitReason("coverage class", CoverageClass) + setSubReason("weight class", WeightClass) +setSubReason("coating class", CoatingClass) + setSubReason("quality mode", qualityMode));
+    }
+
+    //Value Reducer
+    private double Reducer(double variable, double value){
+            //Change double type to BigDecimal type
+            BigDecimal var = new BigDecimal(String.valueOf(variable));
+            BigDecimal val = new BigDecimal(String.valueOf(value));
+
+            //Perform subtraction
+            var = var.subtract(val);
+
+            //Return result
+            return var.doubleValue();
+    }
+
+    public void DryerZoneReduce(double value){
+        setDryerZone(Reducer(this.DryerZone, value));
+    }
+
+    public void PrintZoneReduce(double value){
+        setPrintZone(Reducer(this.PrintZone, value));
+    }
+
+    public void RewinderReduce(double value){
+        setRewinder(Reducer(this.Rewinder_out, value));
+    }
+
+    public void UnwinderReduce(double value){
+        setUnwinder(Reducer(this.Unwinder_out, value));
     }
 
     //Description builder

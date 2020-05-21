@@ -42,11 +42,7 @@ By default, both server is point to each other from our domain. You can update t
 Your_Domain:8080/serving_folder_path_name/
 ```
 
-in file
-
-```
-TestProject/src/main/java/sample/Launcher.java
-```
+in file [Launcher.java](TestProject/src/main/java/sample/Launcher.java) and [Job.java](TestProject/src/main/java/sample/Job.java)  
 
 ## Deploy Locally
 
