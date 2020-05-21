@@ -580,7 +580,7 @@ class NewJobForm extends Component {
 	};
 
 	/* Called when there is an error in a fetch call. */
-	fetchError = (type) => {
+	fetchError = (type, description = "The server is probably down. Try again later.") => {
 		this.alertPresent = false;
 
 		/* This is for debouncing, so the alert doesn't appear twice. */
@@ -589,7 +589,7 @@ class NewJobForm extends Component {
 
 			notification['error']({
 				message: 'Failed to ' + type + '.',
-				description: "The server is probably down. Try again later.",
+				description: description,
 				duration: null
 			});
 
@@ -628,6 +628,7 @@ class NewJobForm extends Component {
 			fileList,
 			jobCreated,
 			createdID,
+			error,
 			showSubmitModal,
 			formValues,
 			windowWidth,
@@ -670,8 +671,11 @@ class NewJobForm extends Component {
 			accept: ".pdf"
 		};
 
-		if (jobCreated)
-			return <Redirect to={{ pathname: '/job-results', search: '?justifications=true?IDs=' + createdID }} />;
+		if (jobCreated && error != true)
+			if (createdID.match(/undefined/i))
+				return <Redirect to={{ pathname: '/job-results', search: '?justifications=true?IDs=' + createdID }} />;
+			else
+				this.fetchError("generate job(s)", "The SJA Engine probably does not yet recognize the selected paper.")
 		else
 			return (
 				<div className={Style.newJobFormContainer}>
