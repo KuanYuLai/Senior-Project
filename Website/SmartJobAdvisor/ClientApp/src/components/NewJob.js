@@ -312,13 +312,13 @@ class NewJobForm extends Component {
 			/* Set a minimum value, but only for opticalDensity slider. */
 			if (val < 50 && field === "opticalDensity")
 				val = 50;
-			else if (val < 1 && field === "maxCoverage")
+			else if (val < 1 && (field === "maxCoverage" || field === "weightgsm"))
 				val = 1;
 		}
 
 		/* Apply the value to both the form and state. */
-		setFieldsValue({ [field]: val });
-		this.setState({ [field]: val });
+		setFieldsValue({ [field]: parseInt(val) });
+		this.setState({ [field]: parseInt(val) });
 	};
 
 	/* Called when the paper manufacturer is changed.
@@ -545,6 +545,9 @@ class NewJobForm extends Component {
 			if (!err) {
 				/* This is here so the values of the form can be seen in the console for debugging. */
 				console.log('Received values of form: ', values);
+
+				/* Force weightgsm to be an int on the off chance it's passed as a string. */
+				values.weightgsm = parseInt(values.weightgsm);
 
 				/* Set cookies for next time. */
 				this.setCookies(values);
